@@ -1,5 +1,5 @@
-#ifndef INCLUDE_EPOCH_FRONTEND_H__
-#define INCLUDE_EPOCH_FRONTEND_H__
+#ifndef INCLUDE_EPOCH_FRONTEND_H_
+#define INCLUDE_EPOCH_FRONTEND_H_
 
 #include "../../src/Application.h"
 

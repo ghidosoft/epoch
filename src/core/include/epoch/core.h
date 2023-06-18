@@ -1,5 +1,5 @@
-#ifndef INCLUDE_EPOCH_CORE_H__
-#define INCLUDE_EPOCH_CORE_H__
+#ifndef INCLUDE_EPOCH_CORE_H_
+#define INCLUDE_EPOCH_CORE_H_
 
 namespace epoch
 {

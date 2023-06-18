@@ -1,7 +1,7 @@
 add_library(epoch_zxspectrum
     "include/epoch/zxspectrum.h"
 
-    "src/ZX80Cpu.cpp" "src/ZX80Cpu.h"
+    "src/Z80Cpu.cpp" "src/Z80Cpu.h"
     "src/ZXSpectrumEmulator.cpp" "src/ZXSpectrumEmulator.h"
 )
 
