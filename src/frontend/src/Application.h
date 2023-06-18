@@ -6,6 +6,7 @@
 namespace epoch
 {
     class Emulator;
+    class Window;
 
     class Application final
     {
@@ -24,6 +25,8 @@ namespace epoch
 
     private:
         std::shared_ptr<Emulator> m_emulator{};
+
+        std::unique_ptr<Window> m_window{};
     };
 }
 
