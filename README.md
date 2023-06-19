@@ -2,14 +2,11 @@
 
 This is a ZX Spectrum 48K emulator written from scratch in C++.
 
-## Repository
+## Build
 
-This project uses git submodules for dependencies.
-```bash
-git submodule update --init --recursive
-```
+This project uses CMake. Works on Windows (Visual Studio 2022) and Ubuntu 22.04.
 
-## Ubuntu 22.04 build
+### Ubuntu 22.04 build
 
 ```bash
 # Build tools
