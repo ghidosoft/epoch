@@ -2,7 +2,7 @@
 
 namespace epoch
 {
-    Emulator::~Emulator()
-    {
-    }
+    Emulator::Emulator() = default;
+
+    Emulator::~Emulator() = default;
 }

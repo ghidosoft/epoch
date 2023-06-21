@@ -6,6 +6,7 @@ namespace epoch
     class Emulator
     {
     public:
+        Emulator();
         virtual ~Emulator();
 
     public:
