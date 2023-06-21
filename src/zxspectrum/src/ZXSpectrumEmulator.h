@@ -30,8 +30,8 @@ namespace epoch::zxspectrum
         void clock() override;
         void reset() override;
 
-        uint8_t cpuRead(uint16_t address);
-        void cpuWrite(uint16_t address, uint8_t value);
+        uint8_t busRead(uint16_t address);
+        void busWrite(uint16_t address, uint8_t value);
 
     private:
         const std::unique_ptr<Z80Cpu> m_cpu;
@@ -41,6 +41,8 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 8> m_ram{};
 
         std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
+
+        uint8_t m_floatingBusValue;
     };
 }
 

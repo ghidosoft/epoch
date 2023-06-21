@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include <epoch/core.h>
+
 #include "Window.h"
 
 namespace epoch
@@ -18,9 +20,11 @@ namespace epoch
 
     int Application::run()
     {
+        m_emulator->reset();
         while (m_window->nextFrame())
         {
-            // TODO: simulation
+            // TODO: simulate an entire frame
+            m_emulator->clock();
             // TODO: render
         }
         return 0;

@@ -2,10 +2,7 @@
 
 namespace epoch::zxspectrum
 {
-    Z80Cpu::Z80Cpu()
-    {
-        reset();
-    }
+    Z80Cpu::Z80Cpu() = default;
 
     void Z80Cpu::clock()
     {
