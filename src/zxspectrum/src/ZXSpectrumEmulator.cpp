@@ -1,5 +1,7 @@
 #include "ZXSpectrumEmulator.h"
 
+#include "Z80Cpu.h"
+
 namespace epoch::zxspectrum
 {
     static Color defaultColors[] = {
@@ -21,4 +23,20 @@ namespace epoch::zxspectrum
         {0xff, 0xff, 0xff},
     };
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
+
+    ZXSpectrumEmulator::ZXSpectrumEmulator() : m_cpu{ std::make_unique<Z80Cpu>() }
+    {
+    }
+
+    ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
+
+    void ZXSpectrumEmulator::clock()
+    {
+        m_cpu->clock();
+    }
+
+    void ZXSpectrumEmulator::reset()
+    {
+        m_cpu->reset();
+    }
 }

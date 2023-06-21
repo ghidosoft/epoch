@@ -14,6 +14,10 @@ namespace epoch
         Emulator(Emulator&& other) noexcept = delete;
         Emulator& operator=(const Emulator& other) = delete;
         Emulator& operator=(Emulator&& other) noexcept = delete;
+
+    public:
+        virtual void reset() = 0;
+        virtual void clock() = 0;
     };
 }
 

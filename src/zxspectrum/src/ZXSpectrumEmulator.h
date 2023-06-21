@@ -2,11 +2,14 @@
 #define SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_H_
 
 #include <array>
+#include <memory>
 
 #include <epoch/core.h>
 
 namespace epoch::zxspectrum
 {
+    class Z80Cpu;
+
     class ZXSpectrumEmulator : public Emulator
     {
     public:
@@ -19,11 +22,23 @@ namespace epoch::zxspectrum
 
         static const Palette DefaultPalette;
 
+    public:
+        ZXSpectrumEmulator();
+        ~ZXSpectrumEmulator() override;
+
+    public:
+        void clock() override;
+        void reset() override;
+
+        uint8_t cpuRead(uint16_t address);
+        void cpuWrite(uint16_t address, uint8_t value);
+
     private:
+        const std::unique_ptr<Z80Cpu> m_cpu;
+
         using MemoryBank = std::array<uint8_t, 0x4000>;
         MemoryBank m_rom48k{};
-        // MemoryBank m_rom128k{};
-        std::array<MemoryBank, 10> m_ram{};
+        std::array<MemoryBank, 8> m_ram{};
 
         std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
     };
