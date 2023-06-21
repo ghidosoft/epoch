@@ -3,7 +3,7 @@
 
 int main()
 {
-    std::shared_ptr<epoch::Emulator> emulator{ std::make_unique<epoch::ZXSpectrumEmulator>() };
+    const std::shared_ptr<epoch::Emulator> emulator{ std::make_shared<epoch::zxspectrum::ZXSpectrumEmulator>() };
     epoch::Application application{ emulator };
     return application.run();
 }

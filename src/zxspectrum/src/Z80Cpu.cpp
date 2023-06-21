@@ -1,6 +1,6 @@
 #include "Z80Cpu.h"
 
-namespace epoch
+namespace epoch::zxspectrum
 {
     Z80Cpu::Z80Cpu()
     {
