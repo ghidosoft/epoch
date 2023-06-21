@@ -42,7 +42,7 @@ namespace epoch::zxspectrum
 
         std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
 
-        uint8_t m_floatingBusValue;
+        uint8_t m_floatingBusValue{};
     };
 }
 

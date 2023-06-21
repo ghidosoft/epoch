@@ -19,7 +19,7 @@ namespace epoch
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_TRUE);
 
-        m_window = glfwCreateWindow((256 + 96) * 3, (192 + 48 + 56) * 3, info.name.c_str(), nullptr, nullptr);
+        m_window = glfwCreateWindow(info.width * 3, info.height * 3, info.name.c_str(), nullptr, nullptr);
         if (m_window == nullptr)
         {
             throw std::runtime_error("Cannot create GLFW window.");

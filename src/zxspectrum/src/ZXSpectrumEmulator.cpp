@@ -24,7 +24,9 @@ namespace epoch::zxspectrum
     };
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
 
-    ZXSpectrumEmulator::ZXSpectrumEmulator() : m_cpu{ std::make_unique<Z80Cpu>() }
+    ZXSpectrumEmulator::ZXSpectrumEmulator() :
+        Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
+        m_cpu{std::make_unique<Z80Cpu>()}
     {
     }
 

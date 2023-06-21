@@ -8,8 +8,11 @@ namespace epoch
 {
     Application::Application(std::shared_ptr<Emulator> emulator) : m_emulator{ std::move(emulator) }
     {
+        const auto& emulatorInfo = m_emulator->info();
         m_window = std::make_unique<Window>(WindowInfo{
-            .name = "Epoch - ZX Spectrum emulator"
+            .name = "Epoch emulator: " + emulatorInfo.name,
+            .width = emulatorInfo.width,
+            .height = emulatorInfo.height,
         });
     }
 

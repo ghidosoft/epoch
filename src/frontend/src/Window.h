@@ -10,6 +10,8 @@ namespace epoch
     struct WindowInfo
     {
         std::string name;
+        int width;
+        int height;
     };
 
     class Window final

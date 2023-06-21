@@ -1,12 +1,21 @@
 #ifndef SRC_EPOCH_CORE_EMULATOR_H_
 #define SRC_EPOCH_CORE_EMULATOR_H_
 
+#include <string>
+
 namespace epoch
 {
+    struct EmulatorInfo
+    {
+        std::string name;
+        int width;
+        int height;
+    };
+
     class Emulator
     {
     public:
-        Emulator();
+        explicit Emulator(EmulatorInfo info);
         virtual ~Emulator();
 
     public:
@@ -18,6 +27,12 @@ namespace epoch
     public:
         virtual void reset() = 0;
         virtual void clock() = 0;
+
+    public:
+        [[nodiscard]] const EmulatorInfo& info() const;
+
+    protected:
+        const EmulatorInfo m_info;
     };
 }
 
