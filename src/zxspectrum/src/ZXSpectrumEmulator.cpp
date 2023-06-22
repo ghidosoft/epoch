@@ -39,6 +39,12 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::clock()
     {
         m_cpu->clock();
+
+        // TODO: test only
+        static uint16_t index = 0;
+        for (auto x = 0; x < 16; x++)
+            busWrite(0x4000 + index++, 0x55);
+        if (index >= 6144) index = 0;
     }
 
     void ZXSpectrumEmulator::reset()
@@ -110,18 +116,28 @@ namespace epoch::zxspectrum
                 }
                 else
                 {
-                    const auto attribute = vramRead(0x5800 + (((y - BorderTop) >> 3) << 5) + ((x - BorderLeft) >> 3));
-                    // TODO: read vram (pixel)
-                    // TODO: flash
-                    const auto pixel = x % 2 == 0;
+                    const auto xPixel = (x - BorderLeft);
+                    const auto yPixel = (y - BorderTop);
+
+                    uint16_t pixelAddress = 0x4000;
+                    pixelAddress |= (xPixel >> 3) & 0b11111;
+                    pixelAddress |= (yPixel & 0b00000111) << 8;
+                    pixelAddress |= (yPixel & 0b00111000) << 2;
+                    pixelAddress |= (yPixel & 0b11000000) << 5;
+                    const auto pixelData = vramRead(pixelAddress);
+                    const bool pixel = (pixelData >> (xPixel & 0b111)) & 0x01;
+
+                    const auto attribute = vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
+
                     auto paper = (attribute >> 3) & 0x07;
                     auto ink = attribute & 0x07;
-                    const auto bright = attribute & 0x40;
+                    const bool bright = attribute & 0x40;
                     if (bright)
                     {
                         paper += 0x08;
                         ink += 0x08;
                     }
+                    // TODO: flash
                     color = DefaultPalette.map(pixel ? paper : ink);
                 }
 
