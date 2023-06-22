@@ -29,7 +29,7 @@ namespace epoch
         virtual void reset() = 0;
         virtual void clock() = 0;
 
-        [[nodiscard]] virtual std::span<const uint8_t> screenBuffer() = 0;
+        [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
     public:
         [[nodiscard]] const EmulatorInfo& info() const;

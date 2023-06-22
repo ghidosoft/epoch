@@ -121,9 +121,9 @@ namespace epoch::frontend
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
-    void GraphicContext::updateScreen(const std::span<const uint8_t> buffer)
+    void GraphicContext::updateScreen(const std::span<const uint32_t> buffer)
     {
-        assert(buffer.size() == static_cast<std::size_t>(m_screenWidth) * m_screenHeight * 4);
+        assert(buffer.size() == static_cast<std::size_t>(m_screenWidth) * m_screenHeight);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());

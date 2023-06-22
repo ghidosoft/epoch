@@ -13,12 +13,12 @@ namespace epoch::zxspectrum
     class ZXSpectrumEmulator : public Emulator
     {
     public:
-        static constexpr int ScreenWidth = 256;
-        static constexpr int ScreenHeight = 192;
-        static constexpr int BorderLeft = 48;
-        static constexpr int BorderRight = 48;
-        static constexpr int BorderTop = 48;
-        static constexpr int BorderBottom = 56;
+        static constexpr std::size_t ScreenWidth = 256;
+        static constexpr std::size_t ScreenHeight = 192;
+        static constexpr std::size_t BorderLeft = 48;
+        static constexpr std::size_t BorderRight = 48;
+        static constexpr std::size_t BorderTop = 48;
+        static constexpr std::size_t BorderBottom = 56;
 
         static const Palette DefaultPalette;
 
@@ -27,14 +27,20 @@ namespace epoch::zxspectrum
         ~ZXSpectrumEmulator() override;
 
     public:
+        ZXSpectrumEmulator(const ZXSpectrumEmulator& other) = delete;
+        ZXSpectrumEmulator(ZXSpectrumEmulator&& other) noexcept = delete;
+        ZXSpectrumEmulator& operator=(const ZXSpectrumEmulator& other) = delete;
+        ZXSpectrumEmulator& operator=(ZXSpectrumEmulator&& other) noexcept = delete;
+
+    public:
         void clock() override;
         void reset() override;
 
         uint8_t busRead(uint16_t address);
         void busWrite(uint16_t address, uint8_t value);
-        uint8_t vramRead(uint16_t address);
+        [[nodiscard]] uint8_t vramRead(uint16_t address) const;
 
-        [[nodiscard]] std::span<const uint8_t> screenBuffer() override;
+        [[nodiscard]] std::span<const uint32_t> screenBuffer() override;
 
     private:
         const std::unique_ptr<Z80Cpu> m_cpu;
@@ -44,7 +50,7 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 8> m_ram{};
 
         std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_borderBuffer{};
-        std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom) * 4> m_screenBuffer{};
+        std::array<uint32_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
 
         uint8_t m_floatingBusValue{};
     };

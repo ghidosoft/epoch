@@ -87,19 +87,19 @@ namespace epoch::zxspectrum
         }
     }
 
-    uint8_t ZXSpectrumEmulator::vramRead(uint16_t address)
+    uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const
     {
         // TODO: allow switching bank for 128K spectrums
         return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
     }
 
-    std::span<const uint8_t> ZXSpectrumEmulator::screenBuffer()
+    std::span<const uint32_t> ZXSpectrumEmulator::screenBuffer()
     {
         std::size_t source = 0;
         std::size_t dest = 0;
-        for (auto y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
+        for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
         {
-            for (auto x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
+            for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
             {
                 Color color;
                 if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
@@ -134,10 +134,7 @@ namespace epoch::zxspectrum
                 }
 
                 source++;
-                m_screenBuffer[dest++] = color.r;
-                m_screenBuffer[dest++] = color.g;
-                m_screenBuffer[dest++] = color.b;
-                m_screenBuffer[dest++] = color.a;
+                m_screenBuffer[dest++] = color.rgba;
             }
         }
         return m_screenBuffer;

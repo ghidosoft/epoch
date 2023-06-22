@@ -24,7 +24,7 @@ namespace epoch::frontend
 
     public:
         void init(int screenWidth, int screenHeight);
-        void updateScreen(std::span<const uint8_t> buffer);
+        void updateScreen(std::span<const uint32_t> buffer);
         void renderScreen();
 
     private:
