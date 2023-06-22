@@ -6,6 +6,11 @@
 namespace epoch
 {
     class Emulator;
+}
+
+namespace epoch::frontend
+{
+    class GraphicContext;
     class Window;
 
     class Application final
@@ -24,9 +29,14 @@ namespace epoch
         int run();
 
     private:
+        void render();
+        void renderGui();
+
+    private:
         std::shared_ptr<Emulator> m_emulator{};
 
         std::unique_ptr<Window> m_window{};
+        std::unique_ptr<GraphicContext> m_context{};
     };
 }
 

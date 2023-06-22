@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-namespace epoch
+namespace epoch::frontend
 {
     Window::Window(const WindowInfo& info)
     {

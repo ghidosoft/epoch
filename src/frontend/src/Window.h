@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-namespace epoch
+namespace epoch::frontend
 {
     struct WindowInfo
     {

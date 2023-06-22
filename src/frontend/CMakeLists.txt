@@ -2,6 +2,7 @@ add_library(epoch_frontend
     "include/epoch/frontend.h"
 
     "src/Application.cpp" "src/Application.h"
+    "src/GraphicContext.cpp" "src/GraphicContext.h"
     "src/Window.cpp" "src/Window.h"
 )
 

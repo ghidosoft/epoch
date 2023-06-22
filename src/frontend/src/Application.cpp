@@ -2,9 +2,10 @@
 
 #include <epoch/core.h>
 
+#include "GraphicContext.h"
 #include "Window.h"
 
-namespace epoch
+namespace epoch::frontend
 {
     Application::Application(std::shared_ptr<Emulator> emulator) : m_emulator{ std::move(emulator) }
     {
@@ -14,22 +15,36 @@ namespace epoch
             .width = emulatorInfo.width,
             .height = emulatorInfo.height,
         });
+        m_context = std::make_unique<GraphicContext>();
     }
 
     Application::~Application()
     {
+        m_context = nullptr;
         m_window = nullptr;
     }
 
     int Application::run()
     {
+        m_context->init(1, 2);
         m_emulator->reset();
         while (m_window->nextFrame())
         {
-            // TODO: simulate an entire frame
+            // TODO: simulate an entire frame (or sync with audio?)
             m_emulator->clock();
-            // TODO: render
+            render();
         }
         return 0;
+    }
+
+    void Application::render()
+    {
+        m_context->renderScreen();
+
+        renderGui();
+    }
+
+    void Application::renderGui()
+    {
     }
 }
