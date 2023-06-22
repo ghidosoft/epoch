@@ -30,9 +30,8 @@ namespace epoch::zxspectrum
         Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
         m_cpu{std::make_unique<Z80Cpu>()}
     {
-        // TODO: test code only
-        for (auto i = 0; i < m_screenBuffer.size(); i++)
-            m_screenBuffer[i] = i & 0x0f;
+        for (auto i = 0; i < 768; i++)
+            busWrite(0x5800 + i, i % 2 == 0 ? 98 : 32);
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
@@ -90,17 +89,49 @@ namespace epoch::zxspectrum
         }
     }
 
+    uint8_t ZXSpectrumEmulator::vramRead(uint16_t address)
+    {
+        // TODO: allow switching bank for 128K spectrums
+        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
+    }
+
     std::span<const uint8_t> ZXSpectrumEmulator::screenBuffer()
     {
-        std::size_t i = 0;
-        for (const auto c : m_screenBuffer)
+        std::size_t source = 0;
+        std::size_t dest = 0;
+        for (auto y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
         {
-            const auto color = DefaultPalette.map(c);
-            m_rgbaBuffer[i++] = color.r;
-            m_rgbaBuffer[i++] = color.g;
-            m_rgbaBuffer[i++] = color.b;
-            m_rgbaBuffer[i++] = color.a;
+            for (auto x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
+            {
+                Color color;
+                if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
+                {
+                    color = DefaultPalette.map(m_borderBuffer[source]);
+                }
+                else
+                {
+                    const auto attribute = vramRead(0x5800 + (((y - BorderTop) >> 3) << 5) + ((x - BorderLeft) >> 3));
+                    // TODO: read vram (pixel)
+                    // TODO: flash
+                    const auto pixel = x % 2 == 0;
+                    auto paper = (attribute >> 3) & 0x07;
+                    auto ink = attribute & 0x07;
+                    const auto bright = attribute & 0x40;
+                    if (bright)
+                    {
+                        paper += 0x08;
+                        ink += 0x08;
+                    }
+                    color = DefaultPalette.map(pixel ? paper : ink);
+                }
+
+                source++;
+                m_screenBuffer[dest++] = color.r;
+                m_screenBuffer[dest++] = color.g;
+                m_screenBuffer[dest++] = color.b;
+                m_screenBuffer[dest++] = color.a;
+            }
         }
-        return m_rgbaBuffer;
+        return m_screenBuffer;
     }
 }

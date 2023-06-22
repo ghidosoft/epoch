@@ -32,6 +32,7 @@ namespace epoch::zxspectrum
 
         uint8_t busRead(uint16_t address);
         void busWrite(uint16_t address, uint8_t value);
+        uint8_t vramRead(uint16_t address);
 
         [[nodiscard]] std::span<const uint8_t> screenBuffer() override;
 
@@ -42,8 +43,8 @@ namespace epoch::zxspectrum
         MemoryBank m_rom48k{};
         std::array<MemoryBank, 8> m_ram{};
 
-        std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
-        std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom) * 4> m_rgbaBuffer{};
+        std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_borderBuffer{};
+        std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom) * 4> m_screenBuffer{};
 
         uint8_t m_floatingBusValue{};
     };
