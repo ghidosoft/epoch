@@ -31,7 +31,7 @@ namespace epoch::zxspectrum
         m_cpu{std::make_unique<Z80Cpu>()}
     {
         for (auto i = 0; i < 768; i++)
-            busWrite(0x5800 + i, i % 2 == 0 ? 98 : 32);
+            busWrite(0x5800 + i, 0b00111000);
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
@@ -125,7 +125,7 @@ namespace epoch::zxspectrum
                     pixelAddress |= (yPixel & 0b00111000) << 2;
                     pixelAddress |= (yPixel & 0b11000000) << 5;
                     const auto pixelData = vramRead(pixelAddress);
-                    const bool pixel = (pixelData >> (xPixel & 0b111)) & 0x01;
+                    const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
 
                     const auto attribute = vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
 
@@ -138,7 +138,7 @@ namespace epoch::zxspectrum
                         ink += 0x08;
                     }
                     // TODO: flash
-                    color = DefaultPalette.map(pixel ? paper : ink);
+                    color = DefaultPalette.map(pixel ? ink : paper);
                 }
 
                 source++;
