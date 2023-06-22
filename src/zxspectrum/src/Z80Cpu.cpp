@@ -10,6 +10,11 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::reset()
     {
-        m_programCounter = 0;
+        m_registers = {};
+    }
+
+    Z80Registers& Z80Cpu::registers()
+    {
+        return m_registers;
     }
 }
