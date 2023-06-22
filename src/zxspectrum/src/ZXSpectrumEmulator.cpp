@@ -30,8 +30,6 @@ namespace epoch::zxspectrum
         Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
         m_cpu{std::make_unique<Z80Cpu>()}
     {
-        for (auto i = 0; i < 768; i++)
-            busWrite(0x5800 + i, 0b00111000);
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
@@ -39,12 +37,6 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::clock()
     {
         m_cpu->clock();
-
-        // TODO: test only
-        static uint16_t index = 0;
-        for (auto x = 0; x < 16; x++)
-            busWrite(0x4000 + index++, 0x55);
-        if (index >= 6144) index = 0;
     }
 
     void ZXSpectrumEmulator::reset()
