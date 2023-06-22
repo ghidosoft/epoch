@@ -2,6 +2,38 @@
 
 #include <cstdint>
 
+#include "Shader.h"
+
+static const char* VERTEX_SHADER = R"GLSL(
+#version 330 core
+
+layout (location = 0) in vec2 inPos;
+layout (location = 1) in vec2 inTexCoords;
+
+out vec2 passTexCoords;
+
+void main()
+{
+    gl_Position = vec4(inPos.x, inPos.y, 0.0, 1.0);
+    passTexCoords = inTexCoords;
+}
+)GLSL";
+
+static const char* FRAGMENT_SHADER = R"GLSL(
+#version 330 core
+
+uniform sampler2D mainTexture;
+
+in vec2 passTexCoords;
+
+out vec4 outFragColor;
+
+void main()
+{
+    outFragColor = texture(mainTexture, passTexCoords);
+}
+)GLSL";
+
 namespace epoch::frontend
 {
     struct Vertex
@@ -12,6 +44,8 @@ namespace epoch::frontend
 
     GraphicContext::GraphicContext()
     {
+        glClearColor(0.f, 0.f, 0.f, 0.f);
+
         glGenVertexArrays(1, &m_vao);
         glGenBuffers(1, &m_vertexBuffer);
         glGenBuffers(1, &m_indexBuffer);
@@ -24,7 +58,9 @@ namespace epoch::frontend
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        // TODO: shader
+        m_shader = std::make_unique<Shader>(VERTEX_SHADER, FRAGMENT_SHADER);
+        m_shader->bind();
+        m_shader->setUniformTexture("mainTexture", 0);
     }
 
     GraphicContext::~GraphicContext()
@@ -33,18 +69,17 @@ namespace epoch::frontend
         if (m_vertexBuffer) glDeleteBuffers(1, &m_vertexBuffer);
         if (m_indexBuffer) glDeleteBuffers(1, &m_indexBuffer);
         if (m_screenTexture) glDeleteTextures(1, &m_screenTexture);
+        m_shader = nullptr;
     }
 
-    void GraphicContext::init(const int screenWidth, const int screenHeight)
+    void GraphicContext::init(const float screenWidth, const float screenHeight)
     {
-        glClearColor(0.f, 0.f, 0.f, 0.f);
-
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
         const Vertex quadVertices[] = {
-            { {-1, -1}, {0.f, static_cast<float>(screenWidth) / 512.f} },
-            { { 1, -1}, {1.f, static_cast<float>(screenHeight) / 512.f} },
+            { {-1, -1}, {0.f, screenWidth / 512.f} },
+            { { 1, -1}, {1.f, screenHeight / 512.f} },
             { { 1,  1}, {1.f, 0.f} },
             { {-1,  1}, {0.f, 0.f} },
         };
@@ -74,7 +109,7 @@ namespace epoch::frontend
         glClear(GL_COLOR_BUFFER_BIT);
 
         glBindVertexArray(m_vao);
-        // TODO: bind shader
+        m_shader->bind();
         glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
         glActiveTexture(GL_TEXTURE0);

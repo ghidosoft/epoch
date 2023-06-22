@@ -26,7 +26,7 @@ namespace epoch::frontend
 
     int Application::run()
     {
-        m_context->init(1, 2);
+        m_context->init(m_emulator->info().width, m_emulator->info().height);
         m_emulator->reset();
         while (m_window->nextFrame())
         {
