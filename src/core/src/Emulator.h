@@ -1,6 +1,7 @@
 #ifndef SRC_EPOCH_CORE_EMULATOR_H_
 #define SRC_EPOCH_CORE_EMULATOR_H_
 
+#include <span>
 #include <string>
 
 namespace epoch
@@ -27,6 +28,8 @@ namespace epoch
     public:
         virtual void reset() = 0;
         virtual void clock() = 0;
+
+        [[nodiscard]] virtual std::span<const uint8_t> screenBuffer() = 0;
 
     public:
         [[nodiscard]] const EmulatorInfo& info() const;

@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+#include <cassert>
 #include <sstream>
 #include <stdexcept>
 
@@ -8,6 +9,7 @@ namespace epoch::frontend
     ShaderModule::ShaderModule(const GLenum shaderType, const std::string_view source)
     {
         m_handle = glCreateShader(shaderType);
+        assert(m_handle);
         compile(source);
     }
 
@@ -57,6 +59,7 @@ namespace epoch::frontend
     Shader::Shader(const std::string_view vertex, const std::string_view fragment)
     {
         m_handle = glCreateProgram();
+        assert(m_handle);
         const ShaderModule vertexModule{ GL_VERTEX_SHADER, vertex };
         const ShaderModule fragmentModule{ GL_FRAGMENT_SHADER, fragment };
         link(vertexModule, fragmentModule);

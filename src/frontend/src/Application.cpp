@@ -32,6 +32,7 @@ namespace epoch::frontend
         {
             // TODO: simulate an entire frame (or sync with audio?)
             m_emulator->clock();
+            m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
         return 0;

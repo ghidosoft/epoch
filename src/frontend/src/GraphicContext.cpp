@@ -1,5 +1,6 @@
 #include "GraphicContext.h"
 
+#include <cassert>
 #include <cstdint>
 
 #include "Shader.h"
@@ -47,9 +48,13 @@ namespace epoch::frontend
         glClearColor(0.f, 0.f, 0.f, 0.f);
 
         glGenVertexArrays(1, &m_vao);
+        assert(m_vao);
         glGenBuffers(1, &m_vertexBuffer);
+        assert(m_vertexBuffer);
         glGenBuffers(1, &m_indexBuffer);
+        assert(m_indexBuffer);
         glGenTextures(1, &m_screenTexture);
+        assert(m_screenTexture);
 
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -72,15 +77,29 @@ namespace epoch::frontend
         m_shader = nullptr;
     }
 
-    void GraphicContext::init(const float screenWidth, const float screenHeight)
+    void GraphicContext::init(const int screenWidth, const int screenHeight)
     {
+        assert(screenWidth > 0);
+        assert(screenHeight > 0);
+        m_screenWidth = screenWidth;
+        m_screenHeight = screenHeight;
+
+        // TODO: calculate from screen size
+        m_screenTextureWidth = 512;
+        m_screenTextureHeight = 512;
+
+        glBindTexture(GL_TEXTURE_2D, m_screenTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenTextureWidth, m_screenTextureHeight,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
         const Vertex quadVertices[] = {
-            { {-1, -1}, {0.f, screenWidth / 512.f} },
-            { { 1, -1}, {1.f, screenHeight / 512.f} },
-            { { 1,  1}, {1.f, 0.f} },
+            { {-1, -1}, {0.f, static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight)} },
+            { { 1, -1}, {static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth), static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight)} },
+            { { 1,  1}, {static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth), 0.f} },
             { {-1,  1}, {0.f, 0.f} },
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
@@ -97,8 +116,18 @@ namespace epoch::frontend
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
+        glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    void GraphicContext::updateScreen(const std::span<const uint8_t> buffer)
+    {
+        assert(buffer.size() == static_cast<std::size_t>(m_screenWidth) * m_screenHeight * 4);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_screenTexture);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void GraphicContext::renderScreen()
@@ -108,13 +137,16 @@ namespace epoch::frontend
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(m_vao);
-        m_shader->bind();
-        glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
+
+        glBindVertexArray(m_vao);
+        m_shader->bind();
+        // glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        glUseProgram(0);
+        glBindVertexArray(0);
     }
 }

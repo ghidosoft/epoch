@@ -30,6 +30,9 @@ namespace epoch::zxspectrum
         Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
         m_cpu{std::make_unique<Z80Cpu>()}
     {
+        // TODO: test code only
+        for (auto i = 0; i < m_screenBuffer.size(); i++)
+            m_screenBuffer[i] = i & 0x0f;
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
@@ -85,5 +88,19 @@ namespace epoch::zxspectrum
             // TODO: allow switching bank for 128K spectrums
             m_ram[0][address & 0x3fff] = m_floatingBusValue = value;
         }
+    }
+
+    std::span<const uint8_t> ZXSpectrumEmulator::screenBuffer()
+    {
+        std::size_t i = 0;
+        for (const auto c : m_screenBuffer)
+        {
+            const auto color = DefaultPalette.map(c);
+            m_rgbaBuffer[i++] = color.r;
+            m_rgbaBuffer[i++] = color.g;
+            m_rgbaBuffer[i++] = color.b;
+            m_rgbaBuffer[i++] = color.a;
+        }
+        return m_rgbaBuffer;
     }
 }
