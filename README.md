@@ -2,12 +2,14 @@
 
 This is a ZX Spectrum 48K emulator written from scratch in C++.
 
+Rendering is done using GLFW and OpenGL Core 4.1.
+
 ## Features
 - WIP
 
 ## Build
 
-This project uses CMake. Works on Windows (Visual Studio 2022) and Ubuntu 22.04.
+This project uses CMake. Tested on Windows (Visual Studio 2022) and GNU/Linux (Ubuntu 22.04).
 
 ### Ubuntu 22.04 build
 
