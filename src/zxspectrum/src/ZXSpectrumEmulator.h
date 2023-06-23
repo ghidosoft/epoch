@@ -24,6 +24,7 @@
 
 namespace epoch::zxspectrum
 {
+    class Ula;
     class Z80Cpu;
 
     class ZXSpectrumEmulator : public Emulator
@@ -59,6 +60,7 @@ namespace epoch::zxspectrum
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override;
 
     private:
+        const std::unique_ptr<Ula> m_ula;
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
         uint64_t m_frameCounter{};

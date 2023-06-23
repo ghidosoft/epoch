@@ -16,6 +16,7 @@
 
 #include "ZXSpectrumEmulator.h"
 
+#include "Ula.h"
 #include "Z80Cpu.h"
 
 namespace epoch::zxspectrum
@@ -44,6 +45,7 @@ namespace epoch::zxspectrum
 
     ZXSpectrumEmulator::ZXSpectrumEmulator() :
         Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
+        m_ula{std::make_unique<Ula>()},
         m_cpu{std::make_unique<Z80Cpu>()}
     {
     }
@@ -52,12 +54,14 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::clock()
     {
+        m_ula->clock();
         m_cpu->clock();
         m_clockCounter++;
     }
 
     void ZXSpectrumEmulator::reset()
     {
+        m_ula->reset();
         m_cpu->reset();
         m_clockCounter = 0;
         m_frameCounter = 0;
