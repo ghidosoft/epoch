@@ -44,6 +44,8 @@ namespace epoch::zxspectrum
 
     private:
         const std::unique_ptr<Z80Cpu> m_cpu;
+        uint64_t m_clockCounter{};
+        uint64_t m_frameCounter{};
 
         using MemoryBank = std::array<uint8_t, 0x4000>;
         MemoryBank m_rom48k{};

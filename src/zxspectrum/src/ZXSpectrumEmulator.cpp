@@ -37,11 +37,14 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::clock()
     {
         m_cpu->clock();
+        m_clockCounter++;
     }
 
     void ZXSpectrumEmulator::reset()
     {
         m_cpu->reset();
+        m_clockCounter = 0;
+        m_frameCounter = 0;
     }
 
     uint8_t ZXSpectrumEmulator::busRead(const uint16_t address)
@@ -129,8 +132,8 @@ namespace epoch::zxspectrum
                         paper += 0x08;
                         ink += 0x08;
                     }
-                    // TODO: flash
-                    color = DefaultPalette.map(pixel ? ink : paper);
+                    const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10); // every 16 frames
+                    color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
                 }
 
                 source++;

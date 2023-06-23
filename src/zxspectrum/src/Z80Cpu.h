@@ -5,48 +5,48 @@
 
 namespace epoch::zxspectrum
 {
-    union WordRegister
-    {
-        uint16_t value;
-        struct
-        {
-            // TODO: endianness
-            uint8_t low;
-            uint8_t high;
-        };
-    };
-
-    union Flags
-    {
-        struct
-        {
-            // TODO: endianness
-            bool c : 1;
-            bool n : 1;
-            bool p : 1;
-            bool x : 1;
-            bool h : 1;
-            bool y : 1;
-            bool z : 1;
-            bool s : 1;
-        };
-        uint8_t value;
-    };
-
-    union WordFlagsRegister
-    {
-        uint16_t value;
-        struct
-        {
-            // TODO: endianness
-            uint8_t low;
-            uint8_t high;
-        };
-        Flags flags;
-    };
-
     struct Z80Registers
     {
+        union WordRegister
+        {
+            uint16_t value;
+            struct
+            {
+                // TODO: endianness
+                uint8_t low;
+                uint8_t high;
+            };
+        };
+
+        union Flags
+        {
+            struct
+            {
+                // TODO: endianness
+                bool c : 1;
+                bool n : 1;
+                bool p : 1;
+                bool x : 1;
+                bool h : 1;
+                bool y : 1;
+                bool z : 1;
+                bool s : 1;
+            };
+            uint8_t value;
+        };
+
+        union WordFlagsRegister
+        {
+            uint16_t value;
+            struct
+            {
+                // TODO: endianness
+                uint8_t low;
+                uint8_t high;
+            };
+            Flags flags;
+        };
+
         // PC Program counter
         uint16_t pc{0x0000};
         // SP Stack pointer
