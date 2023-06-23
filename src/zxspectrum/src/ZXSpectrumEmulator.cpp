@@ -19,6 +19,8 @@
 #include "Ula.h"
 #include "Z80Cpu.h"
 
+#include <cstring>
+
 namespace epoch::zxspectrum
 {
     static constexpr uint8_t darkColor = 0xd9;
@@ -48,6 +50,20 @@ namespace epoch::zxspectrum
         m_ula{std::make_unique<Ula>()},
         m_cpu{std::make_unique<Z80Cpu>()}
     {
+        // Assembled with https://www.asm80.com/
+        // TODO: remove this simple ROM test
+        static const uint8_t bytes[] = {
+            0x11, 0x00, 0x40,   // LD   de, 16384
+            0x3E, 0xFF,         // LD   a, 255
+            0x06, 0x08,         // LD   b, 8
+            // loop:
+            0x12,               // LD   (de), a
+            0x14,               // INC  d
+            0x10, 0xFC,         // DJNZ loop
+            // main:
+            0x18, 0xFE,         // JR   main
+        };
+        std::memcpy(m_rom48k.data(), bytes, sizeof(bytes));
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
