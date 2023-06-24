@@ -1,5 +1,7 @@
 # Epoch: ZX Spectrum emulator
 
+![CMakeBadge](https://github.com/ghidosoft/epoch/actions/workflows/cmake.yml/badge.svg)
+
 This is a ZX Spectrum 48K emulator written from scratch in C++.
 
 Rendering is done using GLFW and OpenGL Core 4.1.
