@@ -23,44 +23,34 @@ namespace epoch::zxspectrum
 {
     struct Z80Registers
     {
-        union WordRegister
+        struct WordRegister
         {
             uint16_t value;
-            struct
-            {
-                // TODO: endianness
-                uint8_t low;
-                uint8_t high;
-            };
+            [[nodiscard]] uint8_t low() const { return value & 0xff; }
+            [[nodiscard]] uint8_t high() const { return (value >> 8) & 0xff; }
+            void low(const uint8_t v) { value = (value & 0xff00) | v; }
+            void high(const uint8_t v) { value = (value & 0x00ff) | static_cast<uint16_t>(v << 8); }
         };
 
-        union Flags
+        struct WordFlagsRegister : WordRegister
         {
-            struct
-            {
-                // TODO: endianness
-                bool c : 1;
-                bool n : 1;
-                bool p : 1;
-                bool x : 1;
-                bool h : 1;
-                bool y : 1;
-                bool z : 1;
-                bool s : 1;
-            };
-            uint8_t value;
-        };
+            [[nodiscard]] bool s() const { return value & 0b10000000; }
+            [[nodiscard]] bool z() const { return value & 0b01000000; }
+            [[nodiscard]] bool y() const { return value & 0b00100000; }
+            [[nodiscard]] bool h() const { return value & 0b00010000; }
+            [[nodiscard]] bool x() const { return value & 0b00001000; }
+            [[nodiscard]] bool p() const { return value & 0b00000100; }
+            [[nodiscard]] bool n() const { return value & 0b00000010; }
+            [[nodiscard]] bool c() const { return value & 0b00000001; }
 
-        union WordFlagsRegister
-        {
-            uint16_t value;
-            struct
-            {
-                // TODO: endianness
-                uint8_t low;
-                uint8_t high;
-            };
-            Flags flags;
+            void s(const bool f) { value = (value & ~0b10000000) | static_cast<uint16_t>(f << 7); }
+            void z(const bool f) { value = (value & ~0b01000000) | static_cast<uint16_t>(f << 6); }
+            void y(const bool f) { value = (value & ~0b00100000) | static_cast<uint16_t>(f << 5); }
+            void h(const bool f) { value = (value & ~0b00010000) | static_cast<uint16_t>(f << 4); }
+            void x(const bool f) { value = (value & ~0b00001000) | static_cast<uint16_t>(f << 3); }
+            void p(const bool f) { value = (value & ~0b00000100) | static_cast<uint16_t>(f << 2); }
+            void n(const bool f) { value = (value & ~0b00000010) | static_cast<uint16_t>(f << 1); }
+            void c(const bool f) { value = (value & ~0b00000001) | static_cast<uint16_t>(f << 0); }
         };
 
         // PC Program counter
@@ -68,18 +58,18 @@ namespace epoch::zxspectrum
         // SP Stack pointer
         uint16_t sp{0xffff};
         // IX Index X
-        WordRegister ix{0xffff};
+        uint16_t ix{0xffff};
         // IY Index Y
-        WordRegister iy{0xffff};
+        uint16_t iy{0xffff};
         // IR Interrupt/Refresh register
         WordRegister ir{0x00ff};
         // AF Accumulator and flags
         WordFlagsRegister af{0xffff};
-        // BC generale purpose
+        // BC General purpose
         WordRegister bc{0xffff};
-        // DE generale purpose
+        // DE General purpose
         WordRegister de{0xffff};
-        // HL generale purpose
+        // HL General purpose
         WordRegister hl{0xffff};
         // AF shadow
         WordFlagsRegister af2{0xffff};
