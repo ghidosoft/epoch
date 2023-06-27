@@ -54,31 +54,31 @@ namespace epoch::zxspectrum
         };
 
         // PC Program counter
-        uint16_t pc{0x0000};
+        uint16_t pc{};
         // SP Stack pointer
-        uint16_t sp{0xffff};
+        uint16_t sp{};
         // IX Index X
-        uint16_t ix{0xffff};
+        uint16_t ix{};
         // IY Index Y
-        uint16_t iy{0xffff};
+        uint16_t iy{};
         // IR Interrupt/Refresh register
-        WordRegister ir{0x00ff};
+        WordRegister ir{};
         // AF Accumulator and flags
-        WordFlagsRegister af{0xffff};
+        WordFlagsRegister af{};
         // BC General purpose
-        WordRegister bc{0xffff};
+        WordRegister bc{};
         // DE General purpose
-        WordRegister de{0xffff};
+        WordRegister de{};
         // HL General purpose
-        WordRegister hl{0xffff};
+        WordRegister hl{};
         // AF shadow
-        WordFlagsRegister af2{0xffff};
+        WordFlagsRegister af2{};
         // BC shadow
-        WordRegister bc2{0xfff};
+        WordRegister bc2{};
         // DE shadow
-        WordRegister de2{0xffff};
+        WordRegister de2{};
         // HL shadow
-        WordRegister hl2{0xffff};
+        WordRegister hl2{};
     };
 
     class Z80Cpu final
@@ -91,6 +91,7 @@ namespace epoch::zxspectrum
         void reset();
 
         Z80Registers& registers();
+        [[nodiscard]] const Z80Registers& registers() const;
 
     private:
         Z80Registers m_registers{};

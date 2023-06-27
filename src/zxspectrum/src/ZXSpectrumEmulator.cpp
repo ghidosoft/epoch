@@ -71,6 +71,7 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::clock()
     {
         m_ula->clock();
+        // TODO: check if CPU is stalled by ULA (memory contention)
         m_cpu->clock();
         m_clockCounter++;
     }

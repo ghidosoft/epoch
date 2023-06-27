@@ -33,4 +33,9 @@ namespace epoch::zxspectrum
     {
         return m_registers;
     }
+
+    const Z80Registers& Z80Cpu::registers() const
+    {
+        return m_registers;
+    }
 }
