@@ -16,14 +16,23 @@
 
 #include "Z80Cpu.h"
 
+#include <sstream>
+
 #include "Z80Config.inc.h"
 
 namespace epoch::zxspectrum
 {
     Z80Cpu::Z80Cpu()
     {
-        Z80CONFIG;
-        // TODO: parse config and generate instructions
+        std::istringstream is{ Z80CONFIG };
+        std::string line;
+        while (std::getline(is, line))
+        {
+            if (!line.empty() && line[0] != '#')
+            {
+                // TODO: parse config and generate instructions
+            }
+        }
     }
 
     void Z80Cpu::clock()
