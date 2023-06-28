@@ -16,9 +16,15 @@
 
 #include "Z80Cpu.h"
 
+#include "Z80Config.inc.h"
+
 namespace epoch::zxspectrum
 {
-    Z80Cpu::Z80Cpu() = default;
+    Z80Cpu::Z80Cpu()
+    {
+        Z80CONFIG;
+        // TODO: parse config and generate instructions
+    }
 
     void Z80Cpu::clock()
     {
