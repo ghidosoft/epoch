@@ -53,8 +53,6 @@ namespace epoch::zxspectrum
         void clock() override;
         void reset() override;
 
-        uint8_t busRead(uint16_t address);
-        void busWrite(uint16_t address, uint8_t value);
         [[nodiscard]] uint8_t vramRead(uint16_t address) const;
 
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override;
@@ -71,8 +69,6 @@ namespace epoch::zxspectrum
 
         std::array<uint8_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_borderBuffer{};
         std::array<uint32_t, (ScreenWidth + BorderLeft + BorderRight) * (ScreenHeight + BorderTop + BorderBottom)> m_screenBuffer{};
-
-        uint8_t m_floatingBusValue{};
     };
 }
 

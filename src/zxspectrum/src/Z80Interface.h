@@ -14,37 +14,19 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_ULA_H_
-#define SRC_EPOCH_ZXSPECTRUM_ULA_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_H_
+#define SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_H_
 
-#include <array>
-
-#include "Z80Interface.h"
+#include <cstdint>
 
 namespace epoch::zxspectrum
 {
-    class Ula final : public Z80Interface
+    class Z80Interface
     {
     public:
-        using MemoryBank = std::array<uint8_t, 0x4000>;
-
-        Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram);
-
-    public:
-        void clock();
-        void reset();
-
-        uint8_t read(uint16_t address) override;
-        void write(uint16_t address, uint8_t value) override;
-
-        [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
-
-    private:
-        MemoryBank& m_rom48k;
-        std::array<MemoryBank, 8>& m_ram;
-
-        uint8_t m_floatingBusValue{};
-        int m_cpuStalled{};
+        virtual ~Z80Interface() = default;
+        virtual uint8_t read(uint16_t address) = 0;
+        virtual void write(uint16_t address, uint8_t value) = 0;
     };
 }
 

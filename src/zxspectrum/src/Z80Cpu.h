@@ -17,7 +17,11 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_Z80CPU_H_
 #define SRC_EPOCH_ZXSPECTRUM_Z80CPU_H_
 
+#include <array>
 #include <cstdint>
+#include <istream>
+
+#include "Z80Interface.h"
 
 namespace epoch::zxspectrum
 {
@@ -81,10 +85,15 @@ namespace epoch::zxspectrum
         WordRegister hl2{};
     };
 
+    struct Z80Instruction
+    {
+        std::string mnemonic;
+    };
+
     class Z80Cpu final
     {
     public:
-        Z80Cpu();
+        explicit Z80Cpu(Z80Interface& bus);
 
     public:
         void clock();
@@ -95,6 +104,12 @@ namespace epoch::zxspectrum
 
     private:
         Z80Registers m_registers{};
+        uint8_t m_machineCycle{};
+        int m_remainingCycles{};
+
+        std::array<Z80Instruction, 256> m_instructions{};
+
+        Z80Interface& m_bus;
     };
 }
 
