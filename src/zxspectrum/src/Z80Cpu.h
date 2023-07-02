@@ -20,6 +20,7 @@
 #include <array>
 #include <cstdint>
 #include <istream>
+#include <vector>
 
 #include "Z80Interface.h"
 
@@ -85,9 +86,15 @@ namespace epoch::zxspectrum
         WordRegister hl2{};
     };
 
+    enum class Z80MachineCycle
+    {
+        opcode,
+    };
+
     struct Z80Instruction
     {
         std::string mnemonic;
+        std::vector<Z80MachineCycle> machineCycles;
     };
 
     class Z80Cpu final

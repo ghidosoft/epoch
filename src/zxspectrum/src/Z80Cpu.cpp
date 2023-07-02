@@ -17,12 +17,20 @@
 #include "Z80Cpu.h"
 
 #include <cassert>
+#include <optional>
 #include <sstream>
 
 #include "Z80Config.inc.h"
 
 namespace epoch::zxspectrum
 {
+    static std::optional<Z80MachineCycle> parseMachineCycle(const std::string& s)
+    {
+        if (s == "op") return Z80MachineCycle::opcode;
+        if (s == "-") return {};
+        throw std::runtime_error("Invalid machine cycle");
+    }
+
     Z80Cpu::Z80Cpu(Z80Interface& bus) : m_bus{ bus }
     {
         std::istringstream is{ Z80CONFIG };
@@ -34,14 +42,18 @@ namespace epoch::zxspectrum
             {
                 std::istringstream is{ line };
                 uint32_t op;
-                std::string m1, m2, m3, m4, m5, m6, mnemonic, op1, op2;
+                std::vector<Z80MachineCycle> machineCycles{};
+                std::string mnemonic, op1, op2;
                 is >> std::hex >> op;
-                is >> m1;
-                is >> m2;
-                is >> m3;
-                is >> m4;
-                is >> m5;
-                is >> m6;
+                for (auto i = 0; i < 6; i++)
+                {
+                    std::string m;
+                    is >> m;
+                    if (const auto mc = parseMachineCycle(m); mc.has_value())
+                    {
+                        machineCycles.push_back(mc.value());
+                    }
+                }
                 is >> mnemonic;
                 is >> op1;
                 is >> op2;
@@ -50,6 +62,7 @@ namespace epoch::zxspectrum
                 assert(op <= 0xff);
                 m_instructions[op] = {
                     .mnemonic = mnemonic,
+                    .machineCycles = machineCycles,
                 };
             }
         }
@@ -68,8 +81,11 @@ namespace epoch::zxspectrum
         case 0:
             const auto value = m_bus.read(m_registers.pc++);
             m_remainingCycles = 4;
-            m_machineCycle++;
             const auto& instruction = m_instructions[value];
+            if (instruction.machineCycles.size() > 1)
+            {
+                m_machineCycle++;
+            }
             break;
         }
 
