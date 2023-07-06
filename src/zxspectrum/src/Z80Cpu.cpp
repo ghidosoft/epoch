@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <optional>
+#include <span>
 #include <sstream>
 
 #include "Z80Config.inc.h"
@@ -27,8 +28,36 @@ namespace epoch::zxspectrum
     static std::optional<Z80MachineCycle> parseMachineCycle(const std::string& s)
     {
         if (s == "op") return Z80MachineCycle::opcode;
+        if (s == "mr") return Z80MachineCycle::memRead;
+        if (s == "mw") return Z80MachineCycle::memRead;
+        if (s == "ior") return Z80MachineCycle::ioRead;
+        if (s == "iow") return Z80MachineCycle::ioWrite;
         if (s == "-") return {};
         throw std::runtime_error("Invalid machine cycle");
+    }
+
+    static Z80InstructionType parseInstructionType(const std::string& s)
+    {
+        if (s == "LD") return Z80InstructionType::LD;
+        return Z80InstructionType::custom;
+    }
+
+    static Z80Operand parseOperand(const std::string& s)
+    {
+        if (s == "AF") return Z80Operand::af;
+        if (s == "BC") return Z80Operand::bc;
+        if (s == "DE") return Z80Operand::de;
+        if (s == "HL") return Z80Operand::hl;
+        if (s == "A") return Z80Operand::a;
+        if (s == "B") return Z80Operand::b;
+        if (s == "C") return Z80Operand::c;
+        if (s == "D") return Z80Operand::d;
+        if (s == "E") return Z80Operand::e;
+        if (s == "F") return Z80Operand::f;
+        if (s == "n") return Z80Operand::n8;
+        if (s == "nn") return Z80Operand::n16;
+        if (s == "(DE)") return Z80Operand::memDe;
+        return Z80Operand::none;
     }
 
     Z80Cpu::Z80Cpu(Z80Interface& bus) : m_bus{ bus }
@@ -63,6 +92,9 @@ namespace epoch::zxspectrum
                 m_instructions[op] = {
                     .mnemonic = mnemonic,
                     .machineCycles = machineCycles,
+                    .type = parseInstructionType(mnemonic),
+                    .op1 = parseOperand(op1),
+                    .op2 = parseOperand(op2),
                 };
             }
         }
@@ -70,23 +102,65 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::clock()
     {
-        if (m_remainingCycles > 1)
+        if (m_remainingCycles == 0)
         {
-            m_remainingCycles--;
-            return;
-        }
-
-        switch (m_machineCycle)
-        {
-        case 0:
-            const auto value = m_bus.read(m_registers.pc++);
+            m_opcode = m_bus.read(m_registers.pc++);
             m_remainingCycles = 4;
-            const auto& instruction = m_instructions[value];
-            if (instruction.machineCycles.size() > 1)
+
+            if ((m_opcode & 0b11000000) == 0b01000000)
             {
-                m_machineCycle++;
+                const auto dst = (m_opcode & 0b00111000) >> 3;
+                const auto src = (m_opcode & 0b00000111);
+                uint8_t* srcPtr{};
+                uint8_t* dstPtr{};
+                switch (src)
+                {
+                case 0: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1; break;
+                case 1: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value); break;
+                case 2: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1; break;
+                case 3: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value); break;
+                case 4: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1; break;
+                case 5: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value); break;
+                case 7: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1; break;
+                }
+                switch (dst)
+                {
+                case 0: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1; break;
+                case 1: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value); break;
+                case 2: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1; break;
+                case 3: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value); break;
+                case 4: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1; break;
+                case 5: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value); break;
+                case 7: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1; break;
+                }
+                if (src == 0b110)
+                {
+                    if (dst == 0b110)
+                    {
+                        // TODO: HALT
+                    }
+                    else
+                    {
+                        // LD dst, (HL)
+                        m_remainingCycles += 3;
+                        *dstPtr = m_bus.read(m_registers.hl.value);
+                    }
+                }
+                else
+                {
+                    if (dst == 0b110)
+                    {
+                        // LD (HL), src
+                        m_remainingCycles += 3;
+                        m_bus.write(m_registers.hl.value, *srcPtr);
+                    }
+                    else
+                    {
+                        // LD dst, src
+                        *dstPtr = *srcPtr;
+                    }
+                }
             }
-            break;
         }
 
         m_remainingCycles--;
@@ -95,7 +169,6 @@ namespace epoch::zxspectrum
     void Z80Cpu::reset()
     {
         m_registers = {};
-        m_machineCycle = {};
         m_remainingCycles = {};
     }
 

@@ -89,12 +89,48 @@ namespace epoch::zxspectrum
     enum class Z80MachineCycle
     {
         opcode,
+        memRead,
+        memWrite,
+        ioRead,
+        ioWrite,
+        intAck,
+        extra,
+    };
+
+    enum class Z80InstructionType
+    {
+        custom,
+        LD,
+    };
+
+    enum class Z80Operand
+    {
+        none,
+
+        af,
+        bc,
+        de,
+        hl,
+        memDe,
+        n8,
+
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        n16,
     };
 
     struct Z80Instruction
     {
         std::string mnemonic;
         std::vector<Z80MachineCycle> machineCycles;
+        Z80InstructionType type;
+        Z80Operand op1;
+        Z80Operand op2;
+        int totalCycles;
     };
 
     class Z80Cpu final
@@ -111,7 +147,7 @@ namespace epoch::zxspectrum
 
     private:
         Z80Registers m_registers{};
-        uint8_t m_machineCycle{};
+        uint8_t m_opcode{};
         int m_remainingCycles{};
 
         std::array<Z80Instruction, 256> m_instructions{};

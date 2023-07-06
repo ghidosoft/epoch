@@ -3,7 +3,7 @@ static const char* Z80CONFIG = R"TSV(
 00      op      -       -       -       -       -       NOP
 06      op      -       -       -       -       -       LD      B       n
 10      op      -       -       -       -       -       DJNZ    d
-11      op      -       -       -       -       -       LD      DE      nn
+11      op      mr      mr      -       -       -       LD      DE      nn
 12      op      -       -       -       -       -       LD      (DE)    A
 14      op      -       -       -       -       -       INC     D
 18      op      -       -       -       -       -       JR      d
