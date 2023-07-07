@@ -104,15 +104,20 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
-            m_opcode = m_bus.read(m_registers.pc++);
+            if (m_halted)
+            {
+                return;
+            }
+            m_opcode = fetchOpcode();
             m_remainingCycles = 4;
 
             if ((m_opcode & 0b11000000) == 0b01000000)
             {
                 const auto dst = (m_opcode & 0b00111000) >> 3;
                 const auto src = (m_opcode & 0b00000111);
-                uint8_t* srcPtr{};
+                const uint8_t* srcPtr{};
                 uint8_t* dstPtr{};
+                // TODO: endianness
                 switch (src)
                 {
                 case 0: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1; break;
@@ -137,7 +142,8 @@ namespace epoch::zxspectrum
                 {
                     if (dst == 0b110)
                     {
-                        // TODO: HALT
+                        // HALT
+                        m_halted = true;
                     }
                     else
                     {
@@ -170,6 +176,7 @@ namespace epoch::zxspectrum
     {
         m_registers = {};
         m_remainingCycles = {};
+        m_halted = {};
     }
 
     Z80Registers& Z80Cpu::registers()
@@ -180,5 +187,11 @@ namespace epoch::zxspectrum
     const Z80Registers& Z80Cpu::registers() const
     {
         return m_registers;
+    }
+
+    uint8_t Z80Cpu::fetchOpcode()
+    {
+        m_registers.ir.low((m_registers.ir.low() + 1) & 0b01111111);
+        return m_bus.read(m_registers.pc++);
     }
 }

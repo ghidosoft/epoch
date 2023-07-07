@@ -153,6 +153,10 @@ namespace epoch::zxspectrum
         std::array<Z80Instruction, 256> m_instructions{};
 
         Z80Interface& m_bus;
+
+        bool m_halted{};
+
+        uint8_t fetchOpcode();
     };
 }
 
