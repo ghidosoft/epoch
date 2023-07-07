@@ -38,27 +38,27 @@ namespace epoch::zxspectrum
         Z80Cpu sut{ bus };
         sut.reset();
         EXPECT_EQ(sut.registers().pc, 0);
-        EXPECT_EQ(sut.registers().ir.value, 0);
+        EXPECT_EQ(sut.registers().ir, 0);
     }
 
     TEST(Z80Cpu, Opcode01xxxxxx_LD_C_B) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x48 } };
         Z80Cpu sut{ bus };
-        sut.registers().bc.value = 0xaa00;
+        sut.registers().bc = 0xaa00;
         sut.clock();
         sut.clock();
         sut.clock();
         sut.clock();
         EXPECT_EQ(sut.registers().pc, 1);
-        EXPECT_EQ(sut.registers().ir.value, 1);
-        EXPECT_EQ(sut.registers().bc.value, 0xaaaa);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().bc, 0xaaaa);
     }
 
     TEST(Z80Cpu, Opcode01xxxxxx_LD_HL_E) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x73 } };
         Z80Cpu sut{ bus };
-        sut.registers().de.value = 0xbbaa;
-        sut.registers().hl.value = 0x1234;
+        sut.registers().de = 0xbbaa;
+        sut.registers().hl = 0x1234;
         sut.clock();
         sut.clock();
         sut.clock();
@@ -67,15 +67,15 @@ namespace epoch::zxspectrum
         sut.clock();
         sut.clock();
         EXPECT_EQ(sut.registers().pc, 1);
-        EXPECT_EQ(sut.registers().ir.value, 1);
-        EXPECT_EQ(sut.registers().de.value, 0xbbaa);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().de, 0xbbaa);
         EXPECT_EQ(bus.ram()[0x1234], 0xaa);
     }
 
     TEST(Z80Cpu, Opcode01xxxxxx_HALT) {
-        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x76, 0x73 } };
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x76, 0x48 } };
         Z80Cpu sut{ bus };
-        sut.registers().bc.value = 0xaa00;
+        sut.registers().bc = 0xaa00;
         sut.clock();
         sut.clock();
         sut.clock();
@@ -85,7 +85,7 @@ namespace epoch::zxspectrum
         sut.clock();
         sut.clock();
         EXPECT_EQ(sut.registers().pc, 1);
-        EXPECT_EQ(sut.registers().ir.value, 1);
-        EXPECT_EQ(sut.registers().bc.value, 0xaa00);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().bc, 0xaa00);
     }
 }

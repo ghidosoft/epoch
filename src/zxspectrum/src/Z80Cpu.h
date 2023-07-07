@@ -30,11 +30,15 @@ namespace epoch::zxspectrum
     {
         struct WordRegister
         {
-            uint16_t value;
+            WordRegister() = default;
+            WordRegister(const uint16_t value) : value(value) {}
+            uint16_t value{};
             [[nodiscard]] uint8_t low() const { return value & 0xff; }
             [[nodiscard]] uint8_t high() const { return (value >> 8) & 0xff; }
             void low(const uint8_t v) { value = (value & 0xff00) | v; }
             void high(const uint8_t v) { value = (value & 0x00ff) | static_cast<uint16_t>(v << 8); }
+
+            operator uint16_t() const { return value; }
         };
 
         struct WordFlagsRegister : WordRegister
