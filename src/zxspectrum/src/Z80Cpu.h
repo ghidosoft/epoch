@@ -160,6 +160,8 @@ namespace epoch::zxspectrum
 
         bool m_halted{};
 
+        std::array<uint8_t*, 8> m_registersPointers;
+
         uint8_t fetchOpcode();
     };
 }

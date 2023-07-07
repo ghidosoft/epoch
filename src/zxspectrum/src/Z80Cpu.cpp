@@ -18,7 +18,6 @@
 
 #include <cassert>
 #include <optional>
-#include <span>
 #include <sstream>
 
 #include "Z80Config.inc.h"
@@ -60,7 +59,18 @@ namespace epoch::zxspectrum
         return Z80Operand::none;
     }
 
-    Z80Cpu::Z80Cpu(Z80Interface& bus) : m_bus{ bus }
+    Z80Cpu::Z80Cpu(Z80Interface& bus) :
+        m_bus{ bus },
+        m_registersPointers{ // TODO: endianness
+            reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
+            reinterpret_cast<uint8_t*>(&m_registers.bc.value),
+            reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
+            reinterpret_cast<uint8_t*>(&m_registers.de.value),
+            reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1,
+            reinterpret_cast<uint8_t*>(&m_registers.hl.value),
+            nullptr, // (HL)
+            reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+        }
     {
         std::istringstream is{ Z80CONFIG };
 
@@ -113,31 +123,11 @@ namespace epoch::zxspectrum
 
             if ((m_opcode & 0b11000000) == 0b01000000)
             {
+                // LD 8bit / HALT
                 const auto dst = (m_opcode & 0b00111000) >> 3;
                 const auto src = (m_opcode & 0b00000111);
-                const uint8_t* srcPtr{};
-                uint8_t* dstPtr{};
-                // TODO: endianness
-                switch (src)
-                {
-                case 0: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1; break;
-                case 1: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value); break;
-                case 2: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1; break;
-                case 3: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value); break;
-                case 4: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1; break;
-                case 5: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value); break;
-                case 7: srcPtr = reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1; break;
-                }
-                switch (dst)
-                {
-                case 0: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1; break;
-                case 1: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.bc.value); break;
-                case 2: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1; break;
-                case 3: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.de.value); break;
-                case 4: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1; break;
-                case 5: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.hl.value); break;
-                case 7: dstPtr = reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1; break;
-                }
+                const uint8_t* srcPtr = m_registersPointers[src];
+                uint8_t* dstPtr = m_registersPointers[dst];
                 if (src == 0b110)
                 {
                     if (dst == 0b110)
@@ -166,6 +156,10 @@ namespace epoch::zxspectrum
                         *dstPtr = *srcPtr;
                     }
                 }
+            }
+            else if ((m_opcode & 0b11000000) == 0b10000000)
+            {
+                // TODO: ALU operations
             }
         }
 
