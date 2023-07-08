@@ -177,47 +177,23 @@ namespace epoch::zxspectrum
                 switch (operation)
                 {
                 case 0b000:
-                {
                     // ADD
-                    const uint8_t result = a + b;
-                    const auto carry = (a > 0xff - b) ? 1 : 0;
-                    const auto carryIn = result ^ a ^ b;
-                    const auto overflow = (carryIn >> 7) ^ carry;
-                    m_registers.af.high(result);
-                    m_registers.af.n(false);
-                    m_registers.af.c(carry);
-                    m_registers.af.h((carryIn >> 4) & 0x01);
-                    m_registers.af.p(overflow);
-                    m_registers.af.s(result >> 7);
-                    m_registers.af.z(result == 0);
-                }
+                    add8(a, b, 0);
                     break;
                 case 0b001:
-                {
                     // ADC
-                    uint8_t result;
-                    int carry;
-                    if (m_registers.af.c())
-                    {
-                        result = a + b + 1;
-                        carry = (a >= 0xff - b) ? 1 : 0;
-                    }
-                    else
-                    {
-                        result = a + b;
-                        carry = (a > 0xff - b) ? 1 : 0;
-                    }
-                    const auto carryIn = result ^ a ^ b;
-                    const auto overflow = (carryIn >> 7) ^ carry;
-                    m_registers.af.high(result);
-                    m_registers.af.n(false);
-                    m_registers.af.c(carry);
-                    m_registers.af.h((carryIn >> 4) & 0x01);
-                    m_registers.af.p(overflow);
-                    m_registers.af.s(result >> 7);
-                    m_registers.af.z(result == 0);
-                }
-                break;
+                    add8(a, b, m_registers.af.c());
+                    break;
+                case 0b010:
+                    // SUB
+                    add8(a, ~b, 1);
+                    m_registers.af.c(!m_registers.af.c());
+                    break;
+                case 0b011:
+                    // SBC
+                    add8(a, ~b, !m_registers.af.c());
+                    m_registers.af.c(!m_registers.af.c());
+                    break;
                 default:
                     assert(false);
                     break;
@@ -258,5 +234,30 @@ namespace epoch::zxspectrum
     {
         m_registers.ir.low((m_registers.ir.low() + 1) & 0b01111111);
         return m_bus.read(m_registers.pc++);
+    }
+
+    void Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
+    {
+        uint8_t result;
+        int carry;
+        if (carryFlag)
+        {
+            result = a + b + 1;
+            carry = (a >= 0xff - b) ? 1 : 0;
+        }
+        else
+        {
+            result = a + b;
+            carry = (a > 0xff - b) ? 1 : 0;
+        }
+        const auto carryIn = result ^ a ^ b;
+        const auto overflow = (carryIn >> 7) ^ carry;
+        m_registers.af.high(result);
+        m_registers.af.n(false);
+        m_registers.af.c(carry);
+        m_registers.af.h((carryIn >> 4) & 0x01);
+        m_registers.af.p(overflow);
+        m_registers.af.s(result >> 7);
+        m_registers.af.z(result == 0);
     }
 }
