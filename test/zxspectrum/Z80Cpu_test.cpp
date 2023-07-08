@@ -84,6 +84,7 @@ namespace epoch::zxspectrum
         Z80Cpu sut{ bus };
         sut.registers().bc = 0xaa00;
         sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
         sut.clock();
         sut.clock();
         sut.clock();

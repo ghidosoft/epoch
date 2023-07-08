@@ -119,7 +119,6 @@ namespace epoch::zxspectrum
                 return;
             }
             m_opcode = fetchOpcode();
-            m_remainingCycles = 4;
 
             if ((m_opcode & 0b11000000) == 0b01000000)
             {
@@ -138,8 +137,7 @@ namespace epoch::zxspectrum
                     else
                     {
                         // LD dst, (HL)
-                        m_remainingCycles += 3;
-                        *dstPtr = m_bus.read(m_registers.hl.value);
+                        *dstPtr = busRead(m_registers.hl.value);
                     }
                 }
                 else
@@ -147,8 +145,7 @@ namespace epoch::zxspectrum
                     if (dst == 0b110)
                     {
                         // LD (HL), src
-                        m_remainingCycles += 3;
-                        m_bus.write(m_registers.hl.value, *srcPtr);
+                        busWrite(m_registers.hl.value, *srcPtr);
                     }
                     else
                     {
@@ -167,8 +164,7 @@ namespace epoch::zxspectrum
                 uint8_t b;
                 if (src == 0b110)
                 {
-                    m_remainingCycles += 3;
-                    b = m_bus.read(m_registers.hl.value);
+                    b = busRead(m_registers.hl.value);
                 }
                 else
                 {
@@ -195,6 +191,7 @@ namespace epoch::zxspectrum
                     m_registers.af.c(!m_registers.af.c());
                     break;
                 default:
+                    // TODO: AND XOR OR CP
                     assert(false);
                     break;
                 }
@@ -233,7 +230,20 @@ namespace epoch::zxspectrum
     uint8_t Z80Cpu::fetchOpcode()
     {
         m_registers.ir.low((m_registers.ir.low() + 1) & 0b01111111);
+        m_remainingCycles += 4;
         return m_bus.read(m_registers.pc++);
+    }
+
+    uint8_t Z80Cpu::busRead(const uint16_t address)
+    {
+        m_remainingCycles += 3;
+        return m_bus.read(address);
+    }
+
+    void Z80Cpu::busWrite(const uint16_t address, const uint8_t value)
+    {
+        m_remainingCycles += 3;
+        m_bus.write(address, value);
     }
 
     void Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)

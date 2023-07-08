@@ -164,6 +164,9 @@ namespace epoch::zxspectrum
         std::array<uint8_t*, 8> m_registersPointers;
 
         uint8_t fetchOpcode();
+        uint8_t busRead(uint16_t address);
+        void busWrite(uint16_t address, uint8_t value);
+
         void add8(uint8_t a, uint8_t b, uint8_t carryFlag);
     };
 }
