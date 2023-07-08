@@ -214,4 +214,58 @@ namespace epoch::zxspectrum
         EXPECT_FALSE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
     }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_AND_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xa0 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.c(true);
+        sut.registers().af.high(0xa5);
+        sut.registers().bc = 0xcc00;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0x84);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_TRUE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.p());
+        EXPECT_TRUE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+    }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_XOR_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xa8 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.c(true);
+        sut.registers().af.high(0xa5);
+        sut.registers().bc = 0xcc00;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0x69);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.p());
+        EXPECT_FALSE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+    }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_OR_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xb0 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.c(true);
+        sut.registers().af.high(0xa5);
+        sut.registers().bc = 0xcc00;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0xed);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.p());
+        EXPECT_TRUE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+    }
 }

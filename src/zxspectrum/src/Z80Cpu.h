@@ -90,6 +90,14 @@ namespace epoch::zxspectrum
         WordRegister hl2{};
     };
 
+    struct Z80Flags
+    {
+        enum Values : uint8_t
+        {
+            halfCarry = 1 << 4,
+        };
+    };
+
     enum class Z80MachineCycle
     {
         opcode,
