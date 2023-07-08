@@ -181,10 +181,12 @@ namespace epoch::zxspectrum
                     // ADD
                     const uint8_t result = a + b;
                     const auto carry = (a > 0xff - b) ? 1 : 0;
-                    const auto overflow = ((result ^ a ^ b) >> 7) ^ carry;
+                    const auto carryIn = result ^ a ^ b;
+                    const auto overflow = (carryIn >> 7) ^ carry;
                     m_registers.af.high(result);
                     m_registers.af.n(false);
                     m_registers.af.c(carry);
+                    m_registers.af.h((carryIn >> 4) & 0x01);
                     m_registers.af.p(overflow);
                     m_registers.af.s(result >> 7);
                     m_registers.af.z(result == 0);
