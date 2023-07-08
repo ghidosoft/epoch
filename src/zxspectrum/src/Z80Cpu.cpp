@@ -192,6 +192,32 @@ namespace epoch::zxspectrum
                     m_registers.af.z(result == 0);
                 }
                     break;
+                case 0b001:
+                {
+                    // ADC
+                    uint8_t result;
+                    int carry;
+                    if (m_registers.af.c())
+                    {
+                        result = a + b + 1;
+                        carry = (a >= 0xff - b) ? 1 : 0;
+                    }
+                    else
+                    {
+                        result = a + b;
+                        carry = (a > 0xff - b) ? 1 : 0;
+                    }
+                    const auto carryIn = result ^ a ^ b;
+                    const auto overflow = (carryIn >> 7) ^ carry;
+                    m_registers.af.high(result);
+                    m_registers.af.n(false);
+                    m_registers.af.c(carry);
+                    m_registers.af.h((carryIn >> 4) & 0x01);
+                    m_registers.af.p(overflow);
+                    m_registers.af.s(result >> 7);
+                    m_registers.af.z(result == 0);
+                }
+                break;
                 default:
                     assert(false);
                     break;
