@@ -45,10 +45,7 @@ namespace epoch::zxspectrum
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x48 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0xaa00;
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
+        sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
         EXPECT_EQ(sut.registers().bc, 0xaaaa);
@@ -58,18 +55,12 @@ namespace epoch::zxspectrum
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x48, 0x61 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0xaa00;
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
+        sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
         EXPECT_EQ(sut.registers().bc, 0xaaaa);
         EXPECT_EQ(sut.registers().hl, 0x0000);
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
+        sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
         EXPECT_EQ(sut.registers().bc, 0xaaaa);
@@ -81,13 +72,7 @@ namespace epoch::zxspectrum
         Z80Cpu sut{ bus };
         sut.registers().de = 0xbbaa;
         sut.registers().hl = 0x1234;
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
+        sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
         EXPECT_EQ(sut.registers().de, 0xbbaa);
@@ -98,10 +83,7 @@ namespace epoch::zxspectrum
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x76, 0x48 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0xaa00;
-        sut.clock();
-        sut.clock();
-        sut.clock();
-        sut.clock();
+        sut.step();
         sut.clock();
         sut.clock();
         sut.clock();
@@ -109,5 +91,44 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
         EXPECT_EQ(sut.registers().bc, 0xaa00);
+    }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_ADD_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x80, 0x80 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.high(0x04);
+        sut.registers().bc = 0x8000;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0x84);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_FALSE(sut.registers().af.p());
+        EXPECT_TRUE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+        sut.step();
+        EXPECT_EQ(sut.registers().af.high(), 0x04);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.p());
+        EXPECT_FALSE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+    }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_ADD_L) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x85 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.high(0x00);
+        sut.registers().hl = 0x0000;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0x00);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_FALSE(sut.registers().af.p());
+        EXPECT_FALSE(sut.registers().af.s());
+        EXPECT_TRUE(sut.registers().af.z());
     }
 }

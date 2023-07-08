@@ -159,11 +159,54 @@ namespace epoch::zxspectrum
             }
             else if ((m_opcode & 0b11000000) == 0b10000000)
             {
-                // TODO: ALU operations
+                // ALU operations
+                const auto operation = (m_opcode & 0b00111000) >> 3;
+                const auto src = (m_opcode & 0b00000111);
+                const uint8_t* srcPtr = m_registersPointers[src];
+                const auto a = m_registers.af.high();
+                uint8_t b;
+                if (src == 0b110)
+                {
+                    m_remainingCycles += 3;
+                    b = m_bus.read(m_registers.hl.value);
+                }
+                else
+                {
+                    b = *srcPtr;
+                }
+                switch (operation)
+                {
+                case 0b000:
+                {
+                    // ADD
+                    const uint8_t result = a + b;
+                    const auto carry = (a > 0xff - b) ? 1 : 0;
+                    const auto overflow = ((result ^ a ^ b) >> 7) ^ carry;
+                    m_registers.af.high(result);
+                    m_registers.af.n(false);
+                    m_registers.af.c(carry);
+                    m_registers.af.p(overflow);
+                    m_registers.af.s(result >> 7);
+                    m_registers.af.z(result == 0);
+                }
+                    break;
+                default:
+                    assert(false);
+                    break;
+                }
             }
         }
 
         m_remainingCycles--;
+    }
+
+    void Z80Cpu::step()
+    {
+        if (m_halted) return;
+        do
+        {
+            clock();
+        } while (m_remainingCycles > 0);
     }
 
     void Z80Cpu::reset()

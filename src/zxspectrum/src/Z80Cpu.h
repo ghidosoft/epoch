@@ -144,6 +144,7 @@ namespace epoch::zxspectrum
 
     public:
         void clock();
+        void step();
         void reset();
 
         Z80Registers& registers();
