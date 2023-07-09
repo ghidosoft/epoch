@@ -59,7 +59,7 @@ namespace epoch::zxspectrum
         return Z80Operand::none;
     }
 
-    static const uint8_t signZeroParityFlags[256] = {
+    static const uint8_t s_flagsLookupSZP[256] = {
           0x44,0x00,0x00,0x04,0x00,0x04,0x04,0x00,0x08,0x0c,0x0c,0x08,0x0c,0x08,0x08,0x0c,
           0x00,0x04,0x04,0x00,0x04,0x00,0x00,0x04,0x0c,0x08,0x08,0x0c,0x08,0x0c,0x0c,0x08,
           0x20,0x24,0x24,0x20,0x24,0x20,0x20,0x24,0x2c,0x28,0x28,0x2c,0x28,0x2c,0x2c,0x28,
@@ -214,7 +214,7 @@ namespace epoch::zxspectrum
                     {
                         const uint8_t result = a & b;
                         m_registers.af.high(result);
-                        m_registers.af.low(signZeroParityFlags[result] | Z80Flags::halfCarry);
+                        m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
                     }
                     break;
                 case 0b101:
@@ -222,7 +222,7 @@ namespace epoch::zxspectrum
                     {
                         const uint8_t result = a ^ b;
                         m_registers.af.high(result);
-                        m_registers.af.low(signZeroParityFlags[result]);
+                        m_registers.af.low(s_flagsLookupSZP[result]);
                     }
                     break;
                 case 0b110:
@@ -230,7 +230,7 @@ namespace epoch::zxspectrum
                 {
                     const uint8_t result = a | b;
                     m_registers.af.high(result);
-                    m_registers.af.low(signZeroParityFlags[result]);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
                 }
                     break;
                 default:

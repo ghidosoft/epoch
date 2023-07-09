@@ -26,6 +26,22 @@
 
 namespace epoch::zxspectrum
 {
+    struct Z80Flags
+    {
+        enum Values : uint8_t
+        {
+            c = 1 << 0,
+            n = 1 << 1,
+            p = 1 << 2,
+            v = p,
+            x = 1 << 3,
+            h = 1 << 4,
+            y = 1 << 5,
+            z = 1 << 6,
+            s = 1 << 7,
+        };
+    };
+
     struct Z80Registers
     {
         struct WordRegister
@@ -43,23 +59,23 @@ namespace epoch::zxspectrum
 
         struct WordFlagsRegister : WordRegister
         {
-            [[nodiscard]] bool s() const { return value & 0b10000000; }
-            [[nodiscard]] bool z() const { return value & 0b01000000; }
-            [[nodiscard]] bool y() const { return value & 0b00100000; }
-            [[nodiscard]] bool h() const { return value & 0b00010000; }
-            [[nodiscard]] bool x() const { return value & 0b00001000; }
-            [[nodiscard]] bool p() const { return value & 0b00000100; }
-            [[nodiscard]] bool n() const { return value & 0b00000010; }
-            [[nodiscard]] bool c() const { return value & 0b00000001; }
+            [[nodiscard]] bool s() const { return value & Z80Flags::s; }
+            [[nodiscard]] bool z() const { return value & Z80Flags::z; }
+            [[nodiscard]] bool y() const { return value & Z80Flags::y; }
+            [[nodiscard]] bool h() const { return value & Z80Flags::h; }
+            [[nodiscard]] bool x() const { return value & Z80Flags::x; }
+            [[nodiscard]] bool p() const { return value & Z80Flags::p; }
+            [[nodiscard]] bool n() const { return value & Z80Flags::n; }
+            [[nodiscard]] bool c() const { return value & Z80Flags::c; }
 
-            void s(const bool f) { value = (value & ~0b10000000) | static_cast<uint16_t>(f << 7); }
-            void z(const bool f) { value = (value & ~0b01000000) | static_cast<uint16_t>(f << 6); }
-            void y(const bool f) { value = (value & ~0b00100000) | static_cast<uint16_t>(f << 5); }
-            void h(const bool f) { value = (value & ~0b00010000) | static_cast<uint16_t>(f << 4); }
-            void x(const bool f) { value = (value & ~0b00001000) | static_cast<uint16_t>(f << 3); }
-            void p(const bool f) { value = (value & ~0b00000100) | static_cast<uint16_t>(f << 2); }
-            void n(const bool f) { value = (value & ~0b00000010) | static_cast<uint16_t>(f << 1); }
-            void c(const bool f) { value = (value & ~0b00000001) | static_cast<uint16_t>(f << 0); }
+            void s(const bool f) { value = (value & ~Z80Flags::s) | static_cast<uint16_t>(f << 7); }
+            void z(const bool f) { value = (value & ~Z80Flags::z) | static_cast<uint16_t>(f << 6); }
+            void y(const bool f) { value = (value & ~Z80Flags::y) | static_cast<uint16_t>(f << 5); }
+            void h(const bool f) { value = (value & ~Z80Flags::h) | static_cast<uint16_t>(f << 4); }
+            void x(const bool f) { value = (value & ~Z80Flags::x) | static_cast<uint16_t>(f << 3); }
+            void p(const bool f) { value = (value & ~Z80Flags::p) | static_cast<uint16_t>(f << 2); }
+            void n(const bool f) { value = (value & ~Z80Flags::n) | static_cast<uint16_t>(f << 1); }
+            void c(const bool f) { value = (value & ~Z80Flags::c) | static_cast<uint16_t>(f << 0); }
         };
 
         // PC Program counter
@@ -88,14 +104,6 @@ namespace epoch::zxspectrum
         WordRegister de2{};
         // HL shadow
         WordRegister hl2{};
-    };
-
-    struct Z80Flags
-    {
-        enum Values : uint8_t
-        {
-            halfCarry = 1 << 4,
-        };
     };
 
     enum class Z80MachineCycle
@@ -174,6 +182,8 @@ namespace epoch::zxspectrum
         uint8_t fetchOpcode();
         uint8_t busRead(uint16_t address);
         void busWrite(uint16_t address, uint8_t value);
+        uint8_t ioRead(uint8_t port);
+        void ioWrite(uint8_t port, uint8_t value);
 
         void add8(uint8_t a, uint8_t b, uint8_t carryFlag);
     };
