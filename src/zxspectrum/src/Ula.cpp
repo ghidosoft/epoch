@@ -16,6 +16,8 @@
 
 #include "Ula.h"
 
+#include <cassert>
+
 namespace epoch::zxspectrum
 {
     Ula::Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram) : m_rom48k{ rom48k }, m_ram{ ram }
@@ -74,5 +76,18 @@ namespace epoch::zxspectrum
             // TODO: allow switching bank for 128K spectrums
             m_ram[0][address & 0x3fff] = m_floatingBusValue = value;
         }
+    }
+
+    uint8_t Ula::ioRead(uint8_t port)
+    {
+        // TODO
+        assert(false);
+        return 0;
+    }
+
+    void Ula::ioWrite(uint8_t port, uint8_t value)
+    {
+        // TODO
+        assert(false);
     }
 }

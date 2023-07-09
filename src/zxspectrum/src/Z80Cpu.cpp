@@ -289,6 +289,18 @@ namespace epoch::zxspectrum
         m_bus.write(address, value);
     }
 
+    uint8_t Z80Cpu::ioRead(const uint8_t port)
+    {
+        m_remainingCycles += 4;
+        return m_bus.ioRead(port);
+    }
+
+    void Z80Cpu::ioWrite(const uint8_t port, const uint8_t value)
+    {
+        m_remainingCycles += 4;
+        m_bus.ioWrite(port, value);
+    }
+
     void Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
     {
         uint8_t result;

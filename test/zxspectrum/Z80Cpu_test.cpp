@@ -27,6 +27,9 @@ namespace epoch::zxspectrum
             m_ram[address] = value;
         }
 
+        uint8_t ioRead(uint8_t port) override { return 0; }
+        void ioWrite(uint8_t port, uint8_t value) override {}
+
         [[nodiscard]] std::span<const uint8_t> ram() const { return m_ram; }
 
     private:
