@@ -55,6 +55,36 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().hl2, 0xffff);
     }
 
+    TEST(Z80Cpu, Opcode00000000_NOP) {
+        TestZ80Interface bus{};
+        Z80Cpu sut{ bus };
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+
+        EXPECT_EQ(sut.registers().pc, 8);
+        EXPECT_EQ(sut.registers().ir, 8);
+    }
+
+    TEST(Z80Cpu, Opcode00xxxxxx_EX_AF_AF2) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x08 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.value = 0x1234;
+        sut.registers().af2.value = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af, 0x5678);
+        EXPECT_EQ(sut.registers().af2, 0x1234);
+    }
+
     TEST(Z80Cpu, Opcode01xxxxxx_LD_C_B) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x48 } };
         Z80Cpu sut{ bus };

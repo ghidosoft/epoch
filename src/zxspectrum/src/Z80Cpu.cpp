@@ -135,7 +135,13 @@ namespace epoch::zxspectrum
         {
             m_opcode = fetchOpcode();
 
-            if ((m_opcode & 0b11000000) == 0b01000000)
+            const auto quadrant = m_opcode >> 6;
+
+            if (quadrant == 0)
+            {
+                mainQuadrant0();
+            }
+            else if (quadrant == 1)
             {
                 // LD 8bit / HALT
                 const auto dst = (m_opcode & 0b00111000) >> 3;
@@ -169,7 +175,7 @@ namespace epoch::zxspectrum
                     }
                 }
             }
-            else if ((m_opcode & 0b11000000) == 0b10000000)
+            else if (quadrant == 2)
             {
                 // ALU operations
                 const auto operation = (m_opcode & 0b00111000) >> 3;
@@ -294,6 +300,39 @@ namespace epoch::zxspectrum
     {
         m_remainingCycles += 4;
         m_bus.ioWrite(port, value);
+    }
+
+    void Z80Cpu::mainQuadrant0()
+    {
+        const auto y = (m_opcode & 0b00111000) >> 3;
+        const auto z = (m_opcode & 0b00000111);
+        if (z == 0b000)
+        {
+            switch (y)
+            {
+            case 0b000:
+                // NOP
+                break;
+            case 0b001:
+                // EX AF, AF'
+                std::swap(m_registers.af.value, m_registers.af2.value);
+                break;
+            case 0b010:
+                // DJNZ d
+                {
+                    const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                    m_remainingCycles++;
+                    const uint8_t b = m_registers.bc.high() - 1;
+                    m_registers.bc.high(b);
+                    if (b != 0)
+                    {
+                        m_remainingCycles += 5;
+                        m_registers.pc += d - 2;
+                    }
+                }
+                break;
+            }
+        }
     }
 
     uint8_t Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
