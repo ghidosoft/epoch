@@ -183,7 +183,7 @@ namespace epoch::zxspectrum
         uint8_t ioRead(uint8_t port);
         void ioWrite(uint8_t port, uint8_t value);
 
-        void add8(uint8_t a, uint8_t b, uint8_t carryFlag);
+        uint8_t add8(uint8_t a, uint8_t b, uint8_t carryFlag);
     };
 }
 

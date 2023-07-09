@@ -284,4 +284,22 @@ namespace epoch::zxspectrum
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
     }
+
+    TEST(Z80Cpu, Opcode10xxxxxx_CP_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xb8 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.c(true);
+        sut.registers().af.high(0x03);
+        sut.registers().bc = 0x6000;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0x03);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_TRUE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_FALSE(sut.registers().af.p());
+        EXPECT_TRUE(sut.registers().af.s());
+        EXPECT_FALSE(sut.registers().af.z());
+    }
 }
