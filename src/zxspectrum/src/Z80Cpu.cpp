@@ -133,10 +133,6 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
-            if (m_halted)
-            {
-                return;
-            }
             m_opcode = fetchOpcode();
 
             if ((m_opcode & 0b11000000) == 0b01000000)
@@ -151,7 +147,7 @@ namespace epoch::zxspectrum
                     if (dst == 0b110)
                     {
                         // HALT
-                        m_halted = true;
+                        m_registers.pc--;
                     }
                     else
                     {
@@ -246,7 +242,6 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::step()
     {
-        if (m_halted) return;
         do
         {
             clock();
@@ -257,7 +252,6 @@ namespace epoch::zxspectrum
     {
         m_registers = {};
         m_remainingCycles = {};
-        m_halted = {};
     }
 
     Z80Registers& Z80Cpu::registers()

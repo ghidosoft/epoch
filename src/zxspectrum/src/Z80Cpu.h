@@ -81,29 +81,29 @@ namespace epoch::zxspectrum
         // PC Program counter
         uint16_t pc{};
         // SP Stack pointer
-        uint16_t sp{};
+        uint16_t sp{ 0xffff };
         // IX Index X
-        uint16_t ix{};
+        uint16_t ix{ 0xffff };
         // IY Index Y
-        uint16_t iy{};
+        uint16_t iy{ 0xffff };
         // IR Interrupt/Refresh register
         WordRegister ir{};
         // AF Accumulator and flags
-        WordFlagsRegister af{};
+        WordFlagsRegister af{ 0xffff };
         // BC General purpose
-        WordRegister bc{};
+        WordRegister bc{ 0xffff };
         // DE General purpose
-        WordRegister de{};
+        WordRegister de{ 0xffff };
         // HL General purpose
-        WordRegister hl{};
+        WordRegister hl{ 0xffff };
         // AF shadow
-        WordFlagsRegister af2{};
+        WordFlagsRegister af2{ 0xffff };
         // BC shadow
-        WordRegister bc2{};
+        WordRegister bc2{ 0xffff };
         // DE shadow
-        WordRegister de2{};
+        WordRegister de2{ 0xffff };
         // HL shadow
-        WordRegister hl2{};
+        WordRegister hl2{ 0xffff };
     };
 
     enum class Z80MachineCycle
@@ -174,8 +174,6 @@ namespace epoch::zxspectrum
         std::array<Z80Instruction, 256> m_instructions{};
 
         Z80Interface& m_bus;
-
-        bool m_halted{};
 
         std::array<uint8_t*, 8> m_registersPointers;
 
