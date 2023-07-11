@@ -39,6 +39,7 @@ namespace epoch::zxspectrum
         uint8_t ioRead(uint8_t port) override;
         void ioWrite(uint8_t port, uint8_t value) override;
 
+        [[nodiscard]] uint8_t borderColor() const { return m_border; }
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 
     private:
@@ -46,6 +47,7 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 8>& m_ram;
 
         uint8_t m_floatingBusValue{};
+        uint8_t m_border{};
         int m_cpuStalled{};
     };
 }

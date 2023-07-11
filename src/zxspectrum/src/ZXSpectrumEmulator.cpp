@@ -79,6 +79,25 @@ namespace epoch::zxspectrum
         }
         m_ula->clock();
         m_clockCounter++;
+
+        if (m_x >= Width)
+        {
+            m_x = -HorizontalRetrace;
+            m_y++;
+        }
+        if (m_y >= Height)
+        {
+            m_y = -VerticalRetrace;
+        }
+
+        if (m_y >= 0 && m_x >= 0)
+        {
+            m_borderBuffer[m_y * Width + m_x] = m_ula->borderColor();
+            m_borderBuffer[m_y * Width + m_x + 1] = m_ula->borderColor();
+        }
+
+        m_x++;
+        m_x++;
     }
 
     void ZXSpectrumEmulator::reset()
@@ -87,6 +106,8 @@ namespace epoch::zxspectrum
         m_cpu->reset();
         m_clockCounter = 0;
         m_frameCounter = 0;
+        m_x = -HorizontalRetrace;
+        m_y = -VerticalRetrace;
     }
 
     uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const

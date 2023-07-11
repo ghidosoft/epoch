@@ -32,6 +32,7 @@ namespace epoch::zxspectrum
     void Ula::reset()
     {
         m_floatingBusValue = {};
+        m_border = {};
         m_cpuStalled = {};
     }
 
@@ -78,16 +79,19 @@ namespace epoch::zxspectrum
         }
     }
 
-    uint8_t Ula::ioRead(uint8_t port)
+    uint8_t Ula::ioRead(const uint8_t port)
     {
         // TODO
         assert(false);
         return 0;
     }
 
-    void Ula::ioWrite(uint8_t port, uint8_t value)
+    void Ula::ioWrite(const uint8_t port, const uint8_t value)
     {
-        // TODO
-        assert(false);
+        if ((port & 0x01) == 0)
+        {
+            // TODO ear/mic
+            m_border = value & 0x07;
+        }
     }
 }
