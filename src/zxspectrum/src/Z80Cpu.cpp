@@ -327,10 +327,73 @@ namespace epoch::zxspectrum
                     if (b != 0)
                     {
                         m_remainingCycles += 5;
-                        m_registers.pc += d - 2;
+                        m_registers.pc += d;
                     }
                 }
                 break;
+            case 0b011:
+                // JR d
+                {
+                    const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                    m_remainingCycles += 5;
+                    m_registers.pc += d;
+                }
+                break;
+            }
+        }
+        else if (z == 0b001)
+        {
+            switch (y)
+            {
+            case 0b010:
+                {
+                    const auto low = busRead(m_registers.pc++);
+                    const auto high = busRead(m_registers.pc++);
+                    m_registers.de = static_cast<uint16_t>(high << 8) | low;
+                }
+                break;
+            }
+        }
+        else if (z == 0b010)
+        {
+            switch (y)
+            {
+            case 0b010:
+                // LD (DE), A
+                busWrite(m_registers.de, m_registers.af.high());
+                break;
+            }
+        }
+        else if (z == 0b100)
+        {
+            // INC 8bit
+            uint8_t n;
+            if (y == 0b110)
+            {
+                // INC (HL)
+                n = busRead(m_registers.hl);
+                busWrite(m_registers.hl, n + 1);
+                add8(n, 1, 0);
+                m_remainingCycles++;
+            }
+            else
+            {
+                n = (*m_registersPointers[y])++;
+                add8(n, 1, 0);
+            }
+        }
+        else if (z == 0b110)
+        {
+            // LD 8bit
+            const auto n = busRead(m_registers.pc++);
+            if (y == 0b110)
+            {
+                // LD (HL), n
+                busWrite(m_registers.hl, n);
+            }
+            else
+            {
+                *m_registersPointers[y] = n;
             }
         }
     }
