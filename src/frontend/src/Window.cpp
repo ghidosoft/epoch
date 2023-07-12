@@ -35,15 +35,18 @@ namespace epoch::frontend
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_TRUE);
 
-        m_window = glfwCreateWindow(info.width * 3, info.height * 3, info.name.c_str(), nullptr, nullptr);
+        m_window = glfwCreateWindow(info.width * 2, info.height * 2, info.name.c_str(), nullptr, nullptr);
         if (m_window == nullptr)
         {
             throw std::runtime_error("Cannot create GLFW window.");
         }
 
+        glfwGetFramebufferSize(m_window, &m_width, &m_height);
+
         glfwSetWindowUserPointer(m_window, this);
 
-        // TODO: setup callbacks
+        glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
+        // TODO: setup other callbacks
 
         glfwMakeContextCurrent(m_window);
 
@@ -73,5 +76,17 @@ namespace epoch::frontend
             glfwPollEvents();
         }
         return result;
+    }
+
+    void Window::onFrameResized(const int width, const int height)
+    {
+        m_width = width;
+        m_height = height;
+    }
+
+    void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->onFrameResized(width, height);
     }
 }

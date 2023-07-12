@@ -165,4 +165,9 @@ namespace epoch::frontend
         glUseProgram(0);
         glBindVertexArray(0);
     }
+
+    void GraphicContext::viewport(const int width, const int height)
+    {
+        glViewport(0, 0, width, height);
+    }
 }

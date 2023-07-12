@@ -44,9 +44,19 @@ namespace epoch::frontend
 
     public:
         [[nodiscard]] bool nextFrame() const;
+        [[nodiscard]] int width() const { return m_width; }
+        [[nodiscard]] int height() const { return m_height; }
 
     private:
         GLFWwindow* m_window{};
+
+        int m_width{}, m_height{};
+
+    private:
+        void onFrameResized(int width, int height);
+
+    private:
+        static void s_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height);
     };
 }
 
