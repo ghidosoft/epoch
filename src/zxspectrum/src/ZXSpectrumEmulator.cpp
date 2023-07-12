@@ -55,6 +55,7 @@ namespace epoch::zxspectrum
         static const uint8_t bytes[] = {
             0x11, 0x00, 0x58,   // LD   de, 22528
             0x3E, 0x07,         // LD   a, 7
+            0xD3, 0xFE,         // OUT  $fe, a
             0x12,               // LD   (de), a
             0x11, 0x00, 0x40,   // LD   de, 16384
             0x3E, 0xFF,         // LD   a, 255

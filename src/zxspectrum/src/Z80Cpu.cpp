@@ -440,6 +440,19 @@ namespace epoch::zxspectrum
     {
         const auto y = (m_opcode & 0b00111000) >> 3;
         const auto z = (m_opcode & 0b00000111);
+        if (z == 0b011)
+        {
+            switch (y)
+            {
+            case 0b010:
+                // OUT (n), A
+                {
+                    const auto n = busRead(m_registers.pc++);
+                    ioWrite(n, m_registers.af.high());
+                }
+                break;
+            }
+        }
     }
 
     uint16_t Z80Cpu::read16()
