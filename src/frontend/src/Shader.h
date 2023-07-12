@@ -60,6 +60,7 @@ namespace epoch::frontend
     public:
         void bind() const;
 
+        void setUniformMat4(const std::string& name, const float* data);
         void setUniformTexture(const std::string& name, GLint data);
 
     private:

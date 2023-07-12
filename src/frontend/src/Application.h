@@ -27,6 +27,7 @@ namespace epoch
 namespace epoch::frontend
 {
     class GraphicContext;
+    class Gui;
     class Window;
 
     class Application final
@@ -53,6 +54,7 @@ namespace epoch::frontend
 
         std::unique_ptr<Window> m_window{};
         std::unique_ptr<GraphicContext> m_context{};
+        std::unique_ptr<Gui> m_gui{};
     };
 }
 

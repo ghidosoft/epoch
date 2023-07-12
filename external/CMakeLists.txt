@@ -17,7 +17,25 @@ add_subdirectory(glad)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+FetchContent_Declare(
+  imgui
+  URL https://github.com/ocornut/imgui/archive/v1.89.7.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+    FetchContent_Populate(imgui)
+    set(IMGUI_INCLUDE_DIR ${imgui_SOURCE_DIR}/)
+    file(GLOB IMGUI_SOURCES ${imgui_SOURCE_DIR}/*.cpp)
+    file(GLOB IMGUI_HEADERS ${imgui_SOURCE_DIR}/*.h)
+    add_library(imgui STATIC ${IMGUI_SOURCES} ${IMGUI_SOURCES})
+    # add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
+    target_include_directories(imgui PUBLIC ${IMGUI_INCLUDE_DIR})
+    # target_link_libraries(imgui ${OPENGL_LIBRARIES} glfw glad)
+endif()

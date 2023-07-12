@@ -94,6 +94,12 @@ namespace epoch::frontend
         glUseProgram(m_handle);
     }
 
+    void Shader::setUniformMat4(const std::string& name, const float* data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniformMatrix4fv(location, 1, GL_FALSE, data);
+    }
+
     void Shader::setUniformTexture(const std::string& name, const GLint data)
     {
         const auto location = getUniformLocation(name);

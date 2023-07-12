@@ -17,8 +17,10 @@
 #include "Application.h"
 
 #include <epoch/core.h>
+#include <imgui.h>
 
 #include "GraphicContext.h"
+#include "Gui.h"
 #include "Window.h"
 
 namespace epoch::frontend
@@ -32,13 +34,10 @@ namespace epoch::frontend
             .height = emulatorInfo.height,
         });
         m_context = std::make_unique<GraphicContext>();
+        m_gui = std::make_unique<Gui>();
     }
 
-    Application::~Application()
-    {
-        m_context = nullptr;
-        m_window = nullptr;
-    }
+    Application::~Application() = default;
 
     int Application::run()
     {
@@ -61,11 +60,15 @@ namespace epoch::frontend
         m_context->viewport(m_window->width(), m_window->height());
         m_context->renderScreen();
 
+        m_gui->newFrame(m_window->width(), m_window->height());
         renderGui();
+        m_gui->render();
     }
 
     void Application::renderGui()
     {
         // TODO
+        ImGui::Begin("General");
+        ImGui::End();
     }
 }
