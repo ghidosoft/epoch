@@ -144,103 +144,16 @@ namespace epoch::zxspectrum
             else if (quadrant == 1)
             {
                 // LD 8bit / HALT
-                const auto dst = (m_opcode & 0b00111000) >> 3;
-                const auto src = (m_opcode & 0b00000111);
-                const uint8_t* srcPtr = m_registersPointers[src];
-                uint8_t* dstPtr = m_registersPointers[dst];
-                if (src == 0b110)
-                {
-                    if (dst == 0b110)
-                    {
-                        // HALT
-                        m_registers.pc--;
-                    }
-                    else
-                    {
-                        // LD dst, (HL)
-                        *dstPtr = busRead(m_registers.hl.value);
-                    }
-                }
-                else
-                {
-                    if (dst == 0b110)
-                    {
-                        // LD (HL), src
-                        busWrite(m_registers.hl.value, *srcPtr);
-                    }
-                    else
-                    {
-                        // LD dst, src
-                        *dstPtr = *srcPtr;
-                    }
-                }
+                mainQuadrant1();
             }
             else if (quadrant == 2)
             {
                 // ALU operations
-                const auto operation = (m_opcode & 0b00111000) >> 3;
-                const auto src = (m_opcode & 0b00000111);
-                const uint8_t* srcPtr = m_registersPointers[src];
-                const auto a = m_registers.af.high();
-                uint8_t b;
-                if (src == 0b110)
-                {
-                    b = busRead(m_registers.hl.value);
-                }
-                else
-                {
-                    b = *srcPtr;
-                }
-                switch (operation)
-                {
-                case 0b000:
-                    // ADD
-                    m_registers.af.high(add8(a, b, 0));
-                    break;
-                case 0b001:
-                    // ADC
-                    m_registers.af.high(add8(a, b, m_registers.af.c()));
-                    break;
-                case 0b010:
-                    // SUB
-                    m_registers.af.high(add8(a, ~b, 1));
-                    m_registers.af.c(!m_registers.af.c());
-                    break;
-                case 0b011:
-                    // SBC
-                    m_registers.af.high(add8(a, ~b, !m_registers.af.c()));
-                    m_registers.af.c(!m_registers.af.c());
-                    break;
-                case 0b100:
-                    // AND
-                    {
-                        const uint8_t result = a & b;
-                        m_registers.af.high(result);
-                        m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
-                    }
-                    break;
-                case 0b101:
-                    // XOR
-                    {
-                        const uint8_t result = a ^ b;
-                        m_registers.af.high(result);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                    }
-                    break;
-                case 0b110:
-                    // OR
-                {
-                    const uint8_t result = a | b;
-                    m_registers.af.high(result);
-                    m_registers.af.low(s_flagsLookupSZP[result]);
-                }
-                    break;
-                case 0b111:
-                    // CP
-                    add8(a, ~b, 1);
-                    m_registers.af.c(!m_registers.af.c());
-                    break;
-                }
+                mainQuadrant2();
+            }
+            else
+            {
+                mainQuadrant3();
             }
         }
 
@@ -345,12 +258,21 @@ namespace epoch::zxspectrum
         {
             switch (y)
             {
+            case 0b000:
+                // LD BC, nn
+                m_registers.bc = read16();
+                break;
             case 0b010:
-                {
-                    const auto low = busRead(m_registers.pc++);
-                    const auto high = busRead(m_registers.pc++);
-                    m_registers.de = static_cast<uint16_t>(high << 8) | low;
-                }
+                // LD DE, nn
+                m_registers.de = read16();
+                break;
+            case 0b100:
+                // LD HL, nn
+                m_registers.hl = read16();
+                break;
+            case 0b110:
+                // LD SP, nn
+                m_registers.sp = read16();
                 break;
             }
         }
@@ -396,6 +318,120 @@ namespace epoch::zxspectrum
                 *m_registersPointers[y] = n;
             }
         }
+    }
+
+    void Z80Cpu::mainQuadrant1()
+    {
+        const auto dst = (m_opcode & 0b00111000) >> 3;
+        const auto src = (m_opcode & 0b00000111);
+        const uint8_t* srcPtr = m_registersPointers[src];
+        uint8_t* dstPtr = m_registersPointers[dst];
+        if (src == 0b110)
+        {
+            if (dst == 0b110)
+            {
+                // HALT
+                m_registers.pc--;
+            }
+            else
+            {
+                // LD dst, (HL)
+                *dstPtr = busRead(m_registers.hl.value);
+            }
+        }
+        else
+        {
+            if (dst == 0b110)
+            {
+                // LD (HL), src
+                busWrite(m_registers.hl.value, *srcPtr);
+            }
+            else
+            {
+                // LD dst, src
+                *dstPtr = *srcPtr;
+            }
+        }
+    }
+
+    void Z80Cpu::mainQuadrant2()
+    {
+        const auto operation = (m_opcode & 0b00111000) >> 3;
+        const auto src = (m_opcode & 0b00000111);
+        const uint8_t* srcPtr = m_registersPointers[src];
+        const auto a = m_registers.af.high();
+        uint8_t b;
+        if (src == 0b110)
+        {
+            b = busRead(m_registers.hl.value);
+        }
+        else
+        {
+            b = *srcPtr;
+        }
+        switch (operation)
+        {
+        case 0b000:
+            // ADD
+            m_registers.af.high(add8(a, b, 0));
+            break;
+        case 0b001:
+            // ADC
+            m_registers.af.high(add8(a, b, m_registers.af.c()));
+            break;
+        case 0b010:
+            // SUB
+            m_registers.af.high(add8(a, ~b, 1));
+            m_registers.af.c(!m_registers.af.c());
+            break;
+        case 0b011:
+            // SBC
+            m_registers.af.high(add8(a, ~b, !m_registers.af.c()));
+            m_registers.af.c(!m_registers.af.c());
+            break;
+        case 0b100:
+            // AND
+        {
+            const uint8_t result = a & b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
+        }
+        break;
+        case 0b101:
+            // XOR
+        {
+            const uint8_t result = a ^ b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result]);
+        }
+        break;
+        case 0b110:
+            // OR
+        {
+            const uint8_t result = a | b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result]);
+        }
+        break;
+        case 0b111:
+            // CP
+            add8(a, ~b, 1);
+            m_registers.af.c(!m_registers.af.c());
+            break;
+        }
+    }
+
+    void Z80Cpu::mainQuadrant3()
+    {
+        const auto y = (m_opcode & 0b00111000) >> 3;
+        const auto z = (m_opcode & 0b00000111);
+    }
+
+    uint16_t Z80Cpu::read16()
+    {
+        const auto low = busRead(m_registers.pc++);
+        const auto high = busRead(m_registers.pc++);
+        return static_cast<uint16_t>(high << 8) | low;
     }
 
     uint8_t Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
