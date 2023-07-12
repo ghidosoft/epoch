@@ -294,14 +294,32 @@ namespace epoch::zxspectrum
             {
                 // INC (HL)
                 n = busRead(m_registers.hl);
+                m_remainingCycles++;
                 busWrite(m_registers.hl, n + 1);
                 add8(n, 1, 0);
-                m_remainingCycles++;
             }
             else
             {
                 n = (*m_registersPointers[y])++;
                 add8(n, 1, 0);
+            }
+        }
+        else if (z == 0b101)
+        {
+            // DEC 8bit
+            uint8_t n;
+            if (y == 0b110)
+            {
+                // DEC (HL)
+                n = busRead(m_registers.hl);
+                m_remainingCycles++;
+                busWrite(m_registers.hl, n - 1);
+                sub8(n, 1, 0);
+            }
+            else
+            {
+                n = (*m_registersPointers[y])--;
+                sub8(n, 1, 0);
             }
         }
         else if (z == 0b110)
@@ -381,13 +399,11 @@ namespace epoch::zxspectrum
             break;
         case 0b010:
             // SUB
-            m_registers.af.high(add8(a, ~b, 1));
-            m_registers.af.c(!m_registers.af.c());
+            m_registers.af.high(sub8(a, b, 0));
             break;
         case 0b011:
             // SBC
-            m_registers.af.high(add8(a, ~b, !m_registers.af.c()));
-            m_registers.af.c(!m_registers.af.c());
+            m_registers.af.high(sub8(a, b, m_registers.af.c()));
             break;
         case 0b100:
             // AND
@@ -415,8 +431,7 @@ namespace epoch::zxspectrum
         break;
         case 0b111:
             // CP
-            add8(a, ~b, 1);
-            m_registers.af.c(!m_registers.af.c());
+            sub8(a, b, 0);
             break;
         }
     }
@@ -456,6 +471,14 @@ namespace epoch::zxspectrum
         m_registers.af.p(overflow);
         m_registers.af.s(result >> 7);
         m_registers.af.z(result == 0);
+        return result;
+    }
+
+    uint8_t Z80Cpu::sub8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
+    {
+        const auto result = add8(a, ~b, !carryFlag);
+        m_registers.af.c(!m_registers.af.c());
+        m_registers.af.h(!m_registers.af.h());
         return result;
     }
 }
