@@ -246,11 +246,23 @@ namespace epoch::zxspectrum
                 break;
             case 0b011:
                 // JR d
-                {
-                    const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
-                    m_remainingCycles += 5;
-                    m_registers.pc += d;
-                }
+                jr(true);
+                break;
+            case 0b100:
+                // JR NZ, d
+                jr(m_registers.af.z() == false);
+                break;
+            case 0b101:
+                // JR Z, d
+                jr(m_registers.af.z() == true);
+                break;
+            case 0b110:
+                // JR NC, d
+                jr(m_registers.af.c() == false);
+                break;
+            case 0b111:
+                // JR C, d
+                jr(m_registers.af.c() == true);
                 break;
             }
         }
@@ -497,5 +509,15 @@ namespace epoch::zxspectrum
         m_registers.af.c(!m_registers.af.c());
         m_registers.af.h(!m_registers.af.h());
         return result;
+    }
+
+    void Z80Cpu::jr(const bool condition)
+    {
+        const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+        if (condition)
+        {
+            m_remainingCycles += 5;
+            m_registers.pc += d;
+        }
     }
 }
