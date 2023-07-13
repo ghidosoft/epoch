@@ -195,4 +195,14 @@ namespace epoch::frontend
             }
         }
     }
+
+    void Gui::setCursorPos(const float x, const float y)
+    {
+        ImGui::GetIO().MousePos = ImVec2{ x, y };
+    }
+
+    void Gui::setMouseButton(const int button, const bool down)
+    {
+        ImGui::GetIO().MouseDown[button] = down;
+    }
 }

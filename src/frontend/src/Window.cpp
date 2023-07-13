@@ -17,6 +17,7 @@
 #include "Window.h"
 
 #include <stdexcept>
+#include <utility>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -46,6 +47,9 @@ namespace epoch::frontend
         glfwSetWindowUserPointer(m_window, this);
 
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
+        glfwSetKeyCallback(m_window, s_keyCallback);
+        glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
+        glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
         // TODO: setup other callbacks
 
         glfwMakeContextCurrent(m_window);
@@ -78,15 +82,44 @@ namespace epoch::frontend
         return result;
     }
 
-    void Window::onFrameResized(const int width, const int height)
+    void Window::setCursorPosCallback(CursorPosCallback callback)
     {
-        m_width = width;
-        m_height = height;
+        m_cursorPosCallback = std::move(callback);
+    }
+
+    void Window::setMouseButtonCallback(MouseButtonCallback callback)
+    {
+        m_mouseButtonCallback = std::move(callback);
     }
 
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        window->onFrameResized(width, height);
+        window->m_width = width;
+        window->m_height = height;
+    }
+
+    void Window::s_keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        // TODO
+    }
+
+    void Window::s_cursorPosCallback(GLFWwindow* glfwWindow, const double x, const double y)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_cursorPosCallback)
+        {
+            window->m_cursorPosCallback(static_cast<float>(x), static_cast<float>(y));
+        }
+    }
+
+    void Window::s_mouseButtonCallback(GLFWwindow* glfwWindow, const int button, const int action, const int mods)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_mouseButtonCallback)
+        {
+            window->m_mouseButtonCallback(button, action);
+        }
     }
 }

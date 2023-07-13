@@ -35,6 +35,11 @@ namespace epoch::frontend
         });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
+
+        m_window->setCursorPosCallback(
+            [&](const float x, const float y){ m_gui->setCursorPos(x, y); });
+        m_window->setMouseButtonCallback(
+            [&](const int button, const int action) { m_gui->setMouseButton(button, action == 1); });
     }
 
     Application::~Application() = default;

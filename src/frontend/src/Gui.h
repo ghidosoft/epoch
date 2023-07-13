@@ -36,6 +36,9 @@ namespace epoch::frontend
         void newFrame(int width, int height);
         void render();
 
+        void setCursorPos(float x, float y);
+        void setMouseButton(int button, bool down);
+
     private:
         std::unique_ptr<Shader> m_shader{};
         GLuint m_vao{};

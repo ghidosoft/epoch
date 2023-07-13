@@ -17,6 +17,7 @@
 #ifndef SRC_FRONTEND_WINDOW_H_
 #define SRC_FRONTEND_WINDOW_H_
 
+#include <functional>
 #include <string>
 
 struct GLFWwindow;
@@ -47,16 +48,24 @@ namespace epoch::frontend
         [[nodiscard]] int width() const { return m_width; }
         [[nodiscard]] int height() const { return m_height; }
 
+        using CursorPosCallback = std::function<void(float x, float y)>;
+        using MouseButtonCallback = std::function<void(int button, int action)>;
+        void setCursorPosCallback(CursorPosCallback callback);
+        void setMouseButtonCallback(MouseButtonCallback callback);
+
     private:
         GLFWwindow* m_window{};
 
         int m_width{}, m_height{};
 
-    private:
-        void onFrameResized(int width, int height);
+        CursorPosCallback m_cursorPosCallback{};
+        MouseButtonCallback m_mouseButtonCallback{};
 
     private:
         static void s_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height);
+        static void s_keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods);
+        static void s_cursorPosCallback(GLFWwindow* glfwWindow, double x, double y);
+        static void s_mouseButtonCallback(GLFWwindow* glfwWindow, int button, int action, int mods);
     };
 }
 
