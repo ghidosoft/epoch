@@ -434,4 +434,12 @@ namespace epoch::zxspectrum
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
     }
+
+    TEST(Z80Cpu, Opcode11000011_JP_nn) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xc3, 0x34, 0x12 } };
+        Z80Cpu sut{ bus };
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x1234);
+        EXPECT_EQ(sut.registers().ir, 1);
+    }
 }

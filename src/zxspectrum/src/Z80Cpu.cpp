@@ -444,6 +444,10 @@ namespace epoch::zxspectrum
         {
             switch (y)
             {
+            case 0b000:
+                // JP nn
+                m_registers.pc = read16();
+                break;
             case 0b010:
                 // OUT (n), A
                 {
