@@ -298,6 +298,45 @@ namespace epoch::zxspectrum
                 break;
             }
         }
+        else if (z == 0b011)
+        {
+            switch (y)
+            {
+            case 0b000:
+                // INC BC
+                m_registers.bc.value++;
+                break;
+            case 0b001:
+                // DEC BC
+                m_registers.bc.value--;
+                break;
+            case 0b010:
+                // INC DE
+                m_registers.de.value++;
+                break;
+            case 0b011:
+                // DEC BC
+                m_registers.de.value--;
+                break;
+            case 0b100:
+                // INC HL
+                m_registers.hl.value++;
+                break;
+            case 0b101:
+                // DEC HL
+                m_registers.hl.value--;
+                break;
+            case 0b110:
+                // INC SP
+                m_registers.sp++;
+                break;
+            case 0b111:
+                // DEC SP
+                m_registers.sp--;
+                break;
+            }
+            m_remainingCycles += 2;
+        }
         else if (z == 0b100)
         {
             // INC 8bit
