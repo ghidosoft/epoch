@@ -94,7 +94,7 @@ namespace epoch::frontend
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-        io.Fonts->SetTexID(reinterpret_cast<void*>(static_cast<std::size_t>(m_fontTexture)));
+        io.Fonts->SetTexID(reinterpret_cast<void*>(static_cast<intptr_t>(m_fontTexture)));
     }
 
     Gui::~Gui()
@@ -149,8 +149,8 @@ namespace epoch::frontend
         };
         m_shader->setUniformMat4("ProjMtx", &orthoProjection[0][0]);
 
-        const auto clip_off = drawData->DisplayPos;
-        const auto clip_scale = drawData->FramebufferScale;
+        const auto clipOffset = drawData->DisplayPos;
+        const auto clipScale = drawData->FramebufferScale;
 
         for (int n = 0; n < drawData->CmdListsCount; n++)
         {
@@ -175,16 +175,22 @@ namespace epoch::frontend
                 else
                 {
                     // Project scissor/clipping rectangles into framebuffer space
-                    ImVec2 clip_min((cmd->ClipRect.x - clip_off.x) * clip_scale.x, (cmd->ClipRect.y - clip_off.y) * clip_scale.y);
-                    ImVec2 clip_max((cmd->ClipRect.z - clip_off.x) * clip_scale.x, (cmd->ClipRect.w - clip_off.y) * clip_scale.y);
-                    if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y)
+                    const ImVec2 clipMin((cmd->ClipRect.x - clipOffset.x) * clipScale.x,
+                        (cmd->ClipRect.y - clipOffset.y) * clipScale.y);
+                    const ImVec2 clipMax((cmd->ClipRect.z - clipOffset.x) * clipScale.x,
+                        (cmd->ClipRect.w - clipOffset.y) * clipScale.y);
+                    if (clipMax.x <= clipMin.x || clipMax.y <= clipMin.y)
                         continue;
 
                     // Apply scissor/clipping rectangle (Y is inverted in OpenGL)
-                    glScissor((int)clip_min.x, (int)((float)io.DisplaySize.y - clip_max.y), (int)(clip_max.x - clip_min.x), (int)(clip_max.y - clip_min.y));
+                    glScissor(static_cast<int>(clipMin.x), static_cast<int>(io.DisplaySize.y - clipMax.y),
+                        static_cast<int>(clipMax.x - clipMin.x), static_cast<int>(clipMax.y - clipMin.y));
 
-                    glBindTexture(GL_TEXTURE_2D, (GLuint)cmd->GetTexID());
-                    glDrawElements(GL_TRIANGLES, (GLsizei)cmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(cmd->IdxOffset * sizeof(ImDrawIdx)));
+                    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd->GetTexID())));
+                    glDrawElements(GL_TRIANGLES,
+                        static_cast<GLsizei>(cmd->ElemCount),
+                        sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
+                        reinterpret_cast<void*>(static_cast<intptr_t>(cmd->IdxOffset * sizeof(ImDrawIdx))));
                 }
             }
         }
