@@ -1,6 +1,7 @@
 add_library(epoch_zxspectrum
     "include/epoch/zxspectrum.h"
 
+    "src/Rom.h"
     "src/Ula.cpp" "src/Ula.h"
     "src/Z80Config.inc.h"
     "src/Z80Cpu.cpp" "src/Z80Cpu.h"

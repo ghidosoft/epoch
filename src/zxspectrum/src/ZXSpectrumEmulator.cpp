@@ -16,6 +16,7 @@
 
 #include "ZXSpectrumEmulator.h"
 
+#include "Rom.h"
 #include "Ula.h"
 #include "Z80Cpu.h"
 
@@ -67,7 +68,8 @@ namespace epoch::zxspectrum
             // main:
             0x18, 0xFE,         // JR   main
         };
-        std::memcpy(m_rom48k.data(), bytes, sizeof(bytes));
+        // std::memcpy(m_rom48k.data(), bytes, sizeof(bytes));
+        std::memcpy(m_rom48k.data(), ROM_48K, sizeof(ROM_48K));
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
