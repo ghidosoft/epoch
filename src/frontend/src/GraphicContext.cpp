@@ -112,11 +112,15 @@ namespace epoch::frontend
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+        constexpr auto uMin = .0f;
+        constexpr auto vMin = .0f;
+        const auto uMax = static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth);
+        const auto vMax = static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight);
         const Vertex quadVertices[] = {
-            { {-1, -1}, {0.f, static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight)} },
-            { { 1, -1}, {static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth), static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight)} },
-            { { 1,  1}, {static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth), 0.f} },
-            { {-1,  1}, {0.f, 0.f} },
+            { {-1, -1}, {uMin, vMax} },
+            { { 1, -1}, {uMax, vMax} },
+            { { 1,  1}, {uMax, vMin} },
+            { {-1,  1}, {uMin, vMin} },
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 
@@ -127,9 +131,9 @@ namespace epoch::frontend
         };
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), &quadIndices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
         glBindVertexArray(0);
