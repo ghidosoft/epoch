@@ -272,19 +272,19 @@ namespace epoch::zxspectrum
             {
             case 0b000:
                 // LD BC, nn
-                m_registers.bc = read16();
+                m_registers.bc = fetch16();
                 break;
             case 0b010:
                 // LD DE, nn
-                m_registers.de = read16();
+                m_registers.de = fetch16();
                 break;
             case 0b100:
                 // LD HL, nn
-                m_registers.hl = read16();
+                m_registers.hl = fetch16();
                 break;
             case 0b110:
                 // LD SP, nn
-                m_registers.sp = read16();
+                m_registers.sp = fetch16();
                 break;
             }
         }
@@ -292,9 +292,37 @@ namespace epoch::zxspectrum
         {
             switch (y)
             {
+            case 0b000:
+                // LD (BC), A
+                busWrite(m_registers.bc, m_registers.af.high());
+                break;
+            case 0b001:
+                // LD A, (BC)
+                m_registers.af.high(busRead(m_registers.bc));
+                break;
             case 0b010:
                 // LD (DE), A
                 busWrite(m_registers.de, m_registers.af.high());
+                break;
+            case 0b011:
+                // LD A, (DE)
+                m_registers.af.high(busRead(m_registers.de));
+                break;
+            case 0b100:
+                // LD (nn), HL
+                write16(fetch16(), m_registers.hl);
+                break;
+            case 0b101:
+                // LD HL, (nn)
+                m_registers.hl = read16(fetch16());
+                break;
+            case 0b110:
+                // LD (nn), A
+                busWrite(fetch16(), m_registers.af.high());
+                break;
+            case 0b111:
+                // LD A, (nn)
+                m_registers.af.high(busRead(fetch16()));
                 break;
             }
         }
@@ -497,7 +525,7 @@ namespace epoch::zxspectrum
             {
             case 0b000:
                 // JP nn
-                m_registers.pc = read16();
+                m_registers.pc = fetch16();
                 break;
             case 0b010:
                 // OUT (n), A
@@ -510,11 +538,24 @@ namespace epoch::zxspectrum
         }
     }
 
-    uint16_t Z80Cpu::read16()
+    uint16_t Z80Cpu::fetch16()
     {
         const auto low = busRead(m_registers.pc++);
         const auto high = busRead(m_registers.pc++);
         return static_cast<uint16_t>(high << 8) | low;
+    }
+
+    uint16_t Z80Cpu::read16(const uint16_t address)
+    {
+        const auto low = busRead(address);
+        const auto high = busRead(address + 1);
+        return static_cast<uint16_t>(high << 8) | low;
+    }
+
+    void Z80Cpu::write16(const uint16_t address, const uint16_t value)
+    {
+        busWrite(address, value & 0xff);
+        busWrite(address + 1, value >> 8);
     }
 
     uint8_t Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
