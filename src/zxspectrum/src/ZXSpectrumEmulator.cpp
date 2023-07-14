@@ -91,6 +91,7 @@ namespace epoch::zxspectrum
         if (m_y >= Height)
         {
             m_y = -VerticalRetrace;
+            m_frameCounter++;
         }
 
         if (m_y >= 0 && m_x >= 0)
