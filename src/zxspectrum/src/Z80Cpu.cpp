@@ -435,6 +435,24 @@ namespace epoch::zxspectrum
                 *m_registersPointers[y] = n;
             }
         }
+        else // if (z == 0b111)
+        {
+            switch (y)
+            {
+            case 0b110:
+                // SCF
+                m_registers.af.c(true);
+                m_registers.af.h(false);
+                m_registers.af.n(false);
+                break;
+            case 0b111:
+                // CCF
+                m_registers.af.c(!m_registers.af.c());
+                m_registers.af.h(!m_registers.af.h());
+                m_registers.af.n(false);
+                break;
+            }
+        }
     }
 
     void Z80Cpu::mainQuadrant1()
