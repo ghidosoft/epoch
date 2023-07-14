@@ -47,7 +47,7 @@ namespace epoch::zxspectrum
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
 
     ZXSpectrumEmulator::ZXSpectrumEmulator() :
-        Emulator{ {"ZX Spectrum", ScreenWidth + BorderLeft + BorderRight, ScreenHeight + BorderTop + BorderBottom} },
+        Emulator{ {"ZX Spectrum", Width, Height } },
         m_ula{std::make_unique<Ula>(m_rom48k, m_ram)},
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
@@ -82,26 +82,6 @@ namespace epoch::zxspectrum
         }
         m_ula->clock();
         m_clockCounter++;
-
-        if (m_x >= Width)
-        {
-            m_x = -HorizontalRetrace;
-            m_y++;
-        }
-        if (m_y >= Height)
-        {
-            m_y = -VerticalRetrace;
-            m_frameCounter++;
-        }
-
-        if (m_y >= 0 && m_x >= 0)
-        {
-            m_borderBuffer[m_y * Width + m_x] = m_ula->borderColor();
-            m_borderBuffer[m_y * Width + m_x + 1] = m_ula->borderColor();
-        }
-
-        m_x++;
-        m_x++;
     }
 
     void ZXSpectrumEmulator::reset()
@@ -109,9 +89,6 @@ namespace epoch::zxspectrum
         m_ula->reset();
         m_cpu->reset();
         m_clockCounter = 0;
-        m_frameCounter = 0;
-        m_x = -HorizontalRetrace;
-        m_y = -VerticalRetrace;
     }
 
     uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const
@@ -124,6 +101,8 @@ namespace epoch::zxspectrum
     {
         std::size_t source = 0;
         std::size_t dest = 0;
+        const auto borderBuffer = m_ula->borderBuffer();
+        const auto invertPaperInk = m_ula->invertPaperInk();
         for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
         {
             for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
@@ -131,7 +110,7 @@ namespace epoch::zxspectrum
                 Color color;
                 if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
                 {
-                    color = DefaultPalette.map(m_borderBuffer[source]);
+                    color = DefaultPalette.map(borderBuffer[source]);
                 }
                 else
                 {
@@ -156,7 +135,7 @@ namespace epoch::zxspectrum
                         paper += 0x08;
                         ink += 0x08;
                     }
-                    const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10); // every 16 frames
+                    const bool flash = (attribute & 0x80) && invertPaperInk;
                     color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
                 }
 

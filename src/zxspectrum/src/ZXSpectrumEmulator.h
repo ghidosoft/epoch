@@ -22,6 +22,8 @@
 
 #include <epoch/core.h>
 
+#include "Constants.h"
+
 namespace epoch::zxspectrum
 {
     class Ula;
@@ -30,19 +32,6 @@ namespace epoch::zxspectrum
     class ZXSpectrumEmulator : public Emulator
     {
     public:
-        static constexpr int ScreenWidth = 256;
-        static constexpr int ScreenHeight = 192;
-        static constexpr int BorderLeft = 48;
-        static constexpr int BorderRight = 48;
-        static constexpr int BorderTop = 48;
-        static constexpr int BorderBottom = 56;
-
-        static constexpr int VerticalRetrace = 16;
-        static constexpr int HorizontalRetrace = 48;
-
-        static constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
-        static constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
-
         static const Palette DefaultPalette;
 
     public:
@@ -67,16 +56,12 @@ namespace epoch::zxspectrum
         const std::unique_ptr<Ula> m_ula;
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
-        uint64_t m_frameCounter{};
 
         using MemoryBank = std::array<uint8_t, 0x4000>;
         MemoryBank m_rom48k{};
         std::array<MemoryBank, 8> m_ram{};
 
-        std::array<uint8_t, static_cast<std::size_t>(Width * Height)> m_borderBuffer{};
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
-
-        int m_x{ -HorizontalRetrace }, m_y{ -VerticalRetrace };
     };
 }
 

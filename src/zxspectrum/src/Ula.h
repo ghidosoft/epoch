@@ -18,7 +18,10 @@
 #define SRC_EPOCH_ZXSPECTRUM_ULA_H_
 
 #include <array>
+#include <cstdint>
+#include <span>
 
+#include "Constants.h"
 #include "Z80Interface.h"
 
 namespace epoch::zxspectrum
@@ -38,9 +41,11 @@ namespace epoch::zxspectrum
         void write(uint16_t address, uint8_t value) override;
         uint8_t ioRead(uint8_t port) override;
         void ioWrite(uint8_t port, uint8_t value) override;
-
-        [[nodiscard]] uint8_t borderColor() const { return m_border; }
+        
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
+
+        [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
+        [[nodiscard]] bool invertPaperInk() const;
 
     private:
         MemoryBank& m_rom48k;
@@ -49,6 +54,10 @@ namespace epoch::zxspectrum
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};
         int m_cpuStalled{};
+
+        uint64_t m_frameCounter{};
+        std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_borderBuffer{};
+        int m_x{ -HorizontalRetrace }, m_y{ -VerticalRetrace };
     };
 }
 

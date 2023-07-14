@@ -27,6 +27,26 @@ namespace epoch::zxspectrum
     void Ula::clock()
     {
         if (m_cpuStalled > 0) m_cpuStalled--;
+
+        if (m_x >= Width)
+        {
+            m_x = -HorizontalRetrace;
+            m_y++;
+        }
+        if (m_y >= Height)
+        {
+            m_y = -VerticalRetrace;
+            m_frameCounter++;
+        }
+
+        if (m_y >= 0 && m_x >= 0)
+        {
+            m_borderBuffer[m_y * Width + m_x] = m_border;
+            m_borderBuffer[m_y * Width + m_x + 1] = m_border;
+        }
+
+        m_x++;
+        m_x++;
     }
 
     void Ula::reset()
@@ -34,6 +54,9 @@ namespace epoch::zxspectrum
         m_floatingBusValue = {};
         m_border = {};
         m_cpuStalled = {};
+        m_frameCounter = 0;
+        m_x = -HorizontalRetrace;
+        m_y = -VerticalRetrace;
     }
 
     uint8_t Ula::read(const uint16_t address)
@@ -93,5 +116,11 @@ namespace epoch::zxspectrum
             // TODO ear/mic
             m_border = value & 0x07;
         }
+    }
+
+    bool Ula::invertPaperInk() const
+    {
+        // every 16 frames
+        return m_frameCounter & 0x10;
     }
 }
