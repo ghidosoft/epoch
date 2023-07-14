@@ -85,7 +85,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af2, 0x1234);
     }
 
-    TEST(Z80Cpu, Opcode00xxx001_LD_BC_nn) {
+    TEST(Z80Cpu, Opcode00000001_LD_BC_nn) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x01, 0x34, 0x12 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0x0000;
@@ -95,7 +95,21 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().bc, 0x1234);
     }
 
-    TEST(Z80Cpu, Opcode00xxx001_LD_DE_nn) {
+    TEST(Z80Cpu, Opcode00010001_ADD_HL_BC) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x09 } };
+        Z80Cpu sut{ bus };
+        sut.registers().bc = 0xabcd;
+        sut.registers().hl = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().bc, 0xabcd);
+        EXPECT_EQ(sut.registers().hl, 0x0245);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+    }
+
+    TEST(Z80Cpu, Opcode00010001_LD_DE_nn) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x11, 0x00, 0x40 } };
         Z80Cpu sut{ bus };
         sut.registers().de = 0x0000;
@@ -105,7 +119,21 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().de, 0x4000);
     }
 
-    TEST(Z80Cpu, Opcode00xxx001_LD_HL_nn) {
+    TEST(Z80Cpu, Opcode00011001_ADD_HL_DE) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x19 } };
+        Z80Cpu sut{ bus };
+        sut.registers().de = 0x0101;
+        sut.registers().hl = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().de, 0x0101);
+        EXPECT_EQ(sut.registers().hl, 0x5779);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+    }
+
+    TEST(Z80Cpu, Opcode00100001_LD_HL_nn) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x21, 0x34, 0x12 } };
         Z80Cpu sut{ bus };
         sut.registers().hl = 0x0000;
@@ -115,7 +143,19 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().hl, 0x1234);
     }
 
-    TEST(Z80Cpu, Opcode00xxx001_LD_SP_nn) {
+    TEST(Z80Cpu, Opcode00101001_ADD_HL_HL) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x29 } };
+        Z80Cpu sut{ bus };
+        sut.registers().hl = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().hl, 0xacf0);
+        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
+    }
+
+    TEST(Z80Cpu, Opcode00110001_LD_SP_nn) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x31, 0x34, 0x12 } };
         Z80Cpu sut{ bus };
         sut.registers().sp = 0x0000;
@@ -123,6 +163,20 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().pc, 3);
         EXPECT_EQ(sut.registers().ir, 1);
         EXPECT_EQ(sut.registers().sp, 0x1234);
+    }
+
+    TEST(Z80Cpu, Opcode00111001_ADD_HL_SP) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x39 } };
+        Z80Cpu sut{ bus };
+        sut.registers().sp = 0xfedc;
+        sut.registers().hl = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().sp, 0xfedc);
+        EXPECT_EQ(sut.registers().hl, 0x5554);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.n());
     }
 
     TEST(Z80Cpu, Opcode00000010_LD_BC_A) {
@@ -337,7 +391,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().de, 0x00cc);
         EXPECT_FALSE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_FALSE(sut.registers().af.p());
         EXPECT_FALSE(sut.registers().af.s());
         EXPECT_TRUE(sut.registers().af.z());
@@ -347,7 +401,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().de, 0xffcc);
         EXPECT_TRUE(sut.registers().af.c());
         EXPECT_TRUE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_FALSE(sut.registers().af.p());
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
@@ -499,7 +553,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af.high(), 0xa3);
         EXPECT_TRUE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_FALSE(sut.registers().af.p());
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
@@ -507,7 +561,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af.high(), 0x43);
         EXPECT_FALSE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_TRUE(sut.registers().af.p());
         EXPECT_FALSE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
@@ -525,7 +579,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af.high(), 0x83);
         EXPECT_TRUE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_TRUE(sut.registers().af.p());
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
@@ -533,7 +587,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af.high(), 0x02);
         EXPECT_FALSE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_FALSE(sut.registers().af.p());
         EXPECT_FALSE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
@@ -605,7 +659,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().af.high(), 0x03);
         EXPECT_TRUE(sut.registers().af.c());
         EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.n());
         EXPECT_FALSE(sut.registers().af.p());
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());

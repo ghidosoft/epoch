@@ -274,17 +274,37 @@ namespace epoch::zxspectrum
                 // LD BC, nn
                 m_registers.bc = fetch16();
                 break;
+            case 0b001:
+                // ADD HL, BC
+                m_remainingCycles += 7;
+                m_registers.hl = add16(m_registers.hl, m_registers.bc);
+                break;
             case 0b010:
                 // LD DE, nn
                 m_registers.de = fetch16();
+                break;
+            case 0b011:
+                // ADD HL, DE
+                m_remainingCycles += 7;
+                m_registers.hl = add16(m_registers.hl, m_registers.de);
                 break;
             case 0b100:
                 // LD HL, nn
                 m_registers.hl = fetch16();
                 break;
+            case 0b101:
+                // ADD HL, HL
+                m_remainingCycles += 7;
+                m_registers.hl = add16(m_registers.hl, m_registers.hl);
+                break;
             case 0b110:
                 // LD SP, nn
                 m_registers.sp = fetch16();
+                break;
+            case 0b111:
+                // ADD HL, SP
+                m_remainingCycles += 7;
+                m_registers.hl = add16(m_registers.hl, m_registers.sp);
                 break;
             }
         }
@@ -586,9 +606,19 @@ namespace epoch::zxspectrum
     uint8_t Z80Cpu::sub8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
     {
         const auto result = add8(a, ~b, !carryFlag);
+        m_registers.af.n(true);
         m_registers.af.c(!m_registers.af.c());
         m_registers.af.h(!m_registers.af.h());
         return result;
+    }
+
+    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b)
+    {
+        const uint32_t result = a + b;
+        m_registers.af.c(result >> 16);
+        m_registers.af.n(false);
+        // TODO: investigate H flag
+        return static_cast<uint16_t>(result);
     }
 
     void Z80Cpu::jr(const bool condition)
