@@ -16,6 +16,7 @@
 
 #include "Z80Cpu.h"
 
+#include <bit>
 #include <cassert>
 #include <optional>
 #include <sstream>
@@ -439,6 +440,20 @@ namespace epoch::zxspectrum
         {
             switch (y)
             {
+            case 0b000:
+                // RLCA
+                m_registers.af.high(std::rotl(m_registers.af.high(), 1));
+                m_registers.af.c(m_registers.af & 0x0100);
+                m_registers.af.h(false);
+                m_registers.af.n(false);
+                break;
+            case 0b001:
+                // RRCA
+                m_registers.af.high(std::rotr(m_registers.af.high(), 1));
+                m_registers.af.c(m_registers.af & 0x8000);
+                m_registers.af.h(false);
+                m_registers.af.n(false);
+                break;
             case 0b110:
                 // SCF
                 m_registers.af.c(true);

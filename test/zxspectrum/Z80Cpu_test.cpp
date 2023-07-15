@@ -427,7 +427,35 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().bc, 0xaaaa);
     }
 
-    TEST(Z80Cpu, Opcode01110111_SCF) {
+    TEST(Z80Cpu, Opcode00000111_RLCA) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x07 } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.high(0b11110000);
+        sut.registers().af.low(0x00);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0b11100001);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+    }
+
+    TEST(Z80Cpu, Opcode00001111_RRCA) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x0f } };
+        Z80Cpu sut{ bus };
+        sut.registers().af.high(0b00001111);
+        sut.registers().af.low(0x00);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af.high(), 0b10000111);
+        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_FALSE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.n());
+    }
+
+    TEST(Z80Cpu, Opcode00110111_SCF) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x37 } };
         Z80Cpu sut{ bus };
         sut.registers().af.low(0x00);
@@ -439,7 +467,7 @@ namespace epoch::zxspectrum
         EXPECT_FALSE(sut.registers().af.n());
     }
 
-    TEST(Z80Cpu, Opcode01111111_CCF) {
+    TEST(Z80Cpu, Opcode00111111_CCF) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x3f } };
         Z80Cpu sut{ bus };
         sut.registers().af.low(0x00);
