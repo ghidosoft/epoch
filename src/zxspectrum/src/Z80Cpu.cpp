@@ -474,6 +474,33 @@ namespace epoch::zxspectrum
                     m_registers.af.n(false);
                 }
                 break;
+            case 0b100:
+                // DAA
+                {
+                    auto a = m_registers.af.high();
+                    if ((a & 0x0f) > 9 || m_registers.af.h())
+                    {
+                        a += 0x06;
+                    }
+                    if ((a >> 4) > 9 || m_registers.af.c())
+                    {
+                        a += 0x60;
+                        m_registers.af.c(true);
+                    }
+                    else
+                    {
+                        m_registers.af.c(false);
+                    }
+                    m_registers.af.low(s_flagsLookupSZP[a] | (m_registers.af.low() & 0b00111011));
+                    m_registers.af.high(a);
+                }
+                break;
+            case 0b101:
+                // CPL
+                m_registers.af.high(~m_registers.af.high());
+                m_registers.af.h(true);
+                m_registers.af.n(true);
+                break;
             case 0b110:
                 // SCF
                 m_registers.af.c(true);
