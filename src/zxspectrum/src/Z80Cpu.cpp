@@ -454,6 +454,26 @@ namespace epoch::zxspectrum
                 m_registers.af.h(false);
                 m_registers.af.n(false);
                 break;
+            case 0b010:
+                // RLA
+                {
+                    const uint8_t carry = m_registers.af.c() ? 1 : 0;
+                    m_registers.af.c(m_registers.af & 0x8000);
+                    m_registers.af.high(static_cast<uint8_t>(m_registers.af.high() << 1) | carry);
+                    m_registers.af.h(false);
+                    m_registers.af.n(false);
+                }
+                break;
+            case 0b011:
+                // RRA
+                {
+                    const uint8_t carry = m_registers.af.c() ? 0x80 : 0x00;
+                    m_registers.af.c(m_registers.af & 0x0100);
+                    m_registers.af.high(static_cast<uint8_t>(m_registers.af.high() >> 1) | carry);
+                    m_registers.af.h(false);
+                    m_registers.af.n(false);
+                }
+                break;
             case 0b110:
                 // SCF
                 m_registers.af.c(true);
