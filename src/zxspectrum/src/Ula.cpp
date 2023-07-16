@@ -105,7 +105,6 @@ namespace epoch::zxspectrum
     uint8_t Ula::ioRead(const uint8_t port)
     {
         // TODO
-        assert(false);
         return 0;
     }
 

@@ -47,7 +47,7 @@ namespace epoch::zxspectrum
         struct WordRegister
         {
             WordRegister() = default;
-            WordRegister(const uint16_t value) : value(value) {}
+            WordRegister(const uint16_t v) : value(v) {}
             uint16_t value{};
             [[nodiscard]] uint8_t low() const { return value & 0xff; }
             [[nodiscard]] uint8_t high() const { return (value >> 8) & 0xff; }
@@ -59,6 +59,9 @@ namespace epoch::zxspectrum
 
         struct WordFlagsRegister : WordRegister
         {
+            WordFlagsRegister() = default;
+            WordFlagsRegister(const uint16_t v) : WordRegister(v) {}
+
             [[nodiscard]] bool s() const { return value & Z80Flags::s; }
             [[nodiscard]] bool z() const { return value & Z80Flags::z; }
             [[nodiscard]] bool y() const { return value & Z80Flags::y; }
@@ -192,14 +195,23 @@ namespace epoch::zxspectrum
         void mainQuadrant1();
         void mainQuadrant2();
         void mainQuadrant3();
+
+        void prefixCb();
+        void prefixDd();
+        void prefixEd();
+        void prefixFd();
+
         uint16_t fetch16();
         uint16_t read16(uint16_t address);
         void write16(uint16_t address, uint16_t value);
         uint8_t add8(uint8_t a, uint8_t b, uint8_t carryFlag);
         uint8_t sub8(uint8_t a, uint8_t b, uint8_t carryFlag);
         uint16_t add16(uint16_t a, uint16_t b);
-        void alu8(uint8_t operation, uint8_t a, uint8_t b);
+        void alu8(int operation, uint8_t a, uint8_t b);
+        [[nodiscard]] bool evaluateCondition(int condition) const;
         void jr(bool condition);
+        void push16(uint16_t value);
+        uint16_t pop16();
     };
 }
 

@@ -575,9 +575,68 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::mainQuadrant3()
     {
-        const auto y = (m_opcode & 0b00111000) >> 3;
+        const uint8_t y = (m_opcode & 0b00111000) >> 3;
         const auto z = (m_opcode & 0b00000111);
-        if (z == 0b011)
+        if (z == 0b000)
+        {
+            // RET [cond]
+            m_remainingCycles++;
+            if (evaluateCondition(y))
+            {
+                m_registers.pc = pop16();
+            }
+        }
+        else if (z == 0b001)
+        {
+            switch (y)
+            {
+            case 0b000:
+                // POP BC
+                m_registers.bc = pop16();
+                break;
+            case 0b001:
+                // RET
+                m_registers.pc = pop16();
+                break;
+            case 0b010:
+                // POP DE
+                m_registers.de = pop16();
+                break;
+            case 0b011:
+                // EXX
+                std::swap(m_registers.bc.value, m_registers.bc2.value);
+                std::swap(m_registers.de.value, m_registers.de2.value);
+                std::swap(m_registers.hl.value, m_registers.hl2.value);
+                break;
+            case 0b100:
+                // POP HL
+                m_registers.hl = pop16();
+                break;
+            case 0b101:
+                // JP HL
+                m_registers.pc = m_registers.hl;
+                break;
+            case 0b110:
+                // POP AF
+                m_registers.af = pop16();
+                break;
+            case 0b111:
+                // LD SP, HL
+                m_registers.sp = m_registers.hl;
+                m_remainingCycles++;
+                break;
+            }
+        }
+        else if (z == 0b010)
+        {
+            // JP[cond] nn
+            const auto nn = fetch16();
+            if (evaluateCondition(y))
+            {
+                m_registers.pc = nn;
+            }
+        }
+        else if (z == 0b011)
         {
             switch (y)
             {
@@ -586,7 +645,8 @@ namespace epoch::zxspectrum
                 m_registers.pc = fetch16();
                 break;
             case 0b001:
-                // TODO: 0xCB prefix
+                // CB prefix
+                prefixCb();
                 break;
             case 0b010:
                 // OUT (n), A
@@ -623,13 +683,91 @@ namespace epoch::zxspectrum
                 break;
             }
         }
+        else if (z == 0b100)
+        {
+            // CALL [cond], nn
+            const auto nn = fetch16();
+            if (evaluateCondition(y))
+            {
+                m_remainingCycles++;
+                push16(m_registers.pc);
+                m_registers.pc = nn;
+            }
+        }
+        else if (z == 0b101)
+        {
+            switch (y)
+            {
+            case 0b000:
+                // PUSH BC
+                push16(m_registers.bc);
+                m_remainingCycles++;
+                break;
+            case 0b001:
+                // CALL nn
+                {
+                    const auto nn = fetch16();
+                    m_remainingCycles++;
+                    push16(m_registers.pc);
+                    m_registers.pc = nn;
+                }
+                break;
+            case 0b010:
+                // PUSH DE
+                push16(m_registers.de);
+                m_remainingCycles++;
+                break;
+            case 0b011:
+                // DD prefix
+                prefixDd();
+                break;
+            case 0b100:
+                // PUSH HL
+                push16(m_registers.hl);
+                m_remainingCycles++;
+                break;
+            case 0b101:
+                // ED prefix
+                prefixEd();
+                break;
+            case 0b110:
+                // PUSH AF
+                push16(m_registers.af);
+                m_remainingCycles++;
+                break;
+            case 0b111:
+                // FD prefix
+                prefixFd();
+                break;
+            }
+        }
         else if (z == 0b110)
         {
             // ALU immediate
             const auto a = m_registers.af.high();
             const auto b = busRead(m_registers.pc++);
-            alu8(static_cast<uint8_t>(y), a, b);
+            alu8(y, a, b);
         }
+    }
+
+    void Z80Cpu::prefixCb()
+    {
+        // TODO
+    }
+
+    void Z80Cpu::prefixDd()
+    {
+        // TODO
+    }
+
+    void Z80Cpu::prefixEd()
+    {
+        // TODO
+    }
+
+    void Z80Cpu::prefixFd()
+    {
+        // TODO
     }
 
     uint16_t Z80Cpu::fetch16()
@@ -695,55 +833,89 @@ namespace epoch::zxspectrum
         return static_cast<uint16_t>(result);
     }
 
-    void Z80Cpu::alu8(const uint8_t operation, const uint8_t a, const uint8_t b)
+    void Z80Cpu::alu8(const int operation, const uint8_t a, const uint8_t b)
     {
         switch (operation)
         {
         case 0b000:
             // ADD
             m_registers.af.high(add8(a, b, 0));
-            break;
+            return;
         case 0b001:
             // ADC
             m_registers.af.high(add8(a, b, m_registers.af.c()));
-            break;
+            return;
         case 0b010:
             // SUB
             m_registers.af.high(sub8(a, b, 0));
-            break;
+            return;
         case 0b011:
             // SBC
             m_registers.af.high(sub8(a, b, m_registers.af.c()));
-            break;
+            return;
         case 0b100:
             // AND
-        {
-            const uint8_t result = a & b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
-        }
-        break;
+            {
+                const uint8_t result = a & b;
+                m_registers.af.high(result);
+                m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
+            }
+            return;
         case 0b101:
             // XOR
-        {
-            const uint8_t result = a ^ b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result]);
-        }
-        break;
+            {
+                const uint8_t result = a ^ b;
+                m_registers.af.high(result);
+                m_registers.af.low(s_flagsLookupSZP[result]);
+            }
+            return;
         case 0b110:
             // OR
-        {
-            const uint8_t result = a | b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result]);
-        }
-        break;
+            {
+                const uint8_t result = a | b;
+                m_registers.af.high(result);
+                m_registers.af.low(s_flagsLookupSZP[result]);
+            }
+            return;
         case 0b111:
             // CP
             sub8(a, b, 0);
-            break;
+            return;
         }
+        assert(false);
+    }
+
+    bool Z80Cpu::evaluateCondition(const int condition) const
+    {
+        switch (condition)
+        {
+        case 0b000:
+            // NZ
+            return m_registers.af.z() == false;
+        case 0b001:
+            // Z
+            return m_registers.af.z() == true;
+        case 0b010:
+            // NC
+            return m_registers.af.c() == false;
+        case 0b011:
+            // C
+            return m_registers.af.c() == true;
+        case 0b100:
+            // PO
+            return m_registers.af.p() == false;
+        case 0b101:
+            // PE
+            return m_registers.af.p() == true;
+        case 0b110:
+            // P
+            return m_registers.af.s() == false;
+        case 0b111:
+            // M
+            return m_registers.af.s() == true;
+        }
+        assert(false);
+        return false;
     }
 
     void Z80Cpu::jr(const bool condition)
@@ -754,5 +926,18 @@ namespace epoch::zxspectrum
             m_remainingCycles += 5;
             m_registers.pc += d;
         }
+    }
+
+    void Z80Cpu::push16(const uint16_t value)
+    {
+        busWrite(--m_registers.sp, value >> 8);
+        busWrite(--m_registers.sp, value & 0xff);
+    }
+
+    uint16_t Z80Cpu::pop16()
+    {
+        const auto low = busRead(m_registers.sp++);
+        const auto high = busRead(m_registers.sp++);
+        return static_cast<uint16_t>(high << 8) | low;
     }
 }
