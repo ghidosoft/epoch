@@ -4,5 +4,6 @@ out/
 .vs/
 .idea/
 cmake-build-*/
+*.user
 
 /assets/*
