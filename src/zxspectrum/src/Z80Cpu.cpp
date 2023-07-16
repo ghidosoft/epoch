@@ -817,7 +817,7 @@ namespace epoch::zxspectrum
                     break;
                 }
             }
-            else if (z == 0b000)
+            else if (z == 0b001)
             {
                 uint8_t value = 0;
                 m_registers.af.low(s_flagsLookupSZP[value]);
