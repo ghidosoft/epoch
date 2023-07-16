@@ -128,6 +128,8 @@ namespace epoch::zxspectrum
                 };
             }
         }
+
+        reset();
     }
 
     void Z80Cpu::clock()
@@ -156,6 +158,8 @@ namespace epoch::zxspectrum
             {
                 mainQuadrant3();
             }
+
+            if (m_opcode != 0xfb) m_registers.interruptJustEnabled = false;
         }
 
         m_remainingCycles--;
@@ -627,12 +631,41 @@ namespace epoch::zxspectrum
                 // JP nn
                 m_registers.pc = fetch16();
                 break;
+            case 0b001:
+                // TODO: 0xCB prefix
+                break;
             case 0b010:
                 // OUT (n), A
+                ioWrite(busRead(m_registers.pc++), m_registers.af.high());
+                break;
+            case 0b011:
+                // IN A, (n)
+                m_registers.af.high(ioRead(busRead(m_registers.pc++)));
+                break;
+            case 0b100:
+                // EX (SP), HL
                 {
-                    const auto n = busRead(m_registers.pc++);
-                    ioWrite(n, m_registers.af.high());
+                    const auto low = busRead(m_registers.sp);
+                    m_remainingCycles++;
+                    const auto high = busRead(m_registers.sp + 1);
+                    busWrite(m_registers.sp, m_registers.hl.low());
+                    busWrite(m_registers.sp + 1, m_registers.hl.high());
+                    m_remainingCycles += 2;
+                    m_registers.hl = static_cast<uint16_t>(high << 8) | low;
                 }
+                break;
+            case 0b101:
+                // EX DE, HL
+                std::swap(m_registers.de.value, m_registers.hl.value);
+                break;
+            case 0b110:
+                // DI
+                m_registers.iff1 = m_registers.iff2 = false;
+                break;
+            case 0b111:
+                // EI
+                m_registers.iff1 = m_registers.iff2 = true;
+                m_registers.interruptJustEnabled = true;
                 break;
             }
         }

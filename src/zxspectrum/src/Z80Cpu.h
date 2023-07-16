@@ -104,6 +104,11 @@ namespace epoch::zxspectrum
         WordRegister de2{ 0xffff };
         // HL shadow
         WordRegister hl2{ 0xffff };
+
+        uint8_t interruptMode{ 0 };
+        bool iff1{ true };
+        bool iff2{ true };
+        bool interruptJustEnabled{ false };
     };
 
     enum class Z80MachineCycle
@@ -163,7 +168,7 @@ namespace epoch::zxspectrum
         void step();
         void reset();
 
-        Z80Registers& registers();
+        [[nodiscard]] Z80Registers& registers();
         [[nodiscard]] const Z80Registers& registers() const;
 
     private:

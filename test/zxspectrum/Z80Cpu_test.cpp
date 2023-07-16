@@ -39,6 +39,24 @@ namespace epoch::zxspectrum
     TEST(Z80Cpu, ResetBehavior) {
         TestZ80Interface bus{};
         Z80Cpu sut{ bus };
+        EXPECT_EQ(sut.registers().pc, 0);
+        EXPECT_EQ(sut.registers().ir, 0);
+        EXPECT_EQ(sut.registers().af, 0xffff);
+        EXPECT_EQ(sut.registers().bc, 0xffff);
+        EXPECT_EQ(sut.registers().de, 0xffff);
+        EXPECT_EQ(sut.registers().hl, 0xffff);
+        EXPECT_EQ(sut.registers().sp, 0xffff);
+        EXPECT_EQ(sut.registers().ix, 0xffff);
+        EXPECT_EQ(sut.registers().iy, 0xffff);
+        EXPECT_EQ(sut.registers().af2, 0xffff);
+        EXPECT_EQ(sut.registers().bc2, 0xffff);
+        EXPECT_EQ(sut.registers().de2, 0xffff);
+        EXPECT_EQ(sut.registers().hl2, 0xffff);
+        EXPECT_EQ(sut.registers().interruptMode, 0x00);
+        EXPECT_TRUE(sut.registers().iff1);
+        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().interruptJustEnabled);
+        std::memset(&sut.registers(), 0xcc, sizeof(Z80Registers));
         sut.reset();
         EXPECT_EQ(sut.registers().pc, 0);
         EXPECT_EQ(sut.registers().ir, 0);
@@ -53,6 +71,10 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().bc2, 0xffff);
         EXPECT_EQ(sut.registers().de2, 0xffff);
         EXPECT_EQ(sut.registers().hl2, 0xffff);
+        EXPECT_EQ(sut.registers().interruptMode, 0x00);
+        EXPECT_TRUE(sut.registers().iff1);
+        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().interruptJustEnabled);
     }
 
     TEST(Z80Cpu, Opcode00000000_NOP) {
@@ -781,5 +803,63 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 0x1234);
         EXPECT_EQ(sut.registers().ir, 1);
+    }
+
+    TEST(Z80Cpu, Opcode11100011_EX_mSP_HL) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xe3 } };
+        bus.ram()[0x1234] = 0x56;
+        bus.ram()[0x1235] = 0x78;
+        Z80Cpu sut{ bus };
+        sut.registers().sp = 0x1234;
+        sut.registers().hl = 0xabcd;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().sp, 0x1234);
+        EXPECT_EQ(sut.registers().hl, 0x7856);
+        EXPECT_EQ(bus.ram()[0x1234], 0xcd);
+        EXPECT_EQ(bus.ram()[0x1235], 0xab);
+    }
+
+    TEST(Z80Cpu, Opcode11101011_EX_DE_HL) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xeb } };
+        Z80Cpu sut{ bus };
+        sut.registers().de = 0x1234;
+        sut.registers().hl = 0xabcd;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().de, 0xabcd);
+        EXPECT_EQ(sut.registers().hl, 0x1234);
+    }
+
+    TEST(Z80Cpu, Opcode11110011_DI) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xf3 } };
+        Z80Cpu sut{ bus };
+        sut.registers().iff1 = true;
+        sut.registers().iff2 = true;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_FALSE(sut.registers().iff1);
+        EXPECT_FALSE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().interruptJustEnabled);
+    }
+
+    TEST(Z80Cpu, Opcode11111011_EI) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xfb, 0x00 } };
+        Z80Cpu sut{ bus };
+        sut.registers().iff1 = false;
+        sut.registers().iff2 = false;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_TRUE(sut.registers().iff1);
+        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_TRUE(sut.registers().interruptJustEnabled);
+        sut.step();
+        EXPECT_TRUE(sut.registers().iff1);
+        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().interruptJustEnabled);
     }
 }
