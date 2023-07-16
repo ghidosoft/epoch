@@ -896,6 +896,37 @@ namespace epoch::zxspectrum
                     break;
                 }
             }
+            else if (z == 0b100)
+            {
+                // NEG
+                m_registers.af.high(sub8(0, m_registers.af.high(), 0));
+            }
+            else if (z == 0b101)
+            {
+                // RETI/RETN
+                m_registers.iff1 = m_registers.iff2;
+                m_registers.pc = pop16();
+            }
+            else if (z == 0b110)
+            {
+                switch (y)
+                {
+                case 0b000:
+                case 0b001:
+                case 0b100:
+                case 0b101:
+                    m_registers.interruptMode = 0;
+                    break;
+                case 0b010:
+                case 0b110:
+                    m_registers.interruptMode = 1;
+                    break;
+                case 0b011:
+                case 0b111:
+                    m_registers.interruptMode = 2;
+                    break;
+                }
+            }
         }
     }
 

@@ -38,8 +38,8 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().de2, 0xffff);
         EXPECT_EQ(sut.registers().hl2, 0xffff);
         EXPECT_EQ(sut.registers().interruptMode, 0x00);
-        EXPECT_TRUE(sut.registers().iff1);
-        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().iff1);
+        EXPECT_FALSE(sut.registers().iff2);
         EXPECT_FALSE(sut.registers().interruptJustEnabled);
         std::memset(&sut.registers(), 0xcc, sizeof(Z80Registers));
         sut.reset();
@@ -57,8 +57,8 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().de2, 0xffff);
         EXPECT_EQ(sut.registers().hl2, 0xffff);
         EXPECT_EQ(sut.registers().interruptMode, 0x00);
-        EXPECT_TRUE(sut.registers().iff1);
-        EXPECT_TRUE(sut.registers().iff2);
+        EXPECT_FALSE(sut.registers().iff1);
+        EXPECT_FALSE(sut.registers().iff2);
         EXPECT_FALSE(sut.registers().interruptJustEnabled);
     }
 

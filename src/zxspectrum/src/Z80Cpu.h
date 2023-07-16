@@ -109,8 +109,8 @@ namespace epoch::zxspectrum
         WordRegister hl2{ 0xffff };
 
         uint8_t interruptMode{ 0 };
-        bool iff1{ true };
-        bool iff2{ true };
+        bool iff1{ false };
+        bool iff2{ false };
         bool interruptJustEnabled{ false };
     };
 
