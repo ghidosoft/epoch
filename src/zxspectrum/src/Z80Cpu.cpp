@@ -771,7 +771,93 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixEd()
     {
-        // TODO
+        m_opcode = fetchOpcode();
+        const auto x = m_opcode >> 6;
+        const auto y = (m_opcode & 0b00111000) >> 3;
+        const auto z = (m_opcode & 0b00000111);
+        if (x == 1)
+        {
+            // ED: quadrant 1
+            if (z == 0b000)
+            {
+                const auto value = ioRead(m_registers.bc.low());
+                m_registers.af.low(s_flagsLookupSZP[value]);
+                switch (y)
+                {
+                case 0b000:
+                    // IN B, (C)
+                    m_registers.bc.high(value);
+                    break;
+                case 0b001:
+                    // IN C, (C)
+                    m_registers.bc.low(value);
+                    break;
+                case 0b010:
+                    // IN D, (C)
+                    m_registers.de.high(value);
+                    break;
+                case 0b011:
+                    // IN E, (C)
+                    m_registers.de.low(value);
+                    break;
+                case 0b100:
+                    // IN H, (C)
+                    m_registers.hl.high(value);
+                    break;
+                case 0b101:
+                    // IN L, (C)
+                    m_registers.hl.low(value);
+                    break;
+                case 0b110:
+                    // IN (C)
+                    break;
+                case 0b111:
+                    // IN A, (C)
+                    m_registers.af.high(value);
+                    break;
+                }
+            }
+            else if (z == 0b000)
+            {
+                uint8_t value = 0;
+                m_registers.af.low(s_flagsLookupSZP[value]);
+                switch (y)
+                {
+                case 0b000:
+                    // OUT (C), B
+                    value = m_registers.bc.high();
+                    break;
+                case 0b001:
+                    // OUT (C), C
+                    value = m_registers.bc.low();
+                    break;
+                case 0b010:
+                    // OUT (C), D
+                    value = m_registers.de.high();
+                    break;
+                case 0b011:
+                    // OUT (C), E
+                    value = m_registers.de.low();
+                    break;
+                case 0b100:
+                    // OUT (C), H
+                    value = m_registers.hl.high();
+                    break;
+                case 0b101:
+                    // OUT (C), L
+                    value = m_registers.hl.low();
+                    break;
+                case 0b110:
+                    // OUT (C)
+                    break;
+                case 0b111:
+                    // OUT (C), A
+                    value = m_registers.af.high();
+                    break;
+                }
+                ioWrite(m_registers.bc.low(), value);
+            }
+        }
     }
 
     void Z80Cpu::prefixFd()
