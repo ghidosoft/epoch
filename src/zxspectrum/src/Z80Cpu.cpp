@@ -1095,11 +1095,13 @@ namespace epoch::zxspectrum
         case Z80OpcodePrefix::ix:
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                m_remainingCycles += 5;
                 return busRead(m_registers.ix + d);
             }
         case Z80OpcodePrefix::iy:
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                m_remainingCycles += 5;
                 return busRead(m_registers.iy + d);
             }
         }
@@ -1113,15 +1115,17 @@ namespace epoch::zxspectrum
         case Z80OpcodePrefix::none:
             return busWrite(m_registers.hl, value);
         case Z80OpcodePrefix::ix:
-        {
-            const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
-            return busWrite(m_registers.ix + d, value);
-        }
+            {
+                const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                m_remainingCycles += 5; // TODO: should not apply for LD (IX+d), n
+                return busWrite(static_cast<uint16_t>(m_registers.ix + d), value);
+            }
         case Z80OpcodePrefix::iy:
-        {
-            const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
-            return busWrite(m_registers.iy + d, false);
-        }
+            {
+                const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                m_remainingCycles += 5; // TODO: should not apply for LD (IY+d), n
+                return busWrite(static_cast<uint16_t>(m_registers.iy + d), false);
+            }
         }
         assert(false);
     }
