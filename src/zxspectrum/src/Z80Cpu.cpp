@@ -613,7 +613,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b101:
                 // JP HL
-                m_registers.pc = m_registers.hl;
+                m_registers.pc = getHL();
                 break;
             case 0b110:
                 // POP AF
@@ -621,7 +621,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b111:
                 // LD SP, HL
-                m_registers.sp = m_registers.hl;
+                m_registers.sp = getHL();
                 m_remainingCycles++;
                 break;
             }
@@ -760,6 +760,9 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixCb()
     {
+        const uint8_t x = m_opcode >> 6;
+        const uint8_t y = (m_opcode & 0b00111000) >> 3;
+        const uint8_t z = m_opcode & 0b00000111;
         // TODO
         assert(false);
     }
@@ -1074,6 +1077,7 @@ namespace epoch::zxspectrum
         case Z80OpcodePrefix::iy:   return m_registers.iy;
         }
         assert(false);
+        return 0;
     }
 
     void Z80Cpu::setHL(const uint16_t value)
@@ -1106,6 +1110,7 @@ namespace epoch::zxspectrum
             }
         }
         assert(false);
+        return 0;
     }
 
     void Z80Cpu::busWriteHL(const uint8_t value)
