@@ -136,30 +136,7 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
-            m_opcode = fetchOpcode();
-
-            const auto quadrant = m_opcode >> 6;
-
-            if (quadrant == 0)
-            {
-                mainQuadrant0();
-            }
-            else if (quadrant == 1)
-            {
-                // LD 8bit / HALT
-                mainQuadrant1();
-            }
-            else if (quadrant == 2)
-            {
-                // ALU operations
-                mainQuadrant2();
-            }
-            else
-            {
-                mainQuadrant3();
-            }
-
-            if (m_opcode != 0xfb) m_registers.interruptJustEnabled = false;
+            executeInstruction();
         }
 
         m_remainingCycles--;
@@ -176,17 +153,38 @@ namespace epoch::zxspectrum
     void Z80Cpu::reset()
     {
         m_registers = {};
+        m_currentPrefix = Z80OpcodePrefix::none;
         m_remainingCycles = {};
     }
 
-    Z80Registers& Z80Cpu::registers()
+    void Z80Cpu::executeInstruction()
     {
-        return m_registers;
-    }
+        m_opcode = fetchOpcode();
 
-    const Z80Registers& Z80Cpu::registers() const
-    {
-        return m_registers;
+        const auto quadrant = m_opcode >> 6;
+
+        if (quadrant == 0)
+        {
+            mainQuadrant0();
+        }
+        else if (quadrant == 1)
+        {
+            // LD 8bit / HALT
+            mainQuadrant1();
+        }
+        else if (quadrant == 2)
+        {
+            // ALU operations
+            mainQuadrant2();
+        }
+        else
+        {
+            mainQuadrant3();
+        }
+
+        if (m_opcode != 0xfb) m_registers.interruptJustEnabled = false;
+
+        m_currentPrefix = Z80OpcodePrefix::none;
     }
 
     uint8_t Z80Cpu::fetchOpcode()
@@ -282,7 +280,7 @@ namespace epoch::zxspectrum
             case 0b001:
                 // ADD HL, BC
                 m_remainingCycles += 7;
-                m_registers.hl = add16(m_registers.hl, m_registers.bc);
+                setHL(add16(getHL(), m_registers.bc));
                 break;
             case 0b010:
                 // LD DE, nn
@@ -291,16 +289,16 @@ namespace epoch::zxspectrum
             case 0b011:
                 // ADD HL, DE
                 m_remainingCycles += 7;
-                m_registers.hl = add16(m_registers.hl, m_registers.de);
+                setHL(add16(getHL(), m_registers.de));
                 break;
             case 0b100:
                 // LD HL, nn
-                m_registers.hl = fetch16();
+                setHL(fetch16());
                 break;
             case 0b101:
                 // ADD HL, HL
                 m_remainingCycles += 7;
-                m_registers.hl = add16(m_registers.hl, m_registers.hl);
+                setHL(add16(getHL(), getHL()));
                 break;
             case 0b110:
                 // LD SP, nn
@@ -309,7 +307,7 @@ namespace epoch::zxspectrum
             case 0b111:
                 // ADD HL, SP
                 m_remainingCycles += 7;
-                m_registers.hl = add16(m_registers.hl, m_registers.sp);
+                setHL(add16(getHL(), m_registers.sp));
                 break;
             }
         }
@@ -335,11 +333,11 @@ namespace epoch::zxspectrum
                 break;
             case 0b100:
                 // LD (nn), HL
-                write16(fetch16(), m_registers.hl);
+                write16(fetch16(), getHL());
                 break;
             case 0b101:
                 // LD HL, (nn)
-                m_registers.hl = read16(fetch16());
+                setHL(read16(fetch16()));
                 break;
             case 0b110:
                 // LD (nn), A
@@ -373,11 +371,11 @@ namespace epoch::zxspectrum
                 break;
             case 0b100:
                 // INC HL
-                m_registers.hl.value++;
+                setHL(getHL() + 1);
                 break;
             case 0b101:
                 // DEC HL
-                m_registers.hl.value--;
+                setHL(getHL() - 1);
                 break;
             case 0b110:
                 // INC SP
@@ -397,9 +395,9 @@ namespace epoch::zxspectrum
             if (y == 0b110)
             {
                 // INC (HL)
-                n = busRead(m_registers.hl);
+                n = busReadHL();
                 m_remainingCycles++;
-                busWrite(m_registers.hl, n + 1);
+                busWriteHL(n + 1);
                 add8(n, 1);
             }
             else
@@ -415,9 +413,9 @@ namespace epoch::zxspectrum
             if (y == 0b110)
             {
                 // DEC (HL)
-                n = busRead(m_registers.hl);
+                n = busReadHL();
                 m_remainingCycles++;
-                busWrite(m_registers.hl, n - 1);
+                busWriteHL(n - 1);
                 sub8(n, 1);
             }
             else
@@ -433,7 +431,7 @@ namespace epoch::zxspectrum
             if (y == 0b110)
             {
                 // LD (HL), n
-                busWrite(m_registers.hl, n);
+                busWriteHL(n);
             }
             else
             {
@@ -538,7 +536,7 @@ namespace epoch::zxspectrum
             else
             {
                 // LD dst, (HL)
-                *dstPtr = busRead(m_registers.hl.value);
+                *dstPtr = busReadHL();
             }
         }
         else
@@ -546,7 +544,7 @@ namespace epoch::zxspectrum
             if (dst == 0b110)
             {
                 // LD (HL), src
-                busWrite(m_registers.hl.value, *srcPtr);
+                busWriteHL(*srcPtr);
             }
             else
             {
@@ -565,7 +563,7 @@ namespace epoch::zxspectrum
         uint8_t b;
         if (src == 0b110)
         {
-            b = busRead(m_registers.hl.value);
+            b = busReadHL();
         }
         else
         {
@@ -611,7 +609,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b100:
                 // POP HL
-                m_registers.hl = pop16();
+                setHL(pop16());
                 break;
             case 0b101:
                 // JP HL
@@ -663,10 +661,11 @@ namespace epoch::zxspectrum
                     const auto low = busRead(m_registers.sp);
                     m_remainingCycles++;
                     const auto high = busRead(m_registers.sp + 1);
-                    busWrite(m_registers.sp, m_registers.hl.low());
-                    busWrite(m_registers.sp + 1, m_registers.hl.high());
+                    const auto value = getHL();
+                    busWrite(m_registers.sp, value & 0xff);
+                    busWrite(m_registers.sp + 1, value >> 8);
                     m_remainingCycles += 2;
-                    m_registers.hl = static_cast<uint16_t>(high << 8) | low;
+                    setHL(static_cast<uint16_t>(high << 8) | low);
                 }
                 break;
             case 0b101:
@@ -724,7 +723,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b100:
                 // PUSH HL
-                push16(m_registers.hl);
+                push16(getHL());
                 m_remainingCycles++;
                 break;
             case 0b101:
@@ -767,8 +766,8 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixDd()
     {
-        // TODO
-        assert(false);
+        m_currentPrefix = Z80OpcodePrefix::ix;
+        executeInstruction();
     }
 
     void Z80Cpu::prefixEd()
@@ -1062,7 +1061,68 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixFd()
     {
-        // TODO
+        m_currentPrefix = Z80OpcodePrefix::iy;
+        executeInstruction();
+    }
+
+    uint16_t Z80Cpu::getHL() const
+    {
+        switch (m_currentPrefix)
+        {
+        case Z80OpcodePrefix::none: return m_registers.hl;
+        case Z80OpcodePrefix::ix:   return m_registers.ix;
+        case Z80OpcodePrefix::iy:   return m_registers.iy;
+        }
+        assert(false);
+    }
+
+    void Z80Cpu::setHL(const uint16_t value)
+    {
+        switch (m_currentPrefix)
+        {
+        case Z80OpcodePrefix::none: m_registers.hl = value; break;
+        case Z80OpcodePrefix::ix:   m_registers.ix = value; break;
+        case Z80OpcodePrefix::iy:   m_registers.iy = value; break;
+        }
+    }
+
+    uint8_t Z80Cpu::busReadHL()
+    {
+        switch (m_currentPrefix)
+        {
+        case Z80OpcodePrefix::none:
+            return busRead(m_registers.hl);
+        case Z80OpcodePrefix::ix:
+            {
+                const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                return busRead(m_registers.ix + d);
+            }
+        case Z80OpcodePrefix::iy:
+            {
+                const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+                return busRead(m_registers.iy + d);
+            }
+        }
+        assert(false);
+    }
+
+    void Z80Cpu::busWriteHL(const uint8_t value)
+    {
+        switch (m_currentPrefix)
+        {
+        case Z80OpcodePrefix::none:
+            return busWrite(m_registers.hl, value);
+        case Z80OpcodePrefix::ix:
+        {
+            const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+            return busWrite(m_registers.ix + d, value);
+        }
+        case Z80OpcodePrefix::iy:
+        {
+            const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
+            return busWrite(m_registers.iy + d, false);
+        }
+        }
         assert(false);
     }
 

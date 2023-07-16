@@ -161,6 +161,13 @@ namespace epoch::zxspectrum
         int totalCycles;
     };
 
+    enum class Z80OpcodePrefix
+    {
+        none,
+        ix,
+        iy,
+    };
+
     class Z80Cpu final
     {
     public:
@@ -171,12 +178,13 @@ namespace epoch::zxspectrum
         void step();
         void reset();
 
-        [[nodiscard]] Z80Registers& registers();
-        [[nodiscard]] const Z80Registers& registers() const;
+        [[nodiscard]] Z80Registers& registers() { return m_registers; }
+        [[nodiscard]] const Z80Registers& registers() const { return m_registers; }
 
     private:
         Z80Registers m_registers{};
         uint8_t m_opcode{};
+        Z80OpcodePrefix m_currentPrefix{ Z80OpcodePrefix::none };
         int m_remainingCycles{};
 
         std::array<Z80Instruction, 256> m_instructions{};
@@ -184,6 +192,8 @@ namespace epoch::zxspectrum
         Z80Interface& m_bus;
 
         std::array<uint8_t*, 8> m_registersPointers;
+
+        void executeInstruction();
 
         uint8_t fetchOpcode();
         uint8_t busRead(uint16_t address);
@@ -201,6 +211,11 @@ namespace epoch::zxspectrum
         void prefixEd();
         void prefixFd();
 
+        [[nodiscard]] uint16_t getHL() const;
+        void setHL(uint16_t value);
+
+        uint8_t busReadHL();
+        void busWriteHL(uint8_t value);
         uint16_t fetch16();
         uint16_t read16(uint16_t address);
         void write16(uint16_t address, uint16_t value);
