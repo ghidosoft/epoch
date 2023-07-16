@@ -857,6 +857,45 @@ namespace epoch::zxspectrum
                 }
                 ioWrite(m_registers.bc.low(), value);
             }
+            else if (z == 0b011)
+            {
+                const auto nn = fetch16();
+                switch (y)
+                {
+                case 0b000:
+                    // LD (nn), BC
+                    write16(nn, m_registers.bc);
+                    break;
+                case 0b001:
+                    // LD BC, (nn)
+                    m_registers.bc = read16(nn);
+                    break;
+                case 0b010:
+                    // LD (nn), DE
+                    write16(nn, m_registers.de);
+                    break;
+                case 0b011:
+                    // LD DE, (nn)
+                    m_registers.de = read16(nn);
+                    break;
+                case 0b100:
+                    // LD (nn), HL
+                    write16(nn, m_registers.hl);
+                    break;
+                case 0b101:
+                    // LD HL, (nn)
+                    m_registers.hl = read16(nn);
+                    break;
+                case 0b110:
+                    // LD (nn), SP
+                    write16(nn, m_registers.sp);
+                    break;
+                case 0b111:
+                    // LD SP, (nn)
+                    m_registers.sp = read16(nn);
+                    break;
+                }
+            }
         }
     }
 
