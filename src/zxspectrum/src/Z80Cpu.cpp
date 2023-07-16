@@ -400,12 +400,12 @@ namespace epoch::zxspectrum
                 n = busRead(m_registers.hl);
                 m_remainingCycles++;
                 busWrite(m_registers.hl, n + 1);
-                add8(n, 1, 0);
+                add8(n, 1);
             }
             else
             {
                 n = (*m_registersPointers[y])++;
-                add8(n, 1, 0);
+                add8(n, 1);
             }
         }
         else if (z == 0b101)
@@ -418,12 +418,12 @@ namespace epoch::zxspectrum
                 n = busRead(m_registers.hl);
                 m_remainingCycles++;
                 busWrite(m_registers.hl, n - 1);
-                sub8(n, 1, 0);
+                sub8(n, 1);
             }
             else
             {
                 n = (*m_registersPointers[y])--;
-                sub8(n, 1, 0);
+                sub8(n, 1);
             }
         }
         else if (z == 0b110)
@@ -857,6 +857,52 @@ namespace epoch::zxspectrum
                 }
                 ioWrite(m_registers.bc.low(), value);
             }
+            else if (z == 0b010)
+            {
+                switch (y)
+                {
+                case 0b000:
+                    // SBC HL, BC
+                    m_registers.hl = sub16(m_registers.hl, m_registers.bc, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b001:
+                    // ADC HL, BC
+                    m_registers.hl = add16(m_registers.hl, m_registers.bc, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b010:
+                    // SBC HL, DE
+                    m_registers.hl = sub16(m_registers.hl, m_registers.de, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b011:
+                    // ADC HL, DE
+                    m_registers.hl = add16(m_registers.hl, m_registers.de, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b100:
+                    // SBC HL, HL
+                    m_registers.hl = sub16(m_registers.hl, m_registers.hl, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b101:
+                    // ADC HL, HL
+                    m_registers.hl = add16(m_registers.hl, m_registers.hl, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b110:
+                    // SBC HL, SP
+                    m_registers.hl = sub16(m_registers.hl, m_registers.sp, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                case 0b111:
+                    // ADC HL, SP
+                    m_registers.hl = add16(m_registers.hl, m_registers.sp, m_registers.af.c());
+                    m_remainingCycles += 7;
+                    break;
+                }
+            }
             else if (z == 0b011)
             {
                 const auto nn = fetch16();
@@ -899,7 +945,7 @@ namespace epoch::zxspectrum
             else if (z == 0b100)
             {
                 // NEG
-                m_registers.af.high(sub8(0, m_registers.af.high(), 0));
+                m_registers.af.high(sub8(0, m_registers.af.high()));
             }
             else if (z == 0b101)
             {
@@ -924,6 +970,46 @@ namespace epoch::zxspectrum
                 case 0b011:
                 case 0b111:
                     m_registers.interruptMode = 2;
+                    break;
+                }
+            }
+            else if (z == 0b111)
+            {
+                switch (y)
+                {
+                case 0b000:
+                    // LD I, A
+                    m_registers.ir.high(m_registers.af.high());
+                    m_remainingCycles++;
+                    break;
+                case 0b001:
+                    // LD R, A
+                    m_registers.ir.low(m_registers.af.high());
+                    m_remainingCycles++;
+                    break;
+                case 0b010:
+                    // LD A, I
+                    m_registers.af.high(m_registers.ir.high());
+                    m_remainingCycles++;
+                    break;
+                case 0b011:
+                    // LD A, R
+                    m_registers.af.high(m_registers.ir.low());
+                    m_remainingCycles++;
+                    break;
+                case 0b100:
+                    // RRD
+                    m_remainingCycles += 4;
+                    assert(false); // TODO
+                    break;
+                case 0b101:
+                    // RLD
+                    m_remainingCycles += 4;
+                    assert(false); // TODO
+                    break;
+                case 0b110:
+                case 0b111:
+                    // ED NOP
                     break;
                 }
             }
@@ -989,13 +1075,22 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b)
+    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b, const uint16_t carryFlag)
     {
-        const uint32_t result = a + b;
+        const uint32_t result = a + b + carryFlag;
         m_registers.af.c(result >> 16);
         m_registers.af.n(false);
         // TODO: investigate H flag
         return static_cast<uint16_t>(result);
+    }
+
+    uint16_t Z80Cpu::sub16(const uint16_t a, const uint16_t b, const uint16_t carryFlag)
+    {
+        const auto result = add16(a, ~b, carryFlag);
+        m_registers.af.n(true);
+        m_registers.af.c(!m_registers.af.c());
+        m_registers.af.h(!m_registers.af.h());
+        return result;
     }
 
     void Z80Cpu::alu8(const int operation, const uint8_t a, const uint8_t b)
@@ -1004,7 +1099,7 @@ namespace epoch::zxspectrum
         {
         case 0b000:
             // ADD
-            m_registers.af.high(add8(a, b, 0));
+            m_registers.af.high(add8(a, b));
             return;
         case 0b001:
             // ADC
@@ -1012,7 +1107,7 @@ namespace epoch::zxspectrum
             return;
         case 0b010:
             // SUB
-            m_registers.af.high(sub8(a, b, 0));
+            m_registers.af.high(sub8(a, b));
             return;
         case 0b011:
             // SBC
@@ -1044,7 +1139,7 @@ namespace epoch::zxspectrum
             return;
         case 0b111:
             // CP
-            sub8(a, b, 0);
+            sub8(a, b);
             return;
         }
         assert(false);

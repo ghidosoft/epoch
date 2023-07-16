@@ -132,4 +132,32 @@ namespace epoch::zxspectrum
         EXPECT_EQ(bus.ram(0x1234), 0x78);
         EXPECT_EQ(bus.ram(0x1235), 0x56);
     }
+
+    TEST(Z80Cpu_ED, Opcode_01x00110_IM_0) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x46 } };
+        Z80Cpu sut{ bus };
+        sut.registers().interruptMode = 1;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().interruptMode, 0);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_01x10110_IM_1) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x56 } };
+        Z80Cpu sut{ bus };
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().interruptMode, 1);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_01x11110_IM_2) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x5e } };
+        Z80Cpu sut{ bus };
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().interruptMode, 2);
+    }
 }
