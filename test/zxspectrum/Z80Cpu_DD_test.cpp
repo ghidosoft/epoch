@@ -110,6 +110,16 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ix, 0x0001);
     }
 
+    TEST(Z80Cpu_DD, Opcode00100110_LDX_IXH_n) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x26, 0x46 } };
+        Z80Cpu sut{ bus };
+        sut.registers().ix = 0x0000;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 3);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().ix, 0x4600);
+    }
+
     TEST(Z80Cpu_DD, Opcode00101011_DEC_IX) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x2b } };
         Z80Cpu sut{ bus };
@@ -120,7 +130,29 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ix, 0xffff);
     }
 
-    TEST(Z80Cpu_DD, Opcode01xxxxxx_LD_IXd_E) {
+    TEST(Z80Cpu_DD, Opcode00101110_LDX_IXL_n) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x2e, 0x46 } };
+        Z80Cpu sut{ bus };
+        sut.registers().ix = 0x0000;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 3);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().ix, 0x0046);
+    }
+
+    TEST(Z80Cpu_DD, Opcode01101110_LD_L_IXd) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x6e, 0x04 } };
+        bus.ram()[0x1234] = 0x89;
+        Z80Cpu sut{ bus };
+        sut.registers().hl = 0x0000;
+        sut.registers().ix = 0x1230;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 3);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().hl, 0x0089);
+    }
+
+    TEST(Z80Cpu_DD, Opcode01110011_LD_IXd_E) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x73, 0x04 } };
         Z80Cpu sut{ bus };
         sut.registers().de = 0xbbaa;
@@ -132,7 +164,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(bus.ram()[0x1234], 0xaa);
     }
 
-    TEST(Z80Cpu_DD, Opcode10000xxx_ADD_IXL) {
+    TEST(Z80Cpu_DD, Opcode10000101_ADD_IXL) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x85 } };
         Z80Cpu sut{ bus };
         sut.registers().af.high(0xff);
