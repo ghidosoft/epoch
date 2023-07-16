@@ -1165,4 +1165,73 @@ namespace epoch::zxspectrum
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
     }
+
+    TEST(Z80Cpu, Opcode11xxx111_RST_xx) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xc7, 0xcf, 0xd7, 0xdf, 0xe7, 0xef, 0xf7, 0xff } };
+        Z80Cpu sut{ bus };
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x00);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().sp, 0xfffd);
+
+        sut.registers().pc = 1;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x08);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().sp, 0xfffb);
+
+        sut.registers().pc = 2;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x10);
+        EXPECT_EQ(sut.registers().ir, 3);
+        EXPECT_EQ(sut.registers().sp, 0xfff9);
+
+        sut.registers().pc = 3;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x18);
+        EXPECT_EQ(sut.registers().ir, 4);
+        EXPECT_EQ(sut.registers().sp, 0xfff7);
+
+        sut.registers().pc = 4;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x20);
+        EXPECT_EQ(sut.registers().ir, 5);
+        EXPECT_EQ(sut.registers().sp, 0xfff5);
+
+        sut.registers().pc = 5;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x28);
+        EXPECT_EQ(sut.registers().ir, 6);
+        EXPECT_EQ(sut.registers().sp, 0xfff3);
+
+        sut.registers().pc = 6;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x30);
+        EXPECT_EQ(sut.registers().ir, 7);
+        EXPECT_EQ(sut.registers().sp, 0xfff1);
+
+        sut.registers().pc = 7;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0x38);
+        EXPECT_EQ(sut.registers().ir, 8);
+        EXPECT_EQ(sut.registers().sp, 0xffef);
+
+        EXPECT_EQ(bus.ram(0xffff), 0x00);
+        EXPECT_EQ(bus.ram(0xfffe), 0x00);
+        EXPECT_EQ(bus.ram(0xfffd), 0x01);
+        EXPECT_EQ(bus.ram(0xfffc), 0x00);
+        EXPECT_EQ(bus.ram(0xfffb), 0x02);
+        EXPECT_EQ(bus.ram(0xfffa), 0x00);
+        EXPECT_EQ(bus.ram(0xfff9), 0x03);
+        EXPECT_EQ(bus.ram(0xfff8), 0x00);
+        EXPECT_EQ(bus.ram(0xfff7), 0x04);
+        EXPECT_EQ(bus.ram(0xfff6), 0x00);
+        EXPECT_EQ(bus.ram(0xfff5), 0x05);
+        EXPECT_EQ(bus.ram(0xfff4), 0x00);
+        EXPECT_EQ(bus.ram(0xfff3), 0x06);
+        EXPECT_EQ(bus.ram(0xfff2), 0x00);
+        EXPECT_EQ(bus.ram(0xfff1), 0x07);
+        EXPECT_EQ(bus.ram(0xfff0), 0x00);
+        EXPECT_EQ(bus.ram(0xffef), 0x08);
+    }
 }

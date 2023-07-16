@@ -497,6 +497,7 @@ namespace epoch::zxspectrum
                     }
                     m_registers.af.low(s_flagsLookupSZP[a] | (m_registers.af.low() & 0b00111011));
                     m_registers.af.high(a);
+                    // TODO: n = 1
                 }
                 break;
             case 0b101:
@@ -747,6 +748,14 @@ namespace epoch::zxspectrum
             const auto a = m_registers.af.high();
             const auto b = busRead(m_registers.pc++);
             alu8(y, a, b);
+        }
+        else if (z == 0b111)
+        {
+            // RST xx
+            m_remainingCycles++;
+            push16(m_registers.pc);
+            static constexpr uint16_t targets[] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38};
+            m_registers.pc = targets[y];
         }
     }
 
