@@ -762,11 +762,13 @@ namespace epoch::zxspectrum
     void Z80Cpu::prefixCb()
     {
         // TODO
+        assert(false);
     }
 
     void Z80Cpu::prefixDd()
     {
         // TODO
+        assert(false);
     }
 
     void Z80Cpu::prefixEd()
@@ -1014,11 +1016,54 @@ namespace epoch::zxspectrum
                 }
             }
         }
+        else if (x == 2)
+        {
+            // ED: quadrant 2
+            if (z == 0b000)
+            {
+                switch (y)
+                {
+                case 0b100:
+                    // LDI
+                    ldi();
+                    break;
+                case 0b101:
+                    // LDD
+                    ldd();
+                    break;
+                case 0b110:
+                    // LDIR
+                    ldi();
+                    if (m_registers.af.p())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                case 0b111:
+                    // LDDR
+                    ldd();
+                    if (m_registers.af.p())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                    // Rest is NOP
+                }
+            }
+            else
+            {
+                // TODO
+                assert(false);
+            }
+        }
     }
 
     void Z80Cpu::prefixFd()
     {
         // TODO
+        assert(false);
     }
 
     uint16_t Z80Cpu::fetch16()
@@ -1199,5 +1244,27 @@ namespace epoch::zxspectrum
         const auto low = busRead(m_registers.sp++);
         const auto high = busRead(m_registers.sp++);
         return static_cast<uint16_t>(high << 8) | low;
+    }
+
+    void Z80Cpu::ldi()
+    {
+        const auto n = busRead(m_registers.hl.value--);
+        busWrite(m_registers.de.value--, n);
+        const auto bc = m_registers.bc.value--;
+        m_registers.af.n(false);
+        m_registers.af.h(false);
+        m_registers.af.p(bc != 0);
+        m_remainingCycles += 2;
+    }
+
+    void Z80Cpu::ldd()
+    {
+        const auto n = busRead(m_registers.hl.value++);
+        busWrite(m_registers.de.value++, n);
+        m_registers.bc.value--;
+        m_registers.af.n(false);
+        m_registers.af.h(false);
+        m_registers.af.p(m_registers.bc.value != 0);
+        m_remainingCycles += 2;
     }
 }

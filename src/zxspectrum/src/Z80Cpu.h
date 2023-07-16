@@ -213,6 +213,8 @@ namespace epoch::zxspectrum
         void jr(bool condition);
         void push16(uint16_t value);
         uint16_t pop16();
+        void ldi();
+        void ldd();
     };
 }
 
