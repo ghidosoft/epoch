@@ -198,6 +198,7 @@ namespace epoch::zxspectrum
         uint8_t add8(uint8_t a, uint8_t b, uint8_t carryFlag);
         uint8_t sub8(uint8_t a, uint8_t b, uint8_t carryFlag);
         uint16_t add16(uint16_t a, uint16_t b);
+        void alu8(uint8_t operation, uint8_t a, uint8_t b);
         void jr(bool condition);
     };
 }

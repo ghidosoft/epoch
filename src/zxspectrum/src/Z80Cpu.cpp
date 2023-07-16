@@ -570,53 +570,7 @@ namespace epoch::zxspectrum
         {
             b = *srcPtr;
         }
-        switch (operation)
-        {
-        case 0b000:
-            // ADD
-            m_registers.af.high(add8(a, b, 0));
-            break;
-        case 0b001:
-            // ADC
-            m_registers.af.high(add8(a, b, m_registers.af.c()));
-            break;
-        case 0b010:
-            // SUB
-            m_registers.af.high(sub8(a, b, 0));
-            break;
-        case 0b011:
-            // SBC
-            m_registers.af.high(sub8(a, b, m_registers.af.c()));
-            break;
-        case 0b100:
-            // AND
-        {
-            const uint8_t result = a & b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
-        }
-        break;
-        case 0b101:
-            // XOR
-        {
-            const uint8_t result = a ^ b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result]);
-        }
-        break;
-        case 0b110:
-            // OR
-        {
-            const uint8_t result = a | b;
-            m_registers.af.high(result);
-            m_registers.af.low(s_flagsLookupSZP[result]);
-        }
-        break;
-        case 0b111:
-            // CP
-            sub8(a, b, 0);
-            break;
-        }
+        alu8(operation, a, b);
     }
 
     void Z80Cpu::mainQuadrant3()
@@ -668,6 +622,13 @@ namespace epoch::zxspectrum
                 m_registers.interruptJustEnabled = true;
                 break;
             }
+        }
+        else if (z == 0b110)
+        {
+            // ALU immediate
+            const auto a = m_registers.af.high();
+            const auto b = busRead(m_registers.pc++);
+            alu8(static_cast<uint8_t>(y), a, b);
         }
     }
 
@@ -732,6 +693,57 @@ namespace epoch::zxspectrum
         m_registers.af.n(false);
         // TODO: investigate H flag
         return static_cast<uint16_t>(result);
+    }
+
+    void Z80Cpu::alu8(const uint8_t operation, const uint8_t a, const uint8_t b)
+    {
+        switch (operation)
+        {
+        case 0b000:
+            // ADD
+            m_registers.af.high(add8(a, b, 0));
+            break;
+        case 0b001:
+            // ADC
+            m_registers.af.high(add8(a, b, m_registers.af.c()));
+            break;
+        case 0b010:
+            // SUB
+            m_registers.af.high(sub8(a, b, 0));
+            break;
+        case 0b011:
+            // SBC
+            m_registers.af.high(sub8(a, b, m_registers.af.c()));
+            break;
+        case 0b100:
+            // AND
+        {
+            const uint8_t result = a & b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result] | Z80Flags::h);
+        }
+        break;
+        case 0b101:
+            // XOR
+        {
+            const uint8_t result = a ^ b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result]);
+        }
+        break;
+        case 0b110:
+            // OR
+        {
+            const uint8_t result = a | b;
+            m_registers.af.high(result);
+            m_registers.af.low(s_flagsLookupSZP[result]);
+        }
+        break;
+        case 0b111:
+            // CP
+            sub8(a, b, 0);
+            break;
+        }
     }
 
     void Z80Cpu::jr(const bool condition)
