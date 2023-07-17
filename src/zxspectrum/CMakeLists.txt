@@ -14,3 +14,10 @@ target_include_directories(epoch_zxspectrum INTERFACE include)
 target_link_libraries(epoch_zxspectrum PUBLIC Epoch::Core)
 
 add_library(Epoch::ZXSpectrum ALIAS epoch_zxspectrum)
+
+add_executable(epoch_zxspectrum_zex
+    "src/zex.cpp"
+    "src/Z80Cpu.h"
+    "src/Z80Interface.h"
+)
+target_link_libraries(epoch_zxspectrum_zex PUBLIC Epoch::Core Epoch::ZXSpectrum)
