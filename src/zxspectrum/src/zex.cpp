@@ -1132,13 +1132,15 @@ static const uint8_t zexall[] = {
 int main()
 {
     std::array<uint8_t, 0x10000> ram{};
-    ram[0x0005] = 0xc9; // RET
+    ram[0x0005] = 0xc3; // JP $E400
+    ram[0x0006] = 0x00;
+    ram[0x0007] = 0xe4;
+    ram[0xe400] = 0xc9; // RET
     std::memcpy(ram.data() + 0x0100, ROM, sizeof(ROM));
     ZexZ80Interface interface { ram };
     epoch::zxspectrum::Z80Cpu cpu{ interface };
     cpu.reset();
     cpu.registers().pc = 0x0100;
-    cpu.registers().sp = 0xf000;
     do
     {
         cpu.step();
