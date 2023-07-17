@@ -1317,8 +1317,8 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::ldi()
     {
-        const auto n = busRead(m_registers.hl.value--);
-        busWrite(m_registers.de.value--, n);
+        const auto n = busRead(m_registers.hl.value++);
+        busWrite(m_registers.de.value++, n);
         const auto bc = m_registers.bc.value--;
         m_registers.af.n(false);
         m_registers.af.h(false);
@@ -1328,8 +1328,8 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::ldd()
     {
-        const auto n = busRead(m_registers.hl.value++);
-        busWrite(m_registers.de.value++, n);
+        const auto n = busRead(m_registers.hl.value--);
+        busWrite(m_registers.de.value--, n);
         m_registers.bc.value--;
         m_registers.af.n(false);
         m_registers.af.h(false);
