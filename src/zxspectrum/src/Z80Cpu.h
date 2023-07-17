@@ -230,6 +230,8 @@ namespace epoch::zxspectrum
         uint16_t pop16();
         void ldi();
         void ldd();
+        uint8_t prefixCbRead(int8_t d, int z);
+        void prefixCbWrite(int8_t d, int z, uint8_t value);
     };
 }
 

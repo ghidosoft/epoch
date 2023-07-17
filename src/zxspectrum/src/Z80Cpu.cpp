@@ -136,6 +136,10 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
+            if (m_registers.pc == 0x1620)
+            {
+                assert(m_registers.pc);
+            }
             executeInstruction();
         }
 
@@ -748,7 +752,7 @@ namespace epoch::zxspectrum
             const auto b = busRead(m_registers.pc++);
             alu8(y, a, b);
         }
-        else if (z == 0b111)
+        else // if (z == 0b111)
         {
             // RST xx
             m_remainingCycles++;
@@ -760,11 +764,44 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixCb()
     {
+        int8_t d = 0;
+        if (m_currentPrefix != Z80OpcodePrefix::none)
+        {
+            m_remainingCycles += 4;
+            d = static_cast<int8_t>(m_bus.read(m_registers.pc++));
+        }
+        m_opcode = fetchOpcode();
         const uint8_t x = m_opcode >> 6;
         const uint8_t y = (m_opcode & 0b00111000) >> 3;
         const uint8_t z = m_opcode & 0b00000111;
-        // TODO
-        assert(false);
+        if (x == 0)
+        {
+            // TODO: rotate/shift
+            assert(false);
+        }
+        else if (x == 1)
+        {
+            // BIT
+            auto value = prefixCbRead(d, z);
+            value &= (1 << y);
+            m_registers.af.h(false);
+            m_registers.af.n(false);
+            m_registers.af.z(!value);
+        }
+        else if (x == 2)
+        {
+            // RES
+            auto value = prefixCbRead(d, z);
+            value &= ~(1 << y);
+            prefixCbWrite(d, z, value);
+        }
+        else // if (x == 3)
+        {
+            // SET
+            auto value = prefixCbRead(d, z);
+            value |= (1 << y);
+            prefixCbWrite(d, z, value);
+        }
     }
 
     void Z80Cpu::prefixDd()
@@ -775,6 +812,7 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::prefixEd()
     {
+        m_currentPrefix = Z80OpcodePrefix::none;
         m_opcode = fetchOpcode();
         const auto x = m_opcode >> 6;
         const auto y = (m_opcode & 0b00111000) >> 3;
@@ -1335,5 +1373,61 @@ namespace epoch::zxspectrum
         m_registers.af.h(false);
         m_registers.af.p(m_registers.bc.value != 0);
         m_remainingCycles += 2;
+    }
+
+    uint8_t Z80Cpu::prefixCbRead(const int8_t d, const int z)
+    {
+        if (z == 0b110)
+        {
+            // (HL)
+            switch (m_currentPrefix)
+            {
+            case Z80OpcodePrefix::none:
+                return busRead(m_registers.hl);
+            case Z80OpcodePrefix::ix:
+                return busRead(m_registers.ix + d);
+            case Z80OpcodePrefix::iy:
+                return busRead(m_registers.iy + d);
+            }
+            assert(false);
+            return 0;
+        }
+        else
+        {
+            return *m_registersPointers[z];
+        }
+    }
+
+    void Z80Cpu::prefixCbWrite(const int8_t d, const int z, const uint8_t value)
+    {
+        if (z == 0b110)
+        {
+            // (HL)
+            switch (m_currentPrefix)
+            {
+            case Z80OpcodePrefix::none:
+                busWrite(m_registers.hl, value);
+                break;
+            case Z80OpcodePrefix::ix:
+                busWrite(m_registers.ix + d, value);
+                break;
+            case Z80OpcodePrefix::iy:
+                busWrite(m_registers.iy + d, value);
+                break;
+            }
+        }
+        else
+        {
+            *m_registersPointers[z] = value;
+            switch (m_currentPrefix)
+            {
+            case Z80OpcodePrefix::ix:
+                busWrite(m_registers.ix + d, value);
+                break;
+            case Z80OpcodePrefix::iy:
+                busWrite(m_registers.iy + d, value);
+                break;
+            }
+        }
     }
 }
