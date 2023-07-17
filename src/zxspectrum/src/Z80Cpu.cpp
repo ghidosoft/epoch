@@ -1221,9 +1221,10 @@ namespace epoch::zxspectrum
     uint8_t Z80Cpu::sub8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
     {
         const auto result = add8(a, ~b, carryFlag ? 0 : 1);
-        m_registers.af.n(true);
-        m_registers.af.c(!m_registers.af.c());
-        m_registers.af.h(!m_registers.af.h());
+        m_registers.af.value ^= 0b00010011; // invert HNC
+        // m_registers.af.n(true);
+        // m_registers.af.c(!m_registers.af.c());
+        // m_registers.af.h(!m_registers.af.h());
         return result;
     }
 
@@ -1239,9 +1240,10 @@ namespace epoch::zxspectrum
     uint16_t Z80Cpu::sub16(const uint16_t a, const uint16_t b, const uint16_t carryFlag)
     {
         const auto result = add16(a, ~b, carryFlag ? 0 : 1);
-        m_registers.af.n(true);
-        m_registers.af.c(!m_registers.af.c());
-        m_registers.af.h(!m_registers.af.h()); // TODO: investigate H flag
+        m_registers.af.value ^= 0b00010011; // invert HNC
+        // m_registers.af.n(true);
+        // m_registers.af.c(!m_registers.af.c());
+        // m_registers.af.h(!m_registers.af.h()); // TODO: investigate H flag
         return result;
     }
 
