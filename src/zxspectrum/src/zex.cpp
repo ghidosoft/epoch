@@ -24,7 +24,7 @@
 class ZexZ80Interface : public epoch::zxspectrum::Z80Interface
 {
 public:
-    ZexZ80Interface(std::array<uint8_t, 0x10000>& ram) : m_ram{ ram }
+    explicit ZexZ80Interface(std::array<uint8_t, 0x10000>& ram) : m_ram{ ram.data()}
     {
     }
 
@@ -41,7 +41,7 @@ public:
     void ioWrite(uint8_t port, uint8_t value) override {}
 
 private:
-    std::array<uint8_t, 0x10000>& m_ram;
+    uint8_t *m_ram;
 };
 
 // array size is 8587
