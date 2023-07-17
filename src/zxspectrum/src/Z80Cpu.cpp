@@ -136,10 +136,10 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
-            if (m_registers.pc == 0x1620)
+            /* if (m_registers.pc == 0xe84)
             {
                 assert(m_registers.pc);
-            }
+            } */
             executeInstruction();
         }
 

@@ -110,7 +110,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ix, 0x0001);
     }
 
-    TEST(Z80Cpu_DD, Opcode00100110_LDX_IXH_n) {
+    TEST(Z80Cpu_DD, Opcode00100110_LD_IXH_n) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x26, 0x46 } };
         Z80Cpu sut{ bus };
         sut.registers().ix = 0x0000;
@@ -130,7 +130,7 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ix, 0xffff);
     }
 
-    TEST(Z80Cpu_DD, Opcode00101110_LDX_IXL_n) {
+    TEST(Z80Cpu_DD, Opcode00101110_LD_IXL_n) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x2e, 0x46 } };
         Z80Cpu sut{ bus };
         sut.registers().ix = 0x0000;
