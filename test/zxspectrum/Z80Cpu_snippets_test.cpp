@@ -37,14 +37,14 @@ namespace epoch::zxspectrum
             // end:
         } };
         Z80Cpu sut{ bus };
-        while (sut.registers().pc != 0x0011)
+        while (sut.registers().pc < 0x0011)
         {
             sut.step();
         }
         EXPECT_EQ(sut.registers().pc, 0x0011);
         EXPECT_EQ(sut.registers().af.high(), 0xf0);
-        EXPECT_EQ(sut.registers().bc.high(), 0x82);
-        EXPECT_EQ(sut.registers().de.high(), 0x82);
+        EXPECT_EQ(sut.registers().bc, 0x0082);
+        EXPECT_EQ(sut.registers().de, 0x0082);
         EXPECT_EQ(sut.registers().hl, 0x79e0);
         EXPECT_TRUE(sut.registers().af.s());
         EXPECT_FALSE(sut.registers().af.z());
