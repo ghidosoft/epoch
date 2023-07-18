@@ -395,6 +395,7 @@ namespace epoch::zxspectrum
         else if (z == 0b100)
         {
             // INC 8bit
+            const auto c = m_registers.af.c();
             uint8_t n;
             if (y == 0b110)
             {
@@ -409,10 +410,12 @@ namespace epoch::zxspectrum
                 n = (*m_registersPointers[y])++;
                 add8(n, 1);
             }
+            m_registers.af.c(c); // restore carry
         }
         else if (z == 0b101)
         {
             // DEC 8bit
+            const auto c = m_registers.af.c();
             uint8_t n;
             if (y == 0b110)
             {
@@ -427,6 +430,7 @@ namespace epoch::zxspectrum
                 n = (*m_registersPointers[y])--;
                 sub8(n, 1);
             }
+            m_registers.af.c(c); // restore carry
         }
         else if (z == 0b110)
         {
@@ -1193,19 +1197,19 @@ namespace epoch::zxspectrum
         busWrite(address + 1, value >> 8);
     }
 
-    uint8_t Z80Cpu::add8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
+    uint8_t Z80Cpu::add8(const uint8_t a, const uint8_t b, const bool carryFlag)
     {
         uint8_t result;
-        int carry;
+        bool carry;
         if (carryFlag)
         {
             result = a + b + 1;
-            carry = (a >= 0xff - b) ? 1 : 0;
+            carry = a >= 0xff - b;
         }
         else
         {
             result = a + b;
-            carry = (a > 0xff - b) ? 1 : 0;
+            carry = a > 0xff - b;
         }
         const auto carryIn = result ^ a ^ b;
         const auto overflow = (carryIn >> 7) ^ carry;
@@ -1218,32 +1222,59 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    uint8_t Z80Cpu::sub8(const uint8_t a, const uint8_t b, const uint8_t carryFlag)
+    uint8_t Z80Cpu::sub8(const uint8_t a, const uint8_t b, const bool carryFlag)
     {
-        const auto result = add8(a, ~b, carryFlag ? 0 : 1);
-        m_registers.af.value ^= 0b00010011; // invert HNC
-        // m_registers.af.n(true);
-        // m_registers.af.c(!m_registers.af.c());
-        // m_registers.af.h(!m_registers.af.h());
+        const auto result = add8(a, ~b, !carryFlag);
+        m_registers.af.value ^= Z80Flags::h | Z80Flags::n | Z80Flags::c; // invert HNC
         return result;
     }
 
-    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b, const uint16_t carryFlag)
+    uint16_t Z80Cpu::add16(uint16_t a, uint16_t b)
     {
-        const uint32_t result = a + b + carryFlag;
-        m_registers.af.c(result >> 16);
+        const uint16_t lowResult = (a & 0xff) + (b & 0xff);
+        const bool lowCarry = lowResult & 0x100;
+        const auto highA = a >> 8;
+        const auto highB = b >> 8;
+        const auto highResult = highA + highB + lowCarry;
+        bool carry;
+        if (lowCarry)
+        {
+            carry = highA >= 0xff - highB;
+        }
+        else
+        {
+            carry = highA > 0xff - highB;
+        }
+        const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
+        m_registers.af.h((carryIn >> 4) & 0x01);
         m_registers.af.n(false);
-        // TODO: investigate H flag
-        return static_cast<uint16_t>(result);
+        m_registers.af.c(carry);
+        return ((highResult & 0xff) << 8) | (lowResult & 0xff);
     }
 
-    uint16_t Z80Cpu::sub16(const uint16_t a, const uint16_t b, const uint16_t carryFlag)
+    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b, const bool carryFlag)
     {
-        const auto result = add16(a, ~b, carryFlag ? 0 : 1);
-        m_registers.af.value ^= 0b00010011; // invert HNC
-        // m_registers.af.n(true);
-        // m_registers.af.c(!m_registers.af.c());
-        // m_registers.af.h(!m_registers.af.h()); // TODO: investigate H flag
+        const uint32_t result = a + b + carryFlag;
+        m_registers.af.c(result & 0x10000);
+        m_registers.af.p(result & 0x10000);
+        m_registers.af.n(false);
+        m_registers.af.s(result & 0x7000);
+        m_registers.af.z(result == 0);
+        // TODO: investigate H flag
+        return static_cast<uint16_t>(result & 0xffff);
+    }
+
+    uint16_t Z80Cpu::sub16(uint16_t a, uint16_t b)
+    {
+        const auto result = add16(a, ~b + 1);
+        m_registers.af.value ^= Z80Flags::h | Z80Flags::n | Z80Flags::c; // invert HNC
+        return result;
+    }
+
+    uint16_t Z80Cpu::sub16(const uint16_t a, const uint16_t b, const bool carryFlag)
+    {
+        const auto result = add16(a, ~b, !carryFlag);
+        m_registers.af.value ^= Z80Flags::h | Z80Flags::n | Z80Flags::c; // invert HNC
         return result;
     }
 

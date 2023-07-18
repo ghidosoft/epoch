@@ -219,10 +219,12 @@ namespace epoch::zxspectrum
         uint16_t fetch16();
         uint16_t read16(uint16_t address);
         void write16(uint16_t address, uint16_t value);
-        uint8_t add8(uint8_t a, uint8_t b, uint8_t carryFlag = 0);
-        uint8_t sub8(uint8_t a, uint8_t b, uint8_t carryFlag = 0);
-        uint16_t add16(uint16_t a, uint16_t b, uint16_t carryFlag = 0);
-        uint16_t sub16(uint16_t a, uint16_t b, uint16_t carryFlag = 0);
+        uint8_t add8(uint8_t a, uint8_t b, bool carryFlag = false);
+        uint8_t sub8(uint8_t a, uint8_t b, bool carryFlag = false);
+        uint16_t add16(uint16_t a, uint16_t b);
+        uint16_t add16(uint16_t a, uint16_t b, bool carryFlag);
+        uint16_t sub16(uint16_t a, uint16_t b);
+        uint16_t sub16(uint16_t a, uint16_t b, bool carryFlag);
         void alu8(int operation, uint8_t a, uint8_t b);
         [[nodiscard]] bool evaluateCondition(int condition) const;
         void jr(bool condition);
