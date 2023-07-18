@@ -1317,7 +1317,7 @@ namespace epoch::zxspectrum
         m_registers.af.c(result & 0x10000);
         m_registers.af.p(result & 0x10000);
         m_registers.af.n(false);
-        m_registers.af.s(result & 0x7000);
+        m_registers.af.s(result & 0x8000);
         m_registers.af.z(result == 0);
         // TODO: investigate H flag
         return static_cast<uint16_t>(result & 0xffff);
