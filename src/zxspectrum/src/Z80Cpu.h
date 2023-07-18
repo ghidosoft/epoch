@@ -216,6 +216,7 @@ namespace epoch::zxspectrum
 
         uint8_t busReadHL();
         void busWriteHL(uint8_t value);
+        void busWriteHLn();
         uint16_t fetch16();
         uint16_t read16(uint16_t address);
         void write16(uint16_t address, uint16_t value);
