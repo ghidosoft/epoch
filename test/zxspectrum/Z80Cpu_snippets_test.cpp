@@ -23,27 +23,34 @@ namespace epoch::zxspectrum
 {
     TEST(Z80Cpu_snippets, Multiply) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{
-            0x06, 0xf0, // lb b, $f0
-            0x0e, 0x82, // ld c, $82
+            0xc3, 0x13, 0x00, // jp main
+            // multiply:
+            0xc5, // push bc
             0x21, 0x00, 0x00, // ld hl, 0
             0x78, // ld a, b
             0xb7, // or a
-            0x28, 0x06, // jr z, end
+            0x28, 0x06, // jr z, multiplyend
             0x16, 0x00, // ld d, 0
             0x59, // ld e, c
             // loop:
             0x19, // add hl, de
             0x10, 0xfd, // djnz loop
+            // multiplyend:
+            0xc1, // pop bc
+            0xc9, // ret
             // end:
+            0x06, 0xf0, // lb b, $f0
+            0x0e, 0x82, // ld c, $82
+            0xcd, 0x03, 0x00, // call multiply
         } };
         Z80Cpu sut{ bus };
-        while (sut.registers().pc < 0x0011)
+        while (sut.registers().pc < 0x0020)
         {
             sut.step();
         }
-        EXPECT_EQ(sut.registers().pc, 0x0011);
+        EXPECT_EQ(sut.registers().pc, 0x0020);
         EXPECT_EQ(sut.registers().af.high(), 0xf0);
-        EXPECT_EQ(sut.registers().bc, 0x0082);
+        EXPECT_EQ(sut.registers().bc, 0xf082);
         EXPECT_EQ(sut.registers().de, 0x0082);
         EXPECT_EQ(sut.registers().hl, 0x79e0);
         EXPECT_TRUE(sut.registers().af.s());
