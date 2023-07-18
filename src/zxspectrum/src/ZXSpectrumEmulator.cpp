@@ -70,6 +70,7 @@ namespace epoch::zxspectrum
         };
         // std::memcpy(m_rom48k.data(), bytes, sizeof(bytes));
         std::memcpy(m_rom48k.data(), ROM_48K, sizeof(ROM_48K));
+        // std::memcpy(m_rom48k.data(), ZX_Test_Rom, sizeof(ZX_Test_Rom));
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;

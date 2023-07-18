@@ -182,4 +182,36 @@ namespace epoch::zxspectrum
         EXPECT_TRUE(sut.registers().af.n());
         EXPECT_TRUE(sut.registers().af.c());
     }
+
+    TEST(Z80Cpu_snippets, LDIR) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{
+            0x21, 0x00, 0x00, // ld hl, $0000
+            0x11, 0x20, 0x00, // ld de, $2000
+            0x01, 0x07, 0x00, // ld b, $7
+            0xed, 0xb0, // ldir
+        } };
+        Z80Cpu sut{ bus };
+        while (sut.registers().pc < 0x00b)
+        {
+            sut.step();
+        }
+        EXPECT_EQ(sut.registers().pc, 0x00b);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
+        EXPECT_EQ(sut.registers().de, 0x0027);
+        EXPECT_EQ(sut.registers().hl, 0x0007);
+        EXPECT_EQ(bus.ram(0x20), 0x21);
+        EXPECT_EQ(bus.ram(0x21), 0x00);
+        EXPECT_EQ(bus.ram(0x22), 0x00);
+        EXPECT_EQ(bus.ram(0x23), 0x11);
+        EXPECT_EQ(bus.ram(0x24), 0x20);
+        EXPECT_EQ(bus.ram(0x25), 0x00);
+        EXPECT_EQ(bus.ram(0x26), 0x01);
+        EXPECT_EQ(bus.ram(0x27), 0x00);
+        EXPECT_TRUE(sut.registers().af.s());
+        EXPECT_TRUE(sut.registers().af.z());
+        EXPECT_FALSE(sut.registers().af.h());
+        EXPECT_FALSE(sut.registers().af.p());
+        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_TRUE(sut.registers().af.c());
+    }
 }

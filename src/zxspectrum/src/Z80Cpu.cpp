@@ -1449,10 +1449,10 @@ namespace epoch::zxspectrum
     {
         const auto n = busRead(m_registers.hl.value++);
         busWrite(m_registers.de.value++, n);
-        const auto bc = m_registers.bc.value--;
+        m_registers.bc.value--;
         m_registers.af.n(false);
         m_registers.af.h(false);
-        m_registers.af.p(bc != 0);
+        m_registers.af.p(m_registers.bc.value != 0);
         m_remainingCycles += 2;
     }
 
