@@ -788,7 +788,7 @@ namespace epoch::zxspectrum
             // BIT
             auto value = prefixCbRead(d, z);
             value &= (1 << y);
-            m_registers.af.h(false);
+            m_registers.af.h(true);
             m_registers.af.n(false);
             m_registers.af.z(!value);
         }
