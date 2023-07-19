@@ -229,7 +229,7 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::handleInterrupt()
     {
-        if (m_bus.read(m_registers.pc) == 0x76)
+        if (m_opcode == 0x76)
         {
             // Exit HALT state
             m_registers.pc++;
