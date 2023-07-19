@@ -21,7 +21,8 @@
 
 namespace epoch::zxspectrum
 {
-    Ula::Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram) : m_rom48k{ rom48k }, m_ram{ ram }
+    Ula::Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram) : m_rom48k{ rom48k }, m_ram{ ram },
+        m_keyboardState{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
     {
     }
 
@@ -55,6 +56,7 @@ namespace epoch::zxspectrum
         m_floatingBusValue = {};
         m_border = {};
         m_cpuStalled = {};
+
         m_frameCounter = 0;
         m_x = -HorizontalRetrace;
         m_y = -VerticalRetrace;
