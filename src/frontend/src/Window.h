@@ -20,6 +20,8 @@
 #include <functional>
 #include <string>
 
+#include <epoch/core.h>
+
 struct GLFWwindow;
 
 namespace epoch::frontend
@@ -49,8 +51,10 @@ namespace epoch::frontend
         [[nodiscard]] int height() const { return m_height; }
 
         using CursorPosCallback = std::function<void(float x, float y)>;
+        using KeyboardCallback = std::function<void(Key key, KeyAction action)>;
         using MouseButtonCallback = std::function<void(int button, int action)>;
         void setCursorPosCallback(CursorPosCallback callback);
+        void setKeyboardCallback(KeyboardCallback callback);
         void setMouseButtonCallback(MouseButtonCallback callback);
 
     private:
@@ -59,6 +63,7 @@ namespace epoch::frontend
         int m_width{}, m_height{};
 
         CursorPosCallback m_cursorPosCallback{};
+        KeyboardCallback m_keyboardCallback{};
         MouseButtonCallback m_mouseButtonCallback{};
 
     private:

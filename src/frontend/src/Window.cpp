@@ -94,6 +94,11 @@ namespace epoch::frontend
         m_cursorPosCallback = std::move(callback);
     }
 
+    void Window::setKeyboardCallback(KeyboardCallback callback)
+    {
+        m_keyboardCallback = std::move(callback);
+    }
+
     void Window::setMouseButtonCallback(MouseButtonCallback callback)
     {
         m_mouseButtonCallback = std::move(callback);
@@ -108,8 +113,19 @@ namespace epoch::frontend
 
     void Window::s_keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
     {
-        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        // TODO
+        if (key != GLFW_KEY_UNKNOWN)
+        {
+            const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+            if (window->m_keyboardCallback)
+            {
+                auto keyAction = KeyAction::press;
+                if (action == GLFW_RELEASE)
+                    keyAction = KeyAction::release;
+                else if (action == GLFW_REPEAT)
+                    keyAction = KeyAction::repeat;
+                window->m_keyboardCallback(static_cast<Key>(key), keyAction);
+            }
+        }
     }
 
     void Window::s_cursorPosCallback(GLFWwindow* glfwWindow, const double x, const double y)

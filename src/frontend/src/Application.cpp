@@ -38,6 +38,8 @@ namespace epoch::frontend
 
         m_window->setCursorPosCallback(
             [&](const float x, const float y){ m_gui->setCursorPos(x, y); });
+        m_window->setKeyboardCallback(
+            [&](const Key key, const KeyAction action) { m_emulator->keyEvent(key, action); });
         m_window->setMouseButtonCallback(
             [&](const int button, const int action) { m_gui->setMouseButton(button, action == 1); });
     }
