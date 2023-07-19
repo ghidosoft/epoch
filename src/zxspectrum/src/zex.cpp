@@ -18,6 +18,7 @@
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 #include "Z80Cpu.h"
