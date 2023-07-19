@@ -79,6 +79,7 @@ namespace epoch::zxspectrum
     {
         if (!m_ula->isCpuStalled())
         {
+            m_cpu->interruptRequest(m_ula->interruptRequested());
             m_cpu->clock();
         }
         m_ula->clock();

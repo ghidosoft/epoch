@@ -47,6 +47,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
         [[nodiscard]] bool invertPaperInk() const;
 
+        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x <= -HorizontalRetrace + 64; } // 32 t-states
+
     private:
         MemoryBank& m_rom48k;
         std::array<MemoryBank, 8>& m_ram;

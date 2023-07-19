@@ -178,6 +178,8 @@ namespace epoch::zxspectrum
         void step();
         void reset();
 
+        void interruptRequest(bool requested);
+
         [[nodiscard]] Z80Registers& registers() { return m_registers; }
         [[nodiscard]] const Z80Registers& registers() const { return m_registers; }
 
@@ -187,6 +189,7 @@ namespace epoch::zxspectrum
         Z80Registers m_registers{};
         uint8_t m_opcode{};
         Z80OpcodePrefix m_currentPrefix{ Z80OpcodePrefix::none };
+        bool m_interruptRequested{};
         int m_remainingCycles{};
         std::size_t m_clockCounter{};
 
@@ -197,6 +200,7 @@ namespace epoch::zxspectrum
         std::array<std::array<uint8_t*, 8>, 3> m_registersPointers;
 
         void executeInstruction();
+        void handleInterrupt();
 
         uint8_t fetchOpcode();
         uint8_t busRead(uint16_t address);

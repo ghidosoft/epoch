@@ -158,11 +158,14 @@ namespace epoch::zxspectrum
     {
         if (m_remainingCycles == 0)
         {
-            /* if (m_registers.pc == 0xe84)
+            if (m_interruptRequested && m_registers.iff1 && !m_registers.interruptJustEnabled)
             {
-                assert(m_registers.pc);
-            } */
-            executeInstruction();
+                handleInterrupt();
+            }
+            else
+            {
+                executeInstruction();
+            }
         }
 
         m_clockCounter++;
@@ -181,8 +184,14 @@ namespace epoch::zxspectrum
     {
         m_registers = {};
         m_currentPrefix = Z80OpcodePrefix::none;
+        m_interruptRequested = {};
         m_remainingCycles = {};
         m_clockCounter = {};
+    }
+
+    void Z80Cpu::interruptRequest(bool requested)
+    {
+        m_interruptRequested = requested;
     }
 
     void Z80Cpu::executeInstruction()
@@ -213,6 +222,22 @@ namespace epoch::zxspectrum
         if (m_opcode != 0xfb) m_registers.interruptJustEnabled = false;
 
         m_currentPrefix = Z80OpcodePrefix::none;
+    }
+
+    void Z80Cpu::handleInterrupt()
+    {
+        m_registers.iff1 = false;
+        switch (m_registers.interruptMode)
+        {
+        case 1:
+            m_remainingCycles++;
+            push16(m_registers.pc);
+            m_registers.pc = 0x0038;
+            break;
+        default:
+            assert(false);
+            break;
+        }
     }
 
     uint8_t Z80Cpu::fetchOpcode()
@@ -864,7 +889,30 @@ namespace epoch::zxspectrum
         if (x == 0)
         {
             // TODO: rotate/shift
-            assert(false);
+            switch (y)
+            {
+            case 0b000:
+                // RLC
+                {
+                    if (z == 0b110)
+                    {
+                        // RLC (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // RLC r
+                        auto reg = m_registersPointers[0][z];
+                        const auto value = *reg = std::rotl(*reg, 1);
+                        m_registers.af.low(s_flagsLookupSZP[value]);
+                        m_registers.af.c(value & 0x01);
+                    }
+                }
+                break;
+            default:
+                assert(false);
+                break;
+            }
         }
         else if (x == 1)
         {
