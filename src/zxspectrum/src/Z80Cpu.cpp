@@ -189,7 +189,7 @@ namespace epoch::zxspectrum
         m_clockCounter = {};
     }
 
-    void Z80Cpu::interruptRequest(bool requested)
+    void Z80Cpu::interruptRequest(const bool requested)
     {
         m_interruptRequested = requested;
     }
@@ -219,13 +219,22 @@ namespace epoch::zxspectrum
             mainQuadrant3();
         }
 
-        if (m_opcode != 0xfb) m_registers.interruptJustEnabled = false;
+        if (m_opcode != 0xfb && m_registers.interruptJustEnabled)
+        {
+            m_registers.interruptJustEnabled = false;
+        }
 
         m_currentPrefix = Z80OpcodePrefix::none;
     }
 
     void Z80Cpu::handleInterrupt()
     {
+        if (m_bus.read(m_registers.pc) == 0x76)
+        {
+            // Exit HALT state
+            m_registers.pc++;
+        }
+        m_registers.ir.low((m_registers.ir.low() + 1) & 0x7f);
         m_registers.iff1 = false;
         switch (m_registers.interruptMode)
         {
@@ -242,7 +251,7 @@ namespace epoch::zxspectrum
 
     uint8_t Z80Cpu::fetchOpcode()
     {
-        m_registers.ir.low((m_registers.ir.low() + 1) & 0b01111111);
+        m_registers.ir.low((m_registers.ir.low() + 1) & 0x7f);
         m_remainingCycles += 4;
         return m_bus.read(m_registers.pc++);
     }
@@ -616,21 +625,30 @@ namespace epoch::zxspectrum
                 break;
             case 0b101:
                 // CPL
-                m_registers.af.high(~m_registers.af.high());
-                m_registers.af.h(true);
-                m_registers.af.n(true);
+                {
+                    const uint8_t result = ~m_registers.af.high();
+                    m_registers.af.high(result);
+                    m_registers.af.y(result & Z80Flags::y);
+                    m_registers.af.x(result & Z80Flags::x);
+                    m_registers.af.h(true);
+                    m_registers.af.n(true);
+                }
                 break;
             case 0b110:
                 // SCF
-                m_registers.af.c(true);
+                m_registers.af.y((m_registers.af >> 5) & 0x01);
                 m_registers.af.h(false);
+                m_registers.af.x((m_registers.af >> 3) & 0x01);
                 m_registers.af.n(false);
+                m_registers.af.c(true);
                 break;
             case 0b111:
                 // CCF
-                m_registers.af.c(!m_registers.af.c());
-                m_registers.af.h(!m_registers.af.h());
+                m_registers.af.y((m_registers.af >> 5) & 0x01);
+                m_registers.af.h(m_registers.af.c());
+                m_registers.af.x((m_registers.af >> 3) & 0x01);
                 m_registers.af.n(false);
+                m_registers.af.value ^= Z80Flags::c;
                 break;
             }
         }
@@ -1371,12 +1389,14 @@ namespace epoch::zxspectrum
         }
         const auto carryIn = result ^ a ^ b;
         const auto overflow = (carryIn >> 7) ^ carry;
-        m_registers.af.n(false);
-        m_registers.af.c(carry);
-        m_registers.af.h((carryIn >> 4) & 0x01);
-        m_registers.af.p(overflow);
         m_registers.af.s(result >> 7);
         m_registers.af.z(result == 0);
+        m_registers.af.y(result & Z80Flags::y);
+        m_registers.af.h((carryIn >> 4) & 0x01);
+        m_registers.af.x(result & Z80Flags::x);
+        m_registers.af.p(overflow);
+        m_registers.af.n(false);
+        m_registers.af.c(carry);
         return result;
     }
 
