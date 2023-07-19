@@ -903,12 +903,30 @@ namespace epoch::zxspectrum
                     {
                         // RLC r
                         auto reg = m_registersPointers[0][z];
-                        const auto value = *reg = std::rotl(*reg, 1);
-                        m_registers.af.low(s_flagsLookupSZP[value]);
-                        m_registers.af.c(value & 0x01);
+                        const auto result = *reg = std::rotl(*reg, 1);
+                        m_registers.af.low(s_flagsLookupSZP[result]);
+                        m_registers.af.c(result & 0x01);
                     }
                 }
                 break;
+            case 0b010:
+                // RL
+                {
+                    if (z == 0b110)
+                    {
+                        // RL (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // RL r
+                        auto reg = m_registersPointers[0][z];
+                        const bool carry = *reg & 0x80;
+                        const auto result = *reg = (*reg << 1) | m_registers.af.c();
+                        m_registers.af.low(s_flagsLookupSZP[result]);
+                        m_registers.af.c(carry);
+                    }
+                }
             case 0b111:
                 // SRL
                 {
@@ -921,10 +939,10 @@ namespace epoch::zxspectrum
                     {
                         // SRL r
                         auto reg = m_registersPointers[0][z];
-                        const auto value = *reg >> 1;
-                        m_registers.af.low(s_flagsLookupSZP[value]);
+                        const auto result = *reg >> 1;
+                        m_registers.af.low(s_flagsLookupSZP[result]);
                         m_registers.af.c(*reg & 0x01);
-                        *reg = value;
+                        *reg = result;
                     }
                 }
                 break;
