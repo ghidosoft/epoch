@@ -1313,13 +1313,29 @@ namespace epoch::zxspectrum
 
     uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b, const bool carryFlag)
     {
-        const uint32_t result = a + b + carryFlag;
-        m_registers.af.c(result & 0x10000);
-        m_registers.af.p(result & 0x10000);
-        m_registers.af.n(false);
+        const uint16_t lowResult = (a & 0xff) + (b & 0xff) + carryFlag;
+        const bool lowCarry = lowResult & 0x100;
+        const auto highA = a >> 8;
+        const auto highB = b >> 8;
+        const auto highResult = highA + highB + lowCarry;
+        bool carry;
+        if (lowCarry)
+        {
+            carry = highA >= 0xff - highB;
+        }
+        else
+        {
+            carry = highA > 0xff - highB;
+        }
+        const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
+        const auto overflow = (carryIn >> 7) ^ carry;
+        const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
         m_registers.af.s(result & 0x8000);
         m_registers.af.z(result == 0);
-        // TODO: investigate H flag
+        m_registers.af.h((carryIn >> 4) & 0x01);
+        m_registers.af.p(overflow);
+        m_registers.af.n(false);
+        m_registers.af.c(carry);
         return static_cast<uint16_t>(result & 0xffff);
     }
 
