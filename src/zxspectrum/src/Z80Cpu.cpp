@@ -615,8 +615,6 @@ namespace epoch::zxspectrum
     {
         const auto dst = (m_opcode & 0b00111000) >> 3;
         const auto src = (m_opcode & 0b00000111);
-        const uint8_t* srcPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][src];
-        uint8_t* dstPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][dst];
         if (src == 0b110)
         {
             if (dst == 0b110)
@@ -639,6 +637,8 @@ namespace epoch::zxspectrum
             }
             else
             {
+                const uint8_t* srcPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][src];
+                uint8_t* dstPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][dst];
                 // LD dst, src
                 *dstPtr = *srcPtr;
             }
@@ -1225,13 +1225,13 @@ namespace epoch::zxspectrum
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busRead(m_registers.ix + d);
+                return busRead(static_cast<uint16_t>(m_registers.ix + d));
             }
         case Z80OpcodePrefix::iy:
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busRead(m_registers.iy + d);
+                return busRead(static_cast<uint16_t>(m_registers.iy + d));
             }
         }
         assert(false);
@@ -1254,7 +1254,7 @@ namespace epoch::zxspectrum
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busWrite(static_cast<uint16_t>(m_registers.iy + d), false);
+                return busWrite(static_cast<uint16_t>(m_registers.iy + d), value);
             }
         }
         assert(false);
