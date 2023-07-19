@@ -27,8 +27,8 @@ namespace epoch::zxspectrum
         virtual ~Z80Interface() = default;
         virtual uint8_t read(uint16_t address) = 0;
         virtual void write(uint16_t address, uint8_t value) = 0;
-        virtual uint8_t ioRead(uint8_t port) = 0;
-        virtual void ioWrite(uint8_t port, uint8_t value) = 0;
+        virtual uint8_t ioRead(uint16_t port) = 0;
+        virtual void ioWrite(uint16_t port, uint8_t value) = 0;
     };
 }
 

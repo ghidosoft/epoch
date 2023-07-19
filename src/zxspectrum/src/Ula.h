@@ -39,8 +39,8 @@ namespace epoch::zxspectrum
 
         uint8_t read(uint16_t address) override;
         void write(uint16_t address, uint8_t value) override;
-        uint8_t ioRead(uint8_t port) override;
-        void ioWrite(uint8_t port, uint8_t value) override;
+        uint8_t ioRead(uint16_t port) override;
+        void ioWrite(uint16_t port, uint8_t value) override;
         
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 

@@ -198,8 +198,8 @@ namespace epoch::zxspectrum
         uint8_t fetchOpcode();
         uint8_t busRead(uint16_t address);
         void busWrite(uint16_t address, uint8_t value);
-        uint8_t ioRead(uint8_t port);
-        void ioWrite(uint8_t port, uint8_t value);
+        uint8_t ioRead(uint16_t port);
+        void ioWrite(uint16_t port, uint8_t value);
 
         void mainQuadrant0();
         void mainQuadrant1();

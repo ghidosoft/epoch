@@ -210,13 +210,13 @@ namespace epoch::zxspectrum
         m_bus.write(address, value);
     }
 
-    uint8_t Z80Cpu::ioRead(const uint8_t port)
+    uint8_t Z80Cpu::ioRead(const uint16_t port)
     {
         m_remainingCycles += 4;
         return m_bus.ioRead(port);
     }
 
-    void Z80Cpu::ioWrite(const uint8_t port, const uint8_t value)
+    void Z80Cpu::ioWrite(const uint16_t port, const uint8_t value)
     {
         m_remainingCycles += 4;
         m_bus.ioWrite(port, value);
@@ -885,7 +885,7 @@ namespace epoch::zxspectrum
             // ED: quadrant 1
             if (z == 0b000)
             {
-                const auto value = ioRead(m_registers.bc.low());
+                const auto value = ioRead(m_registers.bc);
                 m_registers.af.low(s_flagsLookupSZP[value]);
                 switch (y)
                 {
@@ -960,7 +960,7 @@ namespace epoch::zxspectrum
                     value = m_registers.af.high();
                     break;
                 }
-                ioWrite(m_registers.bc.low(), value);
+                ioWrite(m_registers.bc, value);
             }
             else if (z == 0b010)
             {

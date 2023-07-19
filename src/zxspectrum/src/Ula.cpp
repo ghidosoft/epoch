@@ -102,13 +102,13 @@ namespace epoch::zxspectrum
         }
     }
 
-    uint8_t Ula::ioRead(const uint8_t port)
+    uint8_t Ula::ioRead(const uint16_t port)
     {
         // TODO
-        return 0;
+        return 0xff;
     }
 
-    void Ula::ioWrite(const uint8_t port, const uint8_t value)
+    void Ula::ioWrite(const uint16_t port, const uint8_t value)
     {
         if ((port & 0x01) == 0)
         {

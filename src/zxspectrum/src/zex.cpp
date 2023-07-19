@@ -37,8 +37,8 @@ public:
         m_ram[address] = value;
     }
 
-    uint8_t ioRead(uint8_t port) override { return 0; }
-    void ioWrite(uint8_t port, uint8_t value) override {}
+    uint8_t ioRead(uint16_t port) override { return 0; }
+    void ioWrite(uint16_t port, uint8_t value) override {}
 
 private:
     uint8_t *m_ram;
