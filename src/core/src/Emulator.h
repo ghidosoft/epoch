@@ -20,6 +20,8 @@
 #include <span>
 #include <string>
 
+#include "Keyboard.h"
+
 namespace epoch
 {
     struct EmulatorInfo
@@ -46,6 +48,8 @@ namespace epoch
         virtual void clock() = 0;
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
+
+        virtual void keyEvent(Key key, KeyAction action) {}
 
     public:
         [[nodiscard]] const EmulatorInfo& info() const;

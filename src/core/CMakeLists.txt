@@ -3,6 +3,7 @@ add_library(epoch_core
 
     "src/Color.h"
     "src/Emulator.cpp" "src/Emulator.h"
+    "src/Keyboard.h"
     "src/Palette.cpp" "src/Palette.h"
 )
 

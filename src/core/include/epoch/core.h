@@ -19,6 +19,7 @@
 
 #include "../../src/Color.h"
 #include "../../src/Emulator.h"
+#include "../../src/Keyboard.h"
 #include "../../src/Palette.h"
 
 #endif
