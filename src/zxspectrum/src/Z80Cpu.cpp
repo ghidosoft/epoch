@@ -965,6 +965,63 @@ namespace epoch::zxspectrum
                     }
                 }
                 break;
+            case 0b100:
+                // SLA
+                {
+                    if (z == 0b110)
+                    {
+                        // SLL (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // SLL r
+                        const auto reg = m_registersPointers[0][z];
+                        const bool carry = *reg & 0x80;
+                        const auto result = *reg = static_cast<uint8_t>(*reg << 1);
+                        m_registers.af.low(s_flagsLookupSZP[result]);
+                        m_registers.af.c(carry);
+                    }
+                }
+                break;
+            case 0b101:
+                // SRA
+                {
+                    if (z == 0b110)
+                    {
+                        // SRA (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // SRA r
+                        const auto reg = m_registersPointers[0][z];
+                        const bool carry = *reg & 0x01;
+                        const auto result = *reg = ((*reg & 0x7f) >> 1) | (*reg & 0x80);
+                        m_registers.af.low(s_flagsLookupSZP[result]);
+                        m_registers.af.c(carry);
+                    }
+                }
+                break;
+            case 0b110:
+                // SLL
+                {
+                    if (z == 0b110)
+                    {
+                        // SLL (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // SLL r
+                        const auto reg = m_registersPointers[0][z];
+                        const bool carry = *reg & 0x80;
+                        const auto result = *reg = static_cast<uint8_t>(*reg << 1) | 0x01;
+                        m_registers.af.low(s_flagsLookupSZP[result]);
+                        m_registers.af.c(carry);
+                    }
+                }
+                break;
             case 0b111:
                 // SRL
                 {
