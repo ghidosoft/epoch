@@ -16,6 +16,7 @@
 
 #include "Ula.h"
 
+#include <bit>
 #include <cassert>
 
 namespace epoch::zxspectrum
@@ -104,7 +105,20 @@ namespace epoch::zxspectrum
 
     uint8_t Ula::ioRead(const uint16_t port)
     {
-        // TODO
+        if ((port & 0x01) == 0)
+        {
+            const uint8_t portHigh = port >> 8;
+            uint8_t result = 0b00011111;
+            for (auto i = 0; i < 8; i++)
+            {
+                if ((portHigh & (1 << i)) == 0)
+                {
+                    result &= m_keyboardState[i];
+                }
+            }
+            if (m_ear) result |= 0b01000000;
+            return result | 0b10100000;
+        }
         return 0xff;
     }
 
@@ -112,7 +126,7 @@ namespace epoch::zxspectrum
     {
         if ((port & 0x01) == 0)
         {
-            // TODO ear/mic
+            m_ear = value & 0b00011000; // use mic (d3) | ear (d4)
             m_border = value & 0x07;
         }
     }

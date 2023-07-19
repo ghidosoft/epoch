@@ -53,6 +53,8 @@ namespace epoch::zxspectrum
 
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};
+        std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
+        bool m_ear{};
         int m_cpuStalled{};
 
         uint64_t m_frameCounter{};
