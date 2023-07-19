@@ -1152,6 +1152,7 @@ int main()
             if (c == 0x02)
             {
                 std::cout << cpu.registers().de.low();
+                std::cout.flush();
             }
             else if (c == 0x09)
             {
@@ -1161,6 +1162,7 @@ int main()
                 {
                     if (value != '\r') std::cout << value;
                 }
+                std::cout.flush();
             }
             else
             {
