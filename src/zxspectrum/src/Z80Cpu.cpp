@@ -909,6 +909,25 @@ namespace epoch::zxspectrum
                     }
                 }
                 break;
+            case 0b111:
+                // SRL
+                {
+                    if (z == 0b110)
+                    {
+                        // SRL (HL)
+                        assert(false);
+                    }
+                    else
+                    {
+                        // SRL r
+                        auto reg = m_registersPointers[0][z];
+                        const auto value = *reg >> 1;
+                        m_registers.af.low(s_flagsLookupSZP[value]);
+                        m_registers.af.c(*reg & 0x01);
+                        *reg = value;
+                    }
+                }
+                break;
             default:
                 assert(false);
                 break;
