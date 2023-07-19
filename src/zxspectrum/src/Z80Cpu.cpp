@@ -888,161 +888,92 @@ namespace epoch::zxspectrum
         const uint8_t z = m_opcode & 0b00000111;
         if (x == 0)
         {
-            // TODO: rotate/shift
             switch (y)
             {
             case 0b000:
                 // RLC
                 {
-                    if (z == 0b110)
-                    {
-                        // RLC (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // RLC r
-                        const auto reg = m_registersPointers[0][z];
-                        const auto result = *reg = std::rotl(*reg, 1);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(result & 0x01);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const auto result = std::rotl(value, 1);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(result & 0x01);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b001:
                 // RRC
                 {
-                    if (z == 0b110)
-                    {
-                        // RRC (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // RRC r
-                        const auto reg = m_registersPointers[0][z];
-                        const auto result = *reg = std::rotr(*reg, 1);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(result & 0x80);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const auto result = std::rotr(value, 1);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(result & 0x80);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b010:
                 // RL
                 {
-                    if (z == 0b110)
-                    {
-                        // RL (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // RL r
-                        const auto reg = m_registersPointers[0][z];
-                        const bool carry = *reg & 0x80;
-                        const auto result = *reg = static_cast<uint8_t>(*reg << 1) | m_registers.af.c();
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(carry);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const bool carry = value & 0x80;
+                    const auto result = static_cast<uint8_t>((value << 1) | m_registers.af.c());
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(carry);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b011:
                 // RR
                 {
-                    if (z == 0b110)
-                    {
-                        // RR (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // RR r
-                        const auto reg = m_registersPointers[0][z];
-                        const bool carry = *reg & 0x01;
-                        const auto result = *reg = static_cast<uint8_t>(*reg >> 1) | (m_registers.af.c() << 7);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(carry);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const bool carry = value & 0x01;
+                    const auto result = static_cast<uint8_t>((value >> 1) | (m_registers.af.c() << 7));
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(carry);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b100:
                 // SLA
                 {
-                    if (z == 0b110)
-                    {
-                        // SLL (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // SLL r
-                        const auto reg = m_registersPointers[0][z];
-                        const bool carry = *reg & 0x80;
-                        const auto result = *reg = static_cast<uint8_t>(*reg << 1);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(carry);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const bool carry = value & 0x80;
+                    const auto result = static_cast<uint8_t>(value << 1);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(carry);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b101:
                 // SRA
                 {
-                    if (z == 0b110)
-                    {
-                        // SRA (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // SRA r
-                        const auto reg = m_registersPointers[0][z];
-                        const bool carry = *reg & 0x01;
-                        const auto result = *reg = ((*reg & 0x7f) >> 1) | (*reg & 0x80);
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(carry);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const bool carry = value & 0x01;
+                    const auto result = static_cast<uint8_t>(((value & 0x7f) >> 1) | (value & 0x80));
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(carry);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b110:
                 // SLL
                 {
-                    if (z == 0b110)
-                    {
-                        // SLL (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // SLL r
-                        const auto reg = m_registersPointers[0][z];
-                        const bool carry = *reg & 0x80;
-                        const auto result = *reg = static_cast<uint8_t>(*reg << 1) | 0x01;
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(carry);
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const bool carry = value & 0x80;
+                    const auto result = static_cast<uint8_t>((value << 1) | 0x01);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(carry);
+                    prefixCbWrite(d, z, result);
                 }
                 break;
             case 0b111:
                 // SRL
                 {
-                    if (z == 0b110)
-                    {
-                        // SRL (HL)
-                        assert(false);
-                    }
-                    else
-                    {
-                        // SRL r
-                        const auto reg = m_registersPointers[0][z];
-                        const uint8_t result = *reg >> 1;
-                        m_registers.af.low(s_flagsLookupSZP[result]);
-                        m_registers.af.c(*reg & 0x01);
-                        *reg = result;
-                    }
+                    const auto value = prefixCbRead(d, z);
+                    const auto result = static_cast<uint8_t>(value >> 1);
+                    m_registers.af.low(s_flagsLookupSZP[result]);
+                    m_registers.af.c(value & 0x01);
+                    prefixCbWrite(d, z, result);
                 }
-                break;
-            default:
-                assert(false);
                 break;
             }
         }
@@ -1359,11 +1290,22 @@ namespace epoch::zxspectrum
                     // Rest is NOP
                 }
             }
-            else
+            else if (z == 0b001)
             {
-                // TODO
+                // TODO CPI CPD CPIR CPDR
                 assert(false);
             }
+            else if (z == 0b010)
+            {
+                // TODO INI IND INIR INDR
+                assert(false);
+            }
+            else if (z == 0b011)
+            {
+                // TODO OUTI OUTD OTIR OTDR
+                assert(false);
+            }
+            // Rest is NOP
         }
     }
 

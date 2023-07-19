@@ -22,7 +22,7 @@
 namespace epoch::zxspectrum
 {
     TEST(Z80Cpu_CB, Opcode_00000xxx_RLC_B) {
-        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x00, 0xcb, 0x00 } };
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00, 0xcb, 0x00 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0x6100;
         sut.step();
@@ -35,6 +35,57 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ir, 4);
         EXPECT_EQ(sut.registers().af, 0xff81);
         EXPECT_EQ(sut.registers().bc, 0x8500);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff09);
+        EXPECT_EQ(sut.registers().bc, 0x0b00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff00);
+        EXPECT_EQ(sut.registers().bc, 0x1600);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff28);
+        EXPECT_EQ(sut.registers().bc, 0x2c00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff08);
+        EXPECT_EQ(sut.registers().bc, 0x5800);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xffa0);
+        EXPECT_EQ(sut.registers().bc, 0xb000);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff21);
+        EXPECT_EQ(sut.registers().bc, 0x6100);
+    }
+
+    TEST(Z80Cpu_CB, Opcode_00000xxx_RLC_HL) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06, 0xcb, 0x06 } };
+        Z80Cpu sut{ bus };
+        sut.registers().hl = 0x0020;
+        bus.ram()[0x0020] = 0x61;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0xff80);
+        EXPECT_EQ(bus.ram(0x0020), 0xc2);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff81);
+        EXPECT_EQ(bus.ram(0x0020), 0x85);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff09);
+        EXPECT_EQ(bus.ram(0x0020), 0x0b);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff00);
+        EXPECT_EQ(bus.ram(0x0020), 0x16);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff28);
+        EXPECT_EQ(bus.ram(0x0020), 0x2c);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff08);
+        EXPECT_EQ(bus.ram(0x0020), 0x58);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xffa0);
+        EXPECT_EQ(bus.ram(0x0020), 0xb0);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff21);
+        EXPECT_EQ(bus.ram(0x0020), 0x61);
     }
 
     TEST(Z80Cpu_CB, Opcode_00001xxx_RRC_B) {
@@ -67,6 +118,22 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ir, 4);
         EXPECT_EQ(sut.registers().af, 0xff81);
         EXPECT_EQ(sut.registers().bc, 0x8600);
+    }
+
+    TEST(Z80Cpu_CB, Opcode_00010xxx_RL_C) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x11, 0xcb, 0x11 } };
+        Z80Cpu sut{ bus };
+        sut.registers().bc = 0x0061;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0xff84);
+        EXPECT_EQ(sut.registers().bc, 0x00c3);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 4);
+        EXPECT_EQ(sut.registers().af, 0xff81);
+        EXPECT_EQ(sut.registers().bc, 0x0086);
     }
 
     TEST(Z80Cpu_CB, Opcode_00011xxx_RR_B) {
@@ -142,7 +209,7 @@ namespace epoch::zxspectrum
     }
 
     TEST(Z80Cpu_CB, Opcode_00110xxx_SLL_B) {
-        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30 } };
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30, 0xcb, 0x30 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0x6100;
         sut.step();
@@ -161,10 +228,22 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().af, 0xff08);
         EXPECT_EQ(sut.registers().bc, 0x1f00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff2c);
+        EXPECT_EQ(sut.registers().bc, 0x3f00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff28);
+        EXPECT_EQ(sut.registers().bc, 0x7f00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xffac);
+        EXPECT_EQ(sut.registers().bc, 0xff00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xffad);
+        EXPECT_EQ(sut.registers().bc, 0xff00);
     }
 
     TEST(Z80Cpu_CB, Opcode_00111xxx_SRL_B) {
-        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x38, 0xcb, 0x38 } };
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38, 0xcb, 0x38 } };
         Z80Cpu sut{ bus };
         sut.registers().bc = 0x6100;
         sut.step();
@@ -177,5 +256,23 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ir, 4);
         EXPECT_EQ(sut.registers().af, 0xff0c);
         EXPECT_EQ(sut.registers().bc, 0x1800);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff0c);
+        EXPECT_EQ(sut.registers().bc, 0x0c00);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff04);
+        EXPECT_EQ(sut.registers().bc, 0x0600);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff04);
+        EXPECT_EQ(sut.registers().bc, 0x0300);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff01);
+        EXPECT_EQ(sut.registers().bc, 0x0100);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff45);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xff44);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
     }
 }
