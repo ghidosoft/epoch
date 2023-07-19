@@ -138,4 +138,18 @@ namespace epoch::zxspectrum
         // every 16 frames
         return m_frameCounter & 0x10;
     }
+
+    void Ula::setKeyState(const int row, const int col, const bool state)
+    {
+        assert(row < 8);
+        assert(col < 5);
+        if (state)
+        {
+            m_keyboardState[row] &= ~(1 << col);
+        }
+        else
+        {
+            m_keyboardState[row] |= 1 << col;
+        }
+    }
 }

@@ -49,6 +49,8 @@ namespace epoch::zxspectrum
 
         [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x <= -HorizontalRetrace + 64; } // 32 t-states
 
+        void setKeyState(int row, int col, bool state);
+
     private:
         MemoryBank& m_rom48k;
         std::array<MemoryBank, 8>& m_ram;

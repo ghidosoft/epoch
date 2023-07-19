@@ -51,6 +51,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] uint8_t vramRead(uint16_t address) const;
 
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override;
+        
+        void keyEvent(Key key, KeyAction action) override;
 
     private:
         const std::unique_ptr<Ula> m_ula;
