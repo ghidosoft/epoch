@@ -1158,7 +1158,7 @@ int main()
                 uint8_t value;
                 while ((value = ram[address++]) != '$')
                 {
-                    std::cout << value;
+                    if (value != '\r') std::cout << value;
                 }
             }
             else
