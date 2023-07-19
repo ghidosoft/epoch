@@ -81,16 +81,38 @@ namespace epoch::zxspectrum
 
     Z80Cpu::Z80Cpu(Z80Interface& bus) :
         m_bus{ bus },
-        m_registersPointers{ // TODO: endianness
-            reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
-            reinterpret_cast<uint8_t*>(&m_registers.bc.value),
-            reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
-            reinterpret_cast<uint8_t*>(&m_registers.de.value),
-            reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1,
-            reinterpret_cast<uint8_t*>(&m_registers.hl.value),
-            nullptr, // (HL)
-            reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
-        }
+        m_registersPointers{{ // TODO: endianness
+            {
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value),
+                reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.hl.value),
+                nullptr, // (HL)
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+            },
+            {
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value),
+                reinterpret_cast<uint8_t*>(&m_registers.ix.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.ix.value),
+                nullptr, // (IX)
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+            },
+            {
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value),
+                reinterpret_cast<uint8_t*>(&m_registers.iy.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.iy.value),
+                nullptr, // (IY)
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+            },
+        }}
     {
         std::istringstream is{ Z80CONFIG };
 
@@ -428,7 +450,7 @@ namespace epoch::zxspectrum
             }
             else
             {
-                n = (*m_registersPointers[y])++;
+                n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])++;
                 add8(n, 1);
             }
             m_registers.af.c(c); // restore carry
@@ -467,7 +489,7 @@ namespace epoch::zxspectrum
             }
             else
             {
-                n = (*m_registersPointers[y])--;
+                n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])--;
                 sub8(n, 1);
             }
             m_registers.af.c(c); // restore carry
@@ -504,7 +526,7 @@ namespace epoch::zxspectrum
             }
             else
             {
-                *m_registersPointers[y] = busRead(m_registers.pc++);
+                *m_registersPointers[static_cast<int>(m_currentPrefix)][y] = busRead(m_registers.pc++);
             }
         }
         else // if (z == 0b111)
@@ -593,8 +615,8 @@ namespace epoch::zxspectrum
     {
         const auto dst = (m_opcode & 0b00111000) >> 3;
         const auto src = (m_opcode & 0b00000111);
-        const uint8_t* srcPtr = m_registersPointers[src];
-        uint8_t* dstPtr = m_registersPointers[dst];
+        const uint8_t* srcPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][src];
+        uint8_t* dstPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][dst];
         if (src == 0b110)
         {
             if (dst == 0b110)
@@ -605,7 +627,7 @@ namespace epoch::zxspectrum
             else
             {
                 // LD dst, (HL)
-                *dstPtr = busReadHL();
+                *m_registersPointers[0][dst] = busReadHL();
             }
         }
         else
@@ -613,7 +635,7 @@ namespace epoch::zxspectrum
             if (dst == 0b110)
             {
                 // LD (HL), src
-                busWriteHL(*srcPtr);
+                busWriteHL(*m_registersPointers[0][src]);
             }
             else
             {
@@ -627,7 +649,7 @@ namespace epoch::zxspectrum
     {
         const auto operation = (m_opcode & 0b00111000) >> 3;
         const auto src = (m_opcode & 0b00000111);
-        const uint8_t* srcPtr = m_registersPointers[src];
+        const uint8_t* srcPtr = m_registersPointers[static_cast<int>(m_currentPrefix)][src];
         const auto a = m_registers.af.high();
         uint8_t b;
         if (src == 0b110)
@@ -1504,7 +1526,7 @@ namespace epoch::zxspectrum
         }
         else
         {
-            return *m_registersPointers[z];
+            return *m_registersPointers[0][z];
         }
     }
 
@@ -1528,7 +1550,7 @@ namespace epoch::zxspectrum
         }
         else
         {
-            *m_registersPointers[z] = value;
+            *m_registersPointers[0][z] = value;
             switch (m_currentPrefix)
             {
             case Z80OpcodePrefix::ix:

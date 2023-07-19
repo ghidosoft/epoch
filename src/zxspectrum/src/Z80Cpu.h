@@ -86,9 +86,9 @@ namespace epoch::zxspectrum
         // SP Stack pointer
         uint16_t sp{ 0xffff };
         // IX Index X
-        uint16_t ix{ 0xffff };
+        WordRegister ix{ 0xffff };
         // IY Index Y
-        uint16_t iy{ 0xffff };
+        WordRegister iy{ 0xffff };
         // IR Interrupt/Refresh register
         WordRegister ir{};
         // AF Accumulator and flags
@@ -163,9 +163,9 @@ namespace epoch::zxspectrum
 
     enum class Z80OpcodePrefix
     {
-        none,
-        ix,
-        iy,
+        none = 0,
+        ix = 1,
+        iy = 2,
     };
 
     class Z80Cpu final
@@ -194,7 +194,7 @@ namespace epoch::zxspectrum
 
         Z80Interface& m_bus;
 
-        std::array<uint8_t*, 8> m_registersPointers;
+        std::array<std::array<uint8_t*, 8>, 3> m_registersPointers;
 
         void executeInstruction();
 
