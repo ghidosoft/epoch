@@ -143,6 +143,7 @@ namespace epoch::zxspectrum
             executeInstruction();
         }
 
+        m_clockCounter++;
         m_remainingCycles--;
     }
 
@@ -159,6 +160,7 @@ namespace epoch::zxspectrum
         m_registers = {};
         m_currentPrefix = Z80OpcodePrefix::none;
         m_remainingCycles = {};
+        m_clockCounter = {};
     }
 
     void Z80Cpu::executeInstruction()

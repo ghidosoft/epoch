@@ -16,6 +16,7 @@
 
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
 
@@ -1140,6 +1141,7 @@ int main()
     epoch::zxspectrum::Z80Cpu cpu{ interface };
     cpu.reset();
     cpu.registers().pc = 0x0100;
+    const auto startTime = std::chrono::high_resolution_clock::now();
     do
     {
         cpu.step();
@@ -1165,5 +1167,13 @@ int main()
             }
         }
     } while (cpu.registers().pc != 0x0000);
+    const auto stopTime = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
+    const auto durationSec = static_cast<double>(duration.count()) / 1e6;
+    std::cout << std::endl;
+    std::cout << "=======================================" << std::endl;
+    std::cout << "Duration:     " << durationSec << " s" << std::endl;
+    std::cout << "Clock cycles: " << cpu.clockCounter() << std::endl;
+    std::cout << "Cycles/sec:   " << static_cast<double>(cpu.clockCounter()) / durationSec << std::endl;
     return EXIT_SUCCESS;
 }

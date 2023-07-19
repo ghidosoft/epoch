@@ -181,11 +181,14 @@ namespace epoch::zxspectrum
         [[nodiscard]] Z80Registers& registers() { return m_registers; }
         [[nodiscard]] const Z80Registers& registers() const { return m_registers; }
 
+        [[nodiscard]] std::size_t clockCounter() const { return m_clockCounter; }
+
     private:
         Z80Registers m_registers{};
         uint8_t m_opcode{};
         Z80OpcodePrefix m_currentPrefix{ Z80OpcodePrefix::none };
         int m_remainingCycles{};
+        std::size_t m_clockCounter{};
 
         std::array<Z80Instruction, 256> m_instructions{};
 
@@ -216,7 +219,6 @@ namespace epoch::zxspectrum
 
         uint8_t busReadHL();
         void busWriteHL(uint8_t value);
-        void busWriteHLn();
         uint16_t fetch16();
         uint16_t read16(uint16_t address);
         void write16(uint16_t address, uint16_t value);
