@@ -16,16 +16,23 @@
 
 #include "Window.h"
 
+#include <iostream>
 #include <stdexcept>
 #include <utility>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+static void s_glfwErrorCallback(int code, const char* description)
+{
+    std::cerr << "GLFW error #" << code << ": " << description << std::endl;
+}
+
 namespace epoch::frontend
 {
     Window::Window(const WindowInfo& info)
     {
+        glfwSetErrorCallback(s_glfwErrorCallback);
         if (!glfwInit())
         {
             throw std::runtime_error("Cannot initialize GLFW.");
