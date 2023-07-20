@@ -621,6 +621,10 @@ namespace epoch::zxspectrum
                     m_registers.af.low(s_flagsLookupSZP[a] | (m_registers.af.low() & 0b00111011));
                     m_registers.af.high(a);
                     // TODO: n = 1
+                    if (m_registers.af.n())
+                    {
+                        assert(false);
+                    }
                 }
                 break;
             case 0b101:
@@ -932,7 +936,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b101:
                 // SRA
-                result = static_cast<uint8_t>(((value & 0x7f) >> 1) | (value & 0x80));
+                result = static_cast<uint8_t>((value >> 1) | (value & 0x80));
                 break;
             case 0b110:
                 // SLL

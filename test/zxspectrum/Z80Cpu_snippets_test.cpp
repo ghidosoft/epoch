@@ -214,4 +214,63 @@ namespace epoch::zxspectrum
         EXPECT_FALSE(sut.registers().af.n());
         EXPECT_TRUE(sut.registers().af.c());
     }
+
+    TEST(Z80Cpu_snippets, Shift_Rotation) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{
+            0x01, 0x00, 0x5a, // ld bc, $5a00
+            0x21, 0x00, 0x01, // ld hl, $0100
+            0x70, // ld (hl), b
+            0xdd, 0x21, 0xff, 0x00, // ld ix, $00ff
+            0xfd, 0x21, 0x02, 0x01, // ld iy, $0102
+            0xdd, 0xcb, 0x01, 0x06, // rlc (ix+1)
+            0xfd, 0xcb, 0xfe, 0x06, // rlc (iy-2)
+            0xdd, 0xcb, 0x01, 0x0e, // rrc (ix+1)
+            0xdd, 0xcb, 0x01, 0x26, // sla (ix+1)
+            0xdd, 0xcb, 0x01, 0x16, // rl (ix+1)
+            0xfd, 0xcb, 0xfe, 0x2e, // sra (iy-2)
+            0xdd, 0xcb, 0x01, 0x1e, // rr (ix+1)
+            0xdd, 0xcb, 0x01, 0x3e, // srl (ix+1)
+            0xdd, 0xcb, 0x01, 0x36, // sll (ix+1)
+        } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x5a;
+        sut.registers().ix = 0x00ff;
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step();
+        sut.step(); // rlc
+        EXPECT_EQ(sut.registers().af, 0xffa4);
+        EXPECT_EQ(bus.ram(0x0100), 0xb4);
+        sut.step(); // rlc
+        EXPECT_EQ(sut.registers().af, 0xff2d);
+        EXPECT_EQ(bus.ram(0x0100), 0x69);
+        sut.step(); // rrc
+        EXPECT_EQ(sut.registers().af, 0xffa5);
+        EXPECT_EQ(bus.ram(0x0100), 0xb4);
+        sut.step(); // sla
+        EXPECT_EQ(sut.registers().af, 0xff29);
+        EXPECT_EQ(bus.ram(0x0100), 0x68);
+        sut.step(); // rl
+        EXPECT_EQ(sut.registers().af, 0xff84);
+        EXPECT_EQ(bus.ram(0x0100), 0xd1);
+        sut.step(); // sra
+        EXPECT_EQ(sut.registers().af, 0xffad);
+        EXPECT_EQ(bus.ram(0x0100), 0xe8);
+        sut.step(); // rr
+        EXPECT_EQ(sut.registers().af, 0xffa0);
+        EXPECT_EQ(bus.ram(0x0100), 0xf4);
+        sut.step(); // srl
+        EXPECT_EQ(sut.registers().af, 0xff28);
+        EXPECT_EQ(bus.ram(0x0100), 0x7a);
+        sut.step(); // sll
+        EXPECT_EQ(sut.registers().pc, 0x0033);
+        EXPECT_EQ(sut.registers().af, 0xffa4);
+        EXPECT_EQ(sut.registers().bc, 0x5a00);
+        EXPECT_EQ(sut.registers().hl, 0x0100);
+        EXPECT_EQ(sut.registers().ix, 0x00ff);
+        EXPECT_EQ(sut.registers().iy, 0x0102);
+        EXPECT_EQ(bus.ram(0x0100), 0xf5);
+    }
 }
