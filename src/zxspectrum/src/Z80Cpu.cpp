@@ -785,11 +785,11 @@ namespace epoch::zxspectrum
                 break;
             case 0b010:
                 // OUT (n), A
-                ioWrite(busRead(m_registers.pc++), m_registers.af.high());
+                ioWrite(busRead(m_registers.pc++) | static_cast<uint16_t>(m_registers.af.high() << 8), m_registers.af.high());
                 break;
             case 0b011:
                 // IN A, (n)
-                m_registers.af.high(ioRead(busRead(m_registers.pc++)));
+                m_registers.af.high(ioRead(busRead(m_registers.pc++) | static_cast<uint16_t>(m_registers.af.high() << 8)));
                 break;
             case 0b100:
                 // EX (SP), HL
