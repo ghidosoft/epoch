@@ -1206,23 +1206,57 @@ namespace epoch::zxspectrum
                     break;
                 case 0b010:
                     // LD A, I
-                    m_registers.af.high(m_registers.ir.high());
-                    m_remainingCycles++;
+                    {
+                        const auto value = m_registers.ir.high();
+                        m_registers.af.high(value);
+                        m_registers.af.s(value & Z80Flags::s);
+                        m_registers.af.z(value == 0);
+                        m_registers.af.y(value & Z80Flags::y);
+                        m_registers.af.h(false);
+                        m_registers.af.x(value & Z80Flags::x);
+                        m_registers.af.p(m_registers.iff2);
+                        m_registers.af.n(false);
+                        m_remainingCycles++;
+                    }
                     break;
                 case 0b011:
                     // LD A, R
-                    m_registers.af.high(m_registers.ir.low());
-                    m_remainingCycles++;
+                    {
+                        const auto value = m_registers.ir.low();
+                        m_registers.af.high(value);
+                        m_registers.af.s(value & Z80Flags::s);
+                        m_registers.af.z(value == 0);
+                        m_registers.af.y(value & Z80Flags::y);
+                        m_registers.af.h(false);
+                        m_registers.af.x(value& Z80Flags::x);
+                        m_registers.af.p(m_registers.iff2);
+                        m_registers.af.n(false);
+                        m_remainingCycles++;
+                    }
                     break;
                 case 0b100:
                     // RRD
                     m_remainingCycles += 4;
-                    assert(false); // TODO
+                    {
+                        const auto a = m_registers.af.high();
+                        const auto n = busRead(m_registers.hl);
+                        const auto res = static_cast<uint8_t>((a & 0xf0) | (n & 0x0f));
+                        m_registers.af.high(res);
+                        busWrite(m_registers.hl, static_cast<uint8_t>(a << 4 | n >> 4));
+                        m_registers.af.low((m_registers.af.value & 0x01) | s_flagsLookupSZP[res]);
+                    }
                     break;
                 case 0b101:
                     // RLD
                     m_remainingCycles += 4;
-                    assert(false); // TODO
+                    {
+                        const auto a = m_registers.af.high();
+                        const auto n = busRead(m_registers.hl);
+                        const auto res = static_cast<uint8_t>((a & 0xf0) | n >> 4);
+                        m_registers.af.high(res);
+                        busWrite(m_registers.hl, static_cast<uint8_t>(n << 4 | (a & 0x0f)));
+                        m_registers.af.low((m_registers.af.value & 0x01) | s_flagsLookupSZP[res]);
+                    }
                     break;
                 case 0b110:
                 case 0b111:
@@ -1413,7 +1447,7 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    uint16_t Z80Cpu::add16(uint16_t a, uint16_t b)
+    uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b)
     {
         const uint16_t lowResult = (a & 0xff) + (b & 0xff);
         const bool lowCarry = lowResult & 0x100;
@@ -1430,10 +1464,13 @@ namespace epoch::zxspectrum
             carry = highA > 0xff - highB;
         }
         const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
+        const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
+        m_registers.af.y(highResult & Z80Flags::y);
         m_registers.af.h((carryIn >> 4) & 0x01);
+        m_registers.af.x(highResult & Z80Flags::x);
         m_registers.af.n(false);
         m_registers.af.c(carry);
-        return ((highResult & 0xff) << 8) | (lowResult & 0xff);
+        return static_cast<uint16_t>(result);
     }
 
     uint16_t Z80Cpu::add16(const uint16_t a, const uint16_t b, const bool carryFlag)
@@ -1457,11 +1494,13 @@ namespace epoch::zxspectrum
         const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
         m_registers.af.s(result & 0x8000);
         m_registers.af.z(result == 0);
+        m_registers.af.y(highResult & Z80Flags::y);
         m_registers.af.h((carryIn >> 4) & 0x01);
+        m_registers.af.x(highResult & Z80Flags::x);
         m_registers.af.p(overflow);
         m_registers.af.n(false);
         m_registers.af.c(carry);
-        return static_cast<uint16_t>(result & 0xffff);
+        return static_cast<uint16_t>(result);
     }
 
     uint16_t Z80Cpu::sub16(uint16_t a, uint16_t b)

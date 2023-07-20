@@ -174,6 +174,54 @@ namespace epoch::zxspectrum
         EXPECT_EQ(bus.ram(0x1235), 0x56);
     }
 
+    TEST(Z80Cpu_ED, Opcode_01100111_RRD) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x67, 0xed, 0x67, 0xed, 0x67 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0xab;
+        bus.ram()[0x0101] = 0x56;
+        sut.registers().af = 0x12ff;
+        sut.registers().hl = 0x0100;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0x1b0d);
+        EXPECT_EQ(sut.registers().hl, 0x0100);
+        EXPECT_EQ(bus.ram(0x0100), 0x2a);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0x1a09);
+        EXPECT_EQ(bus.ram(0x0100), 0xb2);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0x1205);
+        EXPECT_EQ(bus.ram(0x0100), 0xab);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_01101111_RLD) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x6f, 0xed, 0x6f, 0xed, 0x6f } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0xab;
+        bus.ram()[0x0101] = 0x56;
+        sut.registers().af = 0x12ff;
+        sut.registers().hl = 0x0100;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0x1a09);
+        EXPECT_EQ(sut.registers().hl, 0x0100);
+        EXPECT_EQ(bus.ram(0x0100), 0xb2);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0x1b0d);
+        EXPECT_EQ(bus.ram(0x0100), 0x2a);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0x1205);
+        EXPECT_EQ(bus.ram(0x0100), 0xab);
+        EXPECT_EQ(bus.ram(0x0101), 0x56);
+    }
+
     TEST(Z80Cpu_ED, Opcode_01x00110_IM_0) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0x46 } };
         Z80Cpu sut{ bus };
