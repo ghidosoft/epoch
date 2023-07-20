@@ -56,5 +56,9 @@ jobs:
         with:
           name: ubuntu_zex_binary
 
+      # See https://github.com/actions/upload-artifact/issues/38
+      - name: Restore permissions
+        run: chmod +x epoch_zxspectrum_zex
       - name: Run Z80 Excerciser tests
-        run: ./epoch_zxspectrum_zex | tee zex.txt
+        run: ./epoch_zxspectrum_zex
+        # run: ./epoch_zxspectrum_zex | tee zex.txt
