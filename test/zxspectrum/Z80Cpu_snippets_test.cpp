@@ -81,30 +81,15 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 0x000c);
         EXPECT_EQ(sut.registers().bc.high(), 0x81);
-        // EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_FALSE(sut.registers().af.z());
-        EXPECT_TRUE(sut.registers().af.h());
-        // EXPECT_FALSE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af.low(), 0x91);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 0x000e);
         EXPECT_EQ(sut.registers().bc.high(), 0x81);
-        // EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_TRUE(sut.registers().af.h());
-        // EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af.low(), 0x55);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 0x0010);
         EXPECT_EQ(sut.registers().bc.high(), 0x03);
-        EXPECT_FALSE(sut.registers().af.s());
-        EXPECT_FALSE(sut.registers().af.z());
-        // EXPECT_TRUE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af.low(), 0x05);
     }
 
     TEST(Z80Cpu_snippets, LD_IX_IY_MEM) {

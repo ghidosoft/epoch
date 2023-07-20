@@ -909,7 +909,7 @@ namespace epoch::zxspectrum
         if (x == 0)
         {
             const auto value = prefixCbRead(d, z);
-            uint8_t result = 0x00;
+            uint8_t result;
             switch (y)
             {
             case 0b000:
@@ -953,11 +953,15 @@ namespace epoch::zxspectrum
         else if (x == 1)
         {
             // BIT
-            auto value = prefixCbRead(d, z);
-            value &= (1 << y);
+            const auto value = prefixCbRead(d, z);
+            const uint8_t result = value & (1 << y);
+            m_registers.af.s(result & Z80Flags::s);
+            m_registers.af.z(!result);
+            m_registers.af.y(result & Z80Flags::y);
             m_registers.af.h(true);
+            m_registers.af.x(result & Z80Flags::x);
+            m_registers.af.p(!result);
             m_registers.af.n(false);
-            m_registers.af.z(!value);
         }
         else if (x == 2)
         {
@@ -1587,9 +1591,12 @@ namespace epoch::zxspectrum
         const auto n = busRead(m_registers.hl.value++);
         busWrite(m_registers.de.value++, n);
         m_registers.bc.value--;
-        m_registers.af.n(false);
+        const uint8_t an = n + m_registers.af.high();
+        m_registers.af.y(an & (1 << 1));
         m_registers.af.h(false);
-        m_registers.af.p(m_registers.bc.value != 0);
+        m_registers.af.x(an & (1 << 3));
+        m_registers.af.n(false);
+        m_registers.af.p(m_registers.bc.value);
         m_remainingCycles += 2;
     }
 
@@ -1598,9 +1605,12 @@ namespace epoch::zxspectrum
         const auto n = busRead(m_registers.hl.value--);
         busWrite(m_registers.de.value--, n);
         m_registers.bc.value--;
-        m_registers.af.n(false);
+        const uint8_t an = n + m_registers.af.high();
+        m_registers.af.y(an & (1 << 1));
         m_registers.af.h(false);
-        m_registers.af.p(m_registers.bc.value != 0);
+        m_registers.af.x(an & (1 << 3));
+        m_registers.af.n(false);
+        m_registers.af.p(m_registers.bc.value);
         m_remainingCycles += 2;
     }
 
