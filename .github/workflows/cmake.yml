@@ -48,7 +48,7 @@ jobs:
         path: build/src/zxspectrum/epoch_zxspectrum_zex
 
   zexall:
-    needs: build_ubuntu
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Download ZEX binary
