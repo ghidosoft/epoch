@@ -18,6 +18,7 @@
 #define SRC_FRONTEND_SHADER_H_
 
 #include <map>
+#include <string>
 #include <string_view>
 
 #include <glad/glad.h>
