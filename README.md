@@ -16,7 +16,7 @@ First 48K ROM running screenshot:
 
 ## Build
 
-This project uses CMake. Tested on Windows (Visual Studio 2022) and GNU/Linux (Ubuntu 22.04).
+This project uses CMake. Builds on Windows (Visual Studio 2022), GNU/Linux (Ubuntu 22.04) and MacOS (12.6.7).
 
 ### Ubuntu 22.04 build
 
