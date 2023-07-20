@@ -57,4 +57,4 @@ jobs:
           name: ubuntu_zex_binary
 
       - name: Run Z80 Excerciser tests
-        run: epoch_zxspectrum_zex | tee zex.txt
+        run: ./epoch_zxspectrum_zex | tee zex.txt
