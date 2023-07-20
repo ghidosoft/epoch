@@ -519,101 +519,67 @@ namespace epoch::zxspectrum
     TEST(Z80Cpu, Opcode00000111_RLCA) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x07, 0x07, 0x07, 0x07, 0x07 } };
         Z80Cpu sut{ bus };
-        sut.registers().af.high(0b11110000);
+        sut.registers().af = 0xf0ff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af.high(), 0b11100001);
-        EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af, 0xe1e5);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
-        EXPECT_EQ(sut.registers().af.high(), 0b11000011);
-        EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af, 0xc3c5);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 3);
         EXPECT_EQ(sut.registers().ir, 3);
-        EXPECT_EQ(sut.registers().af.high(), 0b10000111);
-        EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af, 0x87c5);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 4);
         EXPECT_EQ(sut.registers().ir, 4);
-        EXPECT_EQ(sut.registers().af.high(), 0b00001111);
-        EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_TRUE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af, 0x0fcd);
         sut.step();
         EXPECT_EQ(sut.registers().pc, 5);
         EXPECT_EQ(sut.registers().ir, 5);
-        EXPECT_EQ(sut.registers().af.high(), 0b00011110);
-        EXPECT_TRUE(sut.registers().af.s());
-        EXPECT_TRUE(sut.registers().af.z());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.n());
-        EXPECT_FALSE(sut.registers().af.c());
+        EXPECT_EQ(sut.registers().af, 0x1ecc);
     }
 
     TEST(Z80Cpu, Opcode00001111_RRCA) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x0f } };
         Z80Cpu sut{ bus };
-        sut.registers().af.high(0b00001111);
-        sut.registers().af.low(0x00);
+        sut.registers().af = 0x0fff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af.high(), 0b10000111);
-        EXPECT_TRUE(sut.registers().af.c());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_EQ(sut.registers().af, 0x87c5);
     }
 
     TEST(Z80Cpu, Opcode00010111_RLA) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x17 } };
         Z80Cpu sut{ bus };
-        sut.registers().af.high(0b10100001);
-        sut.registers().af.low(0x00);
-        sut.registers().af.c(true);
+        sut.registers().af = 0xa1ff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af.high(), 0b01000011);
-        EXPECT_TRUE(sut.registers().af.c());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_EQ(sut.registers().af, 0x43c5);
     }
 
     TEST(Z80Cpu, Opcode00011111_RRA) {
-        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x1f } };
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, } };
         Z80Cpu sut{ bus };
-        sut.registers().af.high(0b00001111);
-        sut.registers().af.low(0x00);
-        sut.registers().af.c(true);
+        sut.registers().af = 0x0fff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af.high(), 0b10000111);
-        EXPECT_TRUE(sut.registers().af.c());
-        EXPECT_FALSE(sut.registers().af.h());
-        EXPECT_FALSE(sut.registers().af.n());
+        EXPECT_EQ(sut.registers().af, 0x87c5);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xc3c5);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xe1e5);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xf0e5);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0xf8ec);
+        sut.step();
+        EXPECT_EQ(sut.registers().af, 0x7cec);
     }
 
     TEST(Z80Cpu, Opcode00100111_DAA) {
