@@ -454,7 +454,6 @@ namespace epoch::zxspectrum
         {
             // INC 8bit
             const auto c = m_registers.af.c();
-            uint8_t n;
             if (y == 0b110)
             {
                 // INC (HL)
@@ -484,7 +483,7 @@ namespace epoch::zxspectrum
             }
             else
             {
-                n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])++;
+                const auto n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])++;
                 add8(n, 1);
             }
             m_registers.af.c(c); // restore carry
@@ -493,7 +492,6 @@ namespace epoch::zxspectrum
         {
             // DEC 8bit
             const auto c = m_registers.af.c();
-            uint8_t n;
             if (y == 0b110)
             {
                 // DEC (HL)
@@ -523,7 +521,7 @@ namespace epoch::zxspectrum
             }
             else
             {
-                n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])--;
+                const auto n = (*m_registersPointers[static_cast<int>(m_currentPrefix)][y])--;
                 sub8(n, 1);
             }
             m_registers.af.c(c); // restore carry
@@ -924,7 +922,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b010:
                 // RL
-                result = static_cast<uint8_t>((value << 1) | m_registers.af.c());
+                result = static_cast<uint8_t>((value << 1) | static_cast<uint8_t>(m_registers.af.c()));
                 break;
             case 0b011:
                 // RR
@@ -1392,7 +1390,7 @@ namespace epoch::zxspectrum
             carry = a > 0xff - b;
         }
         const auto carryIn = result ^ a ^ b;
-        const auto overflow = (carryIn >> 7) ^ carry;
+        const auto overflow = (carryIn >> 7) ^ static_cast<uint8_t>(carry);
         m_registers.af.s(result >> 7);
         m_registers.af.z(result == 0);
         m_registers.af.y(result & Z80Flags::y);
@@ -1451,7 +1449,7 @@ namespace epoch::zxspectrum
             carry = highA > 0xff - highB;
         }
         const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
-        const auto overflow = (carryIn >> 7) ^ carry;
+        const auto overflow = (carryIn >> 7) ^ static_cast<uint8_t>(carry);
         const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
         m_registers.af.s(result & 0x8000);
         m_registers.af.z(result == 0);

@@ -1127,8 +1127,8 @@ static const uint8_t zexall[] = {
   0x0c, 0x8e, 0xa1, 0x5a, 0x05, 0xdf, 0x1b, 0x2d, 0x02, 0xef, 0x8d
 };
 
-#define ROM zexdoc
-// #define ROM zexall
+// #define ROM zexdoc
+#define ROM zexall
 
 int main()
 {
@@ -1177,6 +1177,6 @@ int main()
     std::cout << "=======================================" << std::endl;
     std::cout << "Duration:     " << durationSec << " s" << std::endl;
     std::cout << "Clock cycles: " << cpu.clockCounter() << std::endl;
-    std::cout << "Cycles/sec:   " << static_cast<double>(cpu.clockCounter()) / durationSec << std::endl;
+    std::cout << "Frequency:    " << static_cast<double>(cpu.clockCounter()) / durationSec * 1e-6 << " MHz" << std::endl;
     return EXIT_SUCCESS;
 }
