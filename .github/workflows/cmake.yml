@@ -40,12 +40,13 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
-    - name: Upload Ubuntu artifacts
+    - name: Upload Ubuntu ZEX binary
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v3
       with:
         name: ubuntu_zex_binary
         path: build/src/zxspectrum/epoch_zxspectrum_zex
+        retention-days: 2
 
   zexall:
     needs: build
