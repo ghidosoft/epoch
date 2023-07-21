@@ -21,45 +21,8 @@
 #include <optional>
 #include <sstream>
 
-#include "Z80Config.inc.h"
-
 namespace epoch::zxspectrum
 {
-    static std::optional<Z80MachineCycle> parseMachineCycle(const std::string& s)
-    {
-        if (s == "op") return Z80MachineCycle::opcode;
-        if (s == "mr") return Z80MachineCycle::memRead;
-        if (s == "mw") return Z80MachineCycle::memRead;
-        if (s == "ior") return Z80MachineCycle::ioRead;
-        if (s == "iow") return Z80MachineCycle::ioWrite;
-        if (s == "-") return {};
-        throw std::runtime_error("Invalid machine cycle");
-    }
-
-    static Z80InstructionType parseInstructionType(const std::string& s)
-    {
-        if (s == "LD") return Z80InstructionType::LD;
-        return Z80InstructionType::custom;
-    }
-
-    static Z80Operand parseOperand(const std::string& s)
-    {
-        if (s == "AF") return Z80Operand::af;
-        if (s == "BC") return Z80Operand::bc;
-        if (s == "DE") return Z80Operand::de;
-        if (s == "HL") return Z80Operand::hl;
-        if (s == "A") return Z80Operand::a;
-        if (s == "B") return Z80Operand::b;
-        if (s == "C") return Z80Operand::c;
-        if (s == "D") return Z80Operand::d;
-        if (s == "E") return Z80Operand::e;
-        if (s == "F") return Z80Operand::f;
-        if (s == "n") return Z80Operand::n8;
-        if (s == "nn") return Z80Operand::n16;
-        if (s == "(DE)") return Z80Operand::memDe;
-        return Z80Operand::none;
-    }
-
     static const uint8_t s_flagsLookupSZP[256] = {
           0x44,0x00,0x00,0x04,0x00,0x04,0x04,0x00,0x08,0x0c,0x0c,0x08,0x0c,0x08,0x08,0x0c,
           0x00,0x04,0x04,0x00,0x04,0x00,0x00,0x04,0x0c,0x08,0x08,0x0c,0x08,0x0c,0x0c,0x08,
@@ -114,43 +77,6 @@ namespace epoch::zxspectrum
             },
         }}
     {
-        std::istringstream is{ Z80CONFIG };
-
-        std::string line;
-        while (std::getline(is, line))
-        {
-            if (!line.empty() && line[0] != '#')
-            {
-                std::istringstream is{ line };
-                uint32_t op;
-                std::vector<Z80MachineCycle> machineCycles{};
-                std::string mnemonic, op1, op2;
-                is >> std::hex >> op;
-                for (auto i = 0; i < 6; i++)
-                {
-                    std::string m;
-                    is >> m;
-                    if (const auto mc = parseMachineCycle(m); mc.has_value())
-                    {
-                        machineCycles.push_back(mc.value());
-                    }
-                }
-                is >> mnemonic;
-                is >> op1;
-                is >> op2;
-                // TODO: parse config and generate instructions
-                // TODO: support for 2/3-bytes opcodes
-                assert(op <= 0xff);
-                m_instructions[op] = {
-                    .mnemonic = mnemonic,
-                    .machineCycles = machineCycles,
-                    .type = parseInstructionType(mnemonic),
-                    .op1 = parseOperand(op1),
-                    .op2 = parseOperand(op2),
-                };
-            }
-        }
-
         reset();
     }
 

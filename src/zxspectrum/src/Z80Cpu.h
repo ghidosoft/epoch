@@ -19,8 +19,6 @@
 
 #include <array>
 #include <cstdint>
-#include <istream>
-#include <vector>
 
 #include "Z80Interface.h"
 
@@ -114,53 +112,6 @@ namespace epoch::zxspectrum
         bool interruptJustEnabled{ false };
     };
 
-    enum class Z80MachineCycle
-    {
-        opcode,
-        memRead,
-        memWrite,
-        ioRead,
-        ioWrite,
-        intAck,
-        extra,
-    };
-
-    enum class Z80InstructionType
-    {
-        custom,
-        LD,
-    };
-
-    enum class Z80Operand
-    {
-        none,
-
-        af,
-        bc,
-        de,
-        hl,
-        memDe,
-        n8,
-
-        a,
-        b,
-        c,
-        d,
-        e,
-        f,
-        n16,
-    };
-
-    struct Z80Instruction
-    {
-        std::string mnemonic;
-        std::vector<Z80MachineCycle> machineCycles;
-        Z80InstructionType type;
-        Z80Operand op1;
-        Z80Operand op2;
-        int totalCycles;
-    };
-
     enum class Z80OpcodePrefix
     {
         none = 0,
@@ -192,8 +143,6 @@ namespace epoch::zxspectrum
         bool m_interruptRequested{};
         int m_remainingCycles{};
         std::size_t m_clockCounter{};
-
-        std::array<Z80Instruction, 256> m_instructions{};
 
         Z80Interface& m_bus;
 

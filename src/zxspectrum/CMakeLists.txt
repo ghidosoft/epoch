@@ -4,7 +4,6 @@ add_library(epoch_zxspectrum
     "src/Constants.h"
     "src/Rom.h"
     "src/Ula.cpp" "src/Ula.h"
-    "src/Z80Config.inc.h"
     "src/Z80Cpu.cpp" "src/Z80Cpu.h"
     "src/Z80Interface.h"
     "src/ZXSpectrumEmulator.cpp" "src/ZXSpectrumEmulator.h"
