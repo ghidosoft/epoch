@@ -169,6 +169,11 @@ namespace epoch::zxspectrum
             push16(m_registers.pc);
             m_registers.pc = 0x0038;
             break;
+        case 2:
+            m_remainingCycles++;
+            push16(m_registers.pc);
+            m_registers.pc = read16(m_registers.ir & 0xff00); // ignore low byte
+            break;
         default:
             assert(false);
             break;
