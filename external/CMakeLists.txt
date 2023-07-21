@@ -39,3 +39,11 @@ if(NOT imgui_POPULATED)
     target_include_directories(imgui PUBLIC ${IMGUI_INCLUDE_DIR})
     # target_link_libraries(imgui ${OPENGL_LIBRARIES} glfw glad)
 endif()
+
+FetchContent_Declare(
+  portaudio
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  URL https://github.com/PortAudio/portaudio/archive/v19.7.0.zip
+)
+set(PA_BUILD_SHARED OFF CACHE BOOL "Build PortAudio shared library" FORCE)
+FetchContent_MakeAvailable(portaudio)
