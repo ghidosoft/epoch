@@ -4,7 +4,7 @@
 
 This is a ZX Spectrum 48K emulator written from scratch in C++.
 
-Rendering is done using GLFW and OpenGL Core 4.1.
+Rendering is done using GLFW and OpenGL Core 4.1, sound using PortAudio.
 
 ## Features
 - Z80 emulation: all currently implemented instructions (excluding cpd, cpr, daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because MEMPTR is not implemented
@@ -29,7 +29,7 @@ sudo apt install libasound-dev xorg-dev
 ```
 
 ## License
-Copyright © 2023 Andrea Ghidini.
+Copyright &copy; 2023 Andrea Ghidini.
 
 Epoch is [free software](https://www.gnu.org/philosophy/free-sw.html): you can redistribute it and/or modify
 it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by
