@@ -395,14 +395,14 @@ namespace epoch::zxspectrum
                 case Z80OpcodePrefix::ix:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
                     m_remainingCycles += 5;
-                    n = busRead(m_registers.ix + d);
-                    busWrite(m_registers.ix + d, n + 1);
+                    n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
+                    busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), n + 1);
                     break;
                 case Z80OpcodePrefix::iy:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
                     m_remainingCycles += 5;
-                    n = busRead(m_registers.iy + d);
-                    busWrite(m_registers.iy + d, n + 1);
+                    n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
+                    busWrite(m_registers.wz= static_cast<uint16_t>(m_registers.iy + d), n + 1);
                     break;
                 }
                 add8(n, 1);
@@ -433,14 +433,14 @@ namespace epoch::zxspectrum
                 case Z80OpcodePrefix::ix:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
                     m_remainingCycles += 5;
-                    n = busRead(m_registers.ix + d);
-                    busWrite(m_registers.ix + d, n - 1);
+                    n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
+                    busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), n - 1);
                     break;
                 case Z80OpcodePrefix::iy:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
                     m_remainingCycles += 5;
-                    n = busRead(m_registers.iy + d);
-                    busWrite(m_registers.iy + d, n - 1);
+                    n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
+                    busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), n - 1);
                     break;
                 }
                 sub8(n, 1);
@@ -469,7 +469,7 @@ namespace epoch::zxspectrum
                         const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                         const auto value = busRead(m_registers.pc++);
                         // m_remainingCycles += 5;
-                        busWrite(static_cast<uint16_t>(m_registers.ix + d), value);
+                        busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
                         break;
                     }
                 case Z80OpcodePrefix::iy:
@@ -477,7 +477,7 @@ namespace epoch::zxspectrum
                         const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                         const auto value = busRead(m_registers.pc++);
                         // m_remainingCycles += 5;
-                        busWrite(static_cast<uint16_t>(m_registers.iy + d), value);
+                        busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), value);
                         break;
                     }
                 }
@@ -896,17 +896,10 @@ namespace epoch::zxspectrum
             m_registers.af.x(result & Z80Flags::x);
             m_registers.af.p(!result);
             m_registers.af.n(false);
-            if (m_currentPrefix == Z80OpcodePrefix::ix)
+            if (m_currentPrefix != Z80OpcodePrefix::none || z == 0b110)
             {
-                const auto addr = m_registers.ix + d;
-                m_registers.af.y(addr & (Z80Flags::y << 8));
-                m_registers.af.x(addr & (Z80Flags::x << 8));
-            }
-            else if (m_currentPrefix == Z80OpcodePrefix::iy)
-            {
-                const auto addr = m_registers.iy + d;
-                m_registers.af.y(addr & (Z80Flags::y << 8));
-                m_registers.af.x(addr & (Z80Flags::x << 8));
+                m_registers.af.y(m_registers.wz & (Z80Flags::y << 8));
+                m_registers.af.x(m_registers.wz & (Z80Flags::x << 8));
             }
         }
         else if (x == 2)
@@ -1304,13 +1297,13 @@ namespace epoch::zxspectrum
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busRead(static_cast<uint16_t>(m_registers.ix + d));
+                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
             }
         case Z80OpcodePrefix::iy:
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busRead(static_cast<uint16_t>(m_registers.iy + d));
+                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
             }
         }
         assert(false);
@@ -1327,13 +1320,13 @@ namespace epoch::zxspectrum
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busWrite(static_cast<uint16_t>(m_registers.ix + d), value);
+                return busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
             }
         case Z80OpcodePrefix::iy:
             {
                 const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                 m_remainingCycles += 5;
-                return busWrite(static_cast<uint16_t>(m_registers.iy + d), value);
+                return busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), value);
             }
         }
         assert(false);
@@ -1611,9 +1604,9 @@ namespace epoch::zxspectrum
             case Z80OpcodePrefix::none:
                 return busRead(m_registers.hl);
             case Z80OpcodePrefix::ix:
-                return busRead(m_registers.ix + d);
+                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
             case Z80OpcodePrefix::iy:
-                return busRead(m_registers.iy + d);
+                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
             }
             assert(false);
             return 0;
@@ -1635,10 +1628,10 @@ namespace epoch::zxspectrum
                 busWrite(m_registers.hl, value);
                 break;
             case Z80OpcodePrefix::ix:
-                busWrite(m_registers.ix + d, value);
+                busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
                 break;
             case Z80OpcodePrefix::iy:
-                busWrite(m_registers.iy + d, value);
+                busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), value);
                 break;
             }
         }
@@ -1648,10 +1641,10 @@ namespace epoch::zxspectrum
             switch (m_currentPrefix)
             {
             case Z80OpcodePrefix::ix:
-                busWrite(m_registers.ix + d, value);
+                busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
                 break;
             case Z80OpcodePrefix::iy:
-                busWrite(m_registers.iy + d, value);
+                busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), value);
                 break;
             }
         }

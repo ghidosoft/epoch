@@ -106,6 +106,9 @@ namespace epoch::zxspectrum
         // HL shadow
         WordRegister hl2{ 0xffff };
 
+        // WZ (or MEMPTR) internal register
+        uint16_t wz{ 0x0000 };
+
         uint8_t interruptMode{ 0 };
         bool iff1{ false };
         bool iff2{ false };
