@@ -50,6 +50,8 @@ namespace epoch::frontend
         [[nodiscard]] int width() const { return m_width; }
         [[nodiscard]] int height() const { return m_height; }
 
+        void close() const;
+
         using CursorPosCallback = std::function<void(float x, float y)>;
         using KeyboardCallback = std::function<void(Key key, KeyAction action)>;
         using MouseButtonCallback = std::function<void(int button, int action)>;

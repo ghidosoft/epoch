@@ -89,6 +89,11 @@ namespace epoch::frontend
         return result;
     }
 
+    void Window::close() const
+    {
+        glfwSetWindowShouldClose(m_window, true);
+    }
+
     void Window::setCursorPosCallback(CursorPosCallback callback)
     {
         m_cursorPosCallback = std::move(callback);

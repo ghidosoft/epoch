@@ -52,7 +52,10 @@ namespace epoch::frontend
         m_emulator->reset();
         while (m_window->nextFrame())
         {
-            m_emulator->frame();
+            if (m_running)
+            {
+                m_emulator->frame();
+            }
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
@@ -71,8 +74,20 @@ namespace epoch::frontend
 
     void Application::renderGui()
     {
-        // TODO
-        ImGui::Begin("General");
-        ImGui::End();
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Exit")) { m_window->close(); }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Emulator"))
+            {
+                if (ImGui::MenuItem("Run", nullptr, &m_running)) {}
+                if (ImGui::MenuItem("Reset")) { m_emulator->reset(); }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
     }
 }
