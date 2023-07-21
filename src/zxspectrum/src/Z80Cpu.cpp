@@ -896,6 +896,18 @@ namespace epoch::zxspectrum
             m_registers.af.x(result & Z80Flags::x);
             m_registers.af.p(!result);
             m_registers.af.n(false);
+            if (m_currentPrefix == Z80OpcodePrefix::ix)
+            {
+                const auto addr = m_registers.ix + d;
+                m_registers.af.y(addr & (Z80Flags::y << 8));
+                m_registers.af.x(addr & (Z80Flags::x << 8));
+            }
+            else if (m_currentPrefix == Z80OpcodePrefix::iy)
+            {
+                const auto addr = m_registers.iy + d;
+                m_registers.af.y(addr & (Z80Flags::y << 8));
+                m_registers.af.x(addr & (Z80Flags::x << 8));
+            }
         }
         else if (x == 2)
         {
