@@ -1498,6 +1498,8 @@ namespace epoch::zxspectrum
         case 0b111:
             // CP
             sub8(a, b);
+            m_registers.af.y(b & Z80Flags::y);
+            m_registers.af.x(b & Z80Flags::x);
             return;
         }
         assert(false);
