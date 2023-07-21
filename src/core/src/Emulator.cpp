@@ -16,15 +16,28 @@
 
 #include "Emulator.h"
 
+#include <cassert>
+
 namespace epoch
 {
     Emulator::Emulator(EmulatorInfo info) : m_info{ info }
     {
+        assert(info.frameClocks > 0);
+        assert(info.width > 0);
+        assert(info.height > 0);
     }
 
     Emulator::~Emulator() = default;
 
-    const EmulatorInfo& Emulator::info() const
+    void Emulator::frame()
+    {
+        for (std::size_t i = 0; i < m_info.frameClocks; i++)
+        {
+            clock();
+        }
+    }
+
+    const EmulatorInfo &Emulator::info() const
     {
         return m_info;
     }

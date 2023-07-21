@@ -30,6 +30,15 @@ namespace epoch::zxspectrum
     {
         if (m_cpuStalled > 0) m_cpuStalled--;
 
+        if (m_y >= 0 && m_x >= 0)
+        {
+            m_borderBuffer[m_y * Width + m_x] = m_border;
+            m_borderBuffer[m_y * Width + m_x + 1] = m_border;
+        }
+
+        m_x++;
+        m_x++;
+
         if (m_x >= Width)
         {
             m_x = -HorizontalRetrace;
@@ -40,15 +49,6 @@ namespace epoch::zxspectrum
             m_y = -VerticalRetrace;
             m_frameCounter++;
         }
-
-        if (m_y >= 0 && m_x >= 0)
-        {
-            m_borderBuffer[m_y * Width + m_x] = m_border;
-            m_borderBuffer[m_y * Width + m_x + 1] = m_border;
-        }
-
-        m_x++;
-        m_x++;
     }
 
     void Ula::reset()

@@ -52,10 +52,7 @@ namespace epoch::frontend
         m_emulator->reset();
         while (m_window->nextFrame())
         {
-            // TODO: simulate an entire frame (or sync with audio?)
-            for (auto i = 0; i < 69888; i++)
-            // for (auto i = 0; i < 5000; i++)
-            m_emulator->clock();
+            m_emulator->frame();
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }

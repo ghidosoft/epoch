@@ -17,8 +17,13 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_CONSTANTS_H_
 #define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_H_
 
+#include <cstddef>
+
 namespace epoch::zxspectrum
 {
+    constexpr std::size_t TStatesPerFrame = 69888;
+    constexpr std::size_t TStatesPerSecond = 69888 * 50;
+
     constexpr int ScreenWidth = 256;
     constexpr int ScreenHeight = 192;
     constexpr int BorderLeft = 48;

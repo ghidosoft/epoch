@@ -48,9 +48,7 @@ namespace epoch::zxspectrum
         void clock() override;
         void reset() override;
 
-        [[nodiscard]] uint8_t vramRead(uint16_t address) const;
-
-        [[nodiscard]] std::span<const uint32_t> screenBuffer() override;
+        [[nodiscard]] std::span<const uint32_t> screenBuffer() override { return m_screenBuffer; }
         
         void keyEvent(Key key, KeyAction action) override;
 
@@ -64,6 +62,10 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 8> m_ram{};
 
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
+
+        [[nodiscard]] uint8_t vramRead(uint16_t address) const;
+
+        void updateScreenBuffer();
     };
 }
 

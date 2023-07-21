@@ -47,7 +47,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
         [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; } // 16 frames
 
-        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x <= -HorizontalRetrace + 64; } // 32 t-states
+        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x < -HorizontalRetrace + 64; } // 32 t-states
+        [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
         [[nodiscard]] bool audioOutput() const { return m_ear; }
 
@@ -66,6 +67,7 @@ namespace epoch::zxspectrum
         uint64_t m_frameCounter{};
         std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_borderBuffer{};
         int m_x{ -HorizontalRetrace }, m_y{ -VerticalRetrace };
+        bool m_frameReady{};
     };
 }
 

@@ -47,7 +47,7 @@ namespace epoch::zxspectrum
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
 
     ZXSpectrumEmulator::ZXSpectrumEmulator() :
-        Emulator{ {"ZX Spectrum", Width, Height } },
+        Emulator{ {"ZX Spectrum", Width, Height, TStatesPerFrame } },
         m_ula{std::make_unique<Ula>(m_rom48k, m_ram)},
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
@@ -83,6 +83,11 @@ namespace epoch::zxspectrum
             m_cpu->clock();
         }
         m_ula->clock();
+        if (m_ula->frameReady())
+        {
+            updateScreenBuffer();
+        }
+
         m_clockCounter++;
     }
 
@@ -91,61 +96,6 @@ namespace epoch::zxspectrum
         m_ula->reset();
         m_cpu->reset();
         m_clockCounter = 0;
-    }
-
-    uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const
-    {
-        // TODO: allow switching bank for 128K spectrums
-        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
-    }
-
-    std::span<const uint32_t> ZXSpectrumEmulator::screenBuffer()
-    {
-        std::size_t source = 0;
-        std::size_t dest = 0;
-        const auto borderBuffer = m_ula->borderBuffer();
-        const auto invertPaperInk = m_ula->invertPaperInk();
-        for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
-        {
-            for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
-            {
-                Color color;
-                if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
-                {
-                    color = DefaultPalette.map(borderBuffer[source]);
-                }
-                else
-                {
-                    const auto xPixel = (x - BorderLeft);
-                    const auto yPixel = (y - BorderTop);
-
-                    uint16_t pixelAddress = 0x4000;
-                    pixelAddress |= (xPixel >> 3) & 0b11111;
-                    pixelAddress |= (yPixel & 0b00000111) << 8;
-                    pixelAddress |= (yPixel & 0b00111000) << 2;
-                    pixelAddress |= (yPixel & 0b11000000) << 5;
-                    const auto pixelData = vramRead(pixelAddress);
-                    const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
-
-                    const auto attribute = vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
-
-                    auto paper = (attribute >> 3) & 0x07;
-                    auto ink = attribute & 0x07;
-                    const bool bright = attribute & 0x40;
-                    if (bright)
-                    {
-                        paper += 0x08;
-                        ink += 0x08;
-                    }
-                    const bool flash = (attribute & 0x80) && invertPaperInk;
-                    color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
-                }
-
-                source++;
-                m_screenBuffer[dest++] = color.rgba;
-            }
-        }
-        return m_screenBuffer;
     }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
@@ -281,6 +231,60 @@ namespace epoch::zxspectrum
         case Key::Space:
             m_ula->setKeyState(7, 0, action != KeyAction::release);
             break;
+        }
+    }
+
+    uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const
+    {
+        // TODO: allow switching bank for 128K spectrums
+        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
+    }
+
+    void ZXSpectrumEmulator::updateScreenBuffer()
+    {
+        std::size_t source = 0;
+        std::size_t dest = 0;
+        const auto borderBuffer = m_ula->borderBuffer();
+        const auto invertPaperInk = m_ula->invertPaperInk();
+        for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
+        {
+            for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
+            {
+                Color color;
+                if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
+                {
+                    color = DefaultPalette.map(borderBuffer[source]);
+                }
+                else
+                {
+                    const auto xPixel = (x - BorderLeft);
+                    const auto yPixel = (y - BorderTop);
+
+                    uint16_t pixelAddress = 0x4000;
+                    pixelAddress |= (xPixel >> 3) & 0b11111;
+                    pixelAddress |= (yPixel & 0b00000111) << 8;
+                    pixelAddress |= (yPixel & 0b00111000) << 2;
+                    pixelAddress |= (yPixel & 0b11000000) << 5;
+                    const auto pixelData = vramRead(pixelAddress);
+                    const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
+
+                    const auto attribute = vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
+
+                    auto paper = (attribute >> 3) & 0x07;
+                    auto ink = attribute & 0x07;
+                    const bool bright = attribute & 0x40;
+                    if (bright)
+                    {
+                        paper += 0x08;
+                        ink += 0x08;
+                    }
+                    const bool flash = (attribute & 0x80) && invertPaperInk;
+                    color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
+                }
+
+                source++;
+                m_screenBuffer[dest++] = color.rgba;
+            }
         }
     }
 }

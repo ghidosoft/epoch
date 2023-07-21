@@ -29,6 +29,7 @@ namespace epoch
         std::string name;
         int width;
         int height;
+        std::size_t frameClocks;
     };
 
     class Emulator
@@ -46,6 +47,8 @@ namespace epoch
     public:
         virtual void reset() = 0;
         virtual void clock() = 0;
+
+        void frame();
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
