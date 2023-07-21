@@ -45,9 +45,11 @@ namespace epoch::zxspectrum
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 
         [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
-        [[nodiscard]] bool invertPaperInk() const;
+        [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; } // 16 frames
 
         [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x <= -HorizontalRetrace + 64; } // 32 t-states
+
+        [[nodiscard]] bool audioOutput() const { return m_ear; }
 
         void setKeyState(int row, int col, bool state);
 

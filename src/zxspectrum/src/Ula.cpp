@@ -133,12 +133,6 @@ namespace epoch::zxspectrum
         }
     }
 
-    bool Ula::invertPaperInk() const
-    {
-        // every 16 frames
-        return m_frameCounter & 0x10;
-    }
-
     void Ula::setKeyState(const int row, const int col, const bool state)
     {
         assert(row < 8);
