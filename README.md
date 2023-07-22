@@ -8,6 +8,7 @@ Rendering is done using GLFW and OpenGL Core 4.1, sound using PortAudio.
 
 ## Features
 - Z80 emulation: all currently implemented instructions (excluding cpd, cpr, daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because MEMPTR is not implemented
+- Load/Save snapshots (.sna)
 - WIP
 
 First 48K ROM running screenshot:
