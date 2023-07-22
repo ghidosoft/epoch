@@ -104,52 +104,85 @@ namespace epoch::zxspectrum
     {
         reset();
         std::ifstream is(path, std::ios::binary);
-        uint8_t byte, high, low;
-        is >> byte;
-        m_cpu->registers().ir = static_cast<uint16_t>(byte << 8);
-        is >> low >> high;
+        char high, low;
+        is.get(low);
+        m_cpu->registers().ir = static_cast<uint16_t>(low << 8);
+        is.get(low).get(high);
         m_cpu->registers().hl2 = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().de2 = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().bc2 = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().af2 = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().hl = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().de = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().bc = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().iy = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().ix = static_cast<uint16_t>(high << 8 | low);
-        is >> byte;
-        m_cpu->registers().iff1 = m_cpu->registers().iff2 = byte & (1 << 2);
-        is >> byte;
-        m_cpu->registers().ir.value |= byte;
-        is >> low >> high;
+        is.get(low);
+        m_cpu->registers().iff1 = m_cpu->registers().iff2 = low & (1 << 2);
+        is.get(low);
+        m_cpu->registers().ir.value |= low;
+        is.get(low).get(high);
         m_cpu->registers().af = static_cast<uint16_t>(high << 8 | low);
-        is >> low >> high;
+        is.get(low).get(high);
         m_cpu->registers().sp = static_cast<uint16_t>(high << 8 | low);
-        is >> byte;
-        m_cpu->registers().interruptMode = byte;
+        is.get(low);
+        m_cpu->registers().interruptMode = low;
         // Border color
-        is >> byte;
-        m_ula->ioWrite(0xfe, byte);
+        is.get(low);
+        m_ula->ioWrite(0xfe, low);
         // Load memory
         is.read(reinterpret_cast<char*>(m_ram[5].data()), MemoryBankSize);
         is.read(reinterpret_cast<char*>(m_ram[2].data()), MemoryBankSize);
         is.read(reinterpret_cast<char*>(m_ram[0].data()), MemoryBankSize);
-        // POP PC from the stack
+        // Pop PC from the stack
         m_cpu->registers().pc = static_cast<uint16_t>(m_ula->read(m_cpu->registers().sp) | (m_ula->read(m_cpu->registers().sp + 1) << 8));
         m_cpu->registers().sp += 2;
     }
 
     void ZXSpectrumEmulator::saveSnapshot(const std::string& path)
     {
-        throw std::runtime_error("Not yet implemented");
+        std::ofstream os(path, std::ios::binary);
+        os.put(m_cpu->registers().ir.high());
+        os.put(m_cpu->registers().hl2.low());
+        os.put(m_cpu->registers().hl2.high());
+        os.put(m_cpu->registers().de2.low());
+        os.put(m_cpu->registers().de2.high());
+        os.put(m_cpu->registers().bc2.low());
+        os.put(m_cpu->registers().bc2.high());
+        os.put(m_cpu->registers().af2.low());
+        os.put(m_cpu->registers().af2.high());
+        os.put(m_cpu->registers().hl.low());
+        os.put(m_cpu->registers().hl.high());
+        os.put(m_cpu->registers().de.low());
+        os.put(m_cpu->registers().de.high());
+        os.put(m_cpu->registers().bc.low());
+        os.put(m_cpu->registers().bc.high());
+        os.put(m_cpu->registers().iy.low());
+        os.put(m_cpu->registers().iy.high());
+        os.put(m_cpu->registers().ix.low());
+        os.put(m_cpu->registers().ix.high());
+        os.put(m_cpu->registers().iff2 ? (1 << 2) : 0);
+        os.put(m_cpu->registers().ir.low());
+        os.put(m_cpu->registers().af.low());
+        os.put(m_cpu->registers().af.high());
+        auto sp = m_cpu->registers().sp;
+        m_ula->write(--sp, m_cpu->registers().pc >> 8);
+        m_ula->write(--sp, m_cpu->registers().pc & 0xff);
+        os.put(sp & 0xff);
+        os.put(sp >> 8);
+        os.put(m_cpu->registers().interruptMode);
+        os.put(m_ula->border());
+        os.write(reinterpret_cast<char*>(m_ram[5].data()), MemoryBankSize);
+        os.write(reinterpret_cast<char*>(m_ram[2].data()), MemoryBankSize);
+        os.write(reinterpret_cast<char*>(m_ram[0].data()), MemoryBankSize);
     }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
