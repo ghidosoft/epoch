@@ -48,6 +48,9 @@ namespace epoch::zxspectrum
         void clock() override;
         void reset() override;
 
+        void loadSnapshot(const std::string& path) override;
+        void saveSnapshot(const std::string& path) override;
+
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override { return m_screenBuffer; }
         
         void keyEvent(Key key, KeyAction action) override;
@@ -57,7 +60,8 @@ namespace epoch::zxspectrum
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
 
-        using MemoryBank = std::array<uint8_t, 0x4000>;
+        static constexpr uint16_t MemoryBankSize = 0x4000;
+        using MemoryBank = std::array<uint8_t, MemoryBankSize>;
         MemoryBank m_rom48k{};
         std::array<MemoryBank, 8> m_ram{};
 

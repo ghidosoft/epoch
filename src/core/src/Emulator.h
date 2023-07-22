@@ -48,6 +48,9 @@ namespace epoch
         virtual void reset() = 0;
         virtual void clock() = 0;
 
+        virtual void loadSnapshot(const std::string& path) = 0;
+        virtual void saveSnapshot(const std::string& path) = 0;
+
         void frame();
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;

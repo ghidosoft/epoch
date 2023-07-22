@@ -21,6 +21,8 @@
 #include "Z80Cpu.h"
 
 #include <cstring>
+#include <fstream>
+#include <stdexcept>
 
 namespace epoch::zxspectrum
 {
@@ -96,6 +98,58 @@ namespace epoch::zxspectrum
         m_ula->reset();
         m_cpu->reset();
         m_clockCounter = 0;
+    }
+
+    void ZXSpectrumEmulator::loadSnapshot(const std::string& path)
+    {
+        reset();
+        std::ifstream is(path, std::ios::binary);
+        uint8_t byte, high, low;
+        is >> byte;
+        m_cpu->registers().ir = static_cast<uint16_t>(byte << 8);
+        is >> low >> high;
+        m_cpu->registers().hl2 = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().de2 = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().bc2 = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().af2 = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().hl = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().de = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().bc = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().iy = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().ix = static_cast<uint16_t>(high << 8 | low);
+        is >> byte;
+        m_cpu->registers().iff1 = m_cpu->registers().iff2 = byte & (1 << 2);
+        is >> byte;
+        m_cpu->registers().ir.value |= byte;
+        is >> low >> high;
+        m_cpu->registers().af = static_cast<uint16_t>(high << 8 | low);
+        is >> low >> high;
+        m_cpu->registers().sp = static_cast<uint16_t>(high << 8 | low);
+        is >> byte;
+        m_cpu->registers().interruptMode = byte;
+        // Border color
+        is >> byte;
+        m_ula->ioWrite(0xfe, byte);
+        // Load memory
+        is.read(reinterpret_cast<char*>(m_ram[5].data()), MemoryBankSize);
+        is.read(reinterpret_cast<char*>(m_ram[2].data()), MemoryBankSize);
+        is.read(reinterpret_cast<char*>(m_ram[0].data()), MemoryBankSize);
+        // POP PC from the stack
+        m_cpu->registers().pc = static_cast<uint16_t>(m_ula->read(m_cpu->registers().sp) | (m_ula->read(m_cpu->registers().sp + 1) << 8));
+        m_cpu->registers().sp += 2;
+    }
+
+    void ZXSpectrumEmulator::saveSnapshot(const std::string& path)
+    {
+        throw std::runtime_error("Not yet implemented");
     }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
