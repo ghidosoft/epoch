@@ -126,7 +126,7 @@ namespace epoch::zxspectrum
         assert(emulator);
         const std::filesystem::path fs{ path };
         auto ext = fs.extension().string();
-        std::ranges::transform(ext, ext.begin(), [](const char c) { return std::tolower(c); });
+        std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
         emulator->reset();
         if (ext == ".sna")
         {
@@ -139,7 +139,7 @@ namespace epoch::zxspectrum
         assert(emulator);
         const std::filesystem::path fs{ path };
         auto ext = fs.extension().string();
-        std::ranges::transform(ext, ext.begin(), [](const char c) { return std::tolower(c); });
+        std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
         if (ext == ".sna")
         {
             saveSna(fs, emulator);
