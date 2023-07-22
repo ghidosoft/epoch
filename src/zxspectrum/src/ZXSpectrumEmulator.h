@@ -33,6 +33,8 @@ namespace epoch::zxspectrum
     {
     public:
         static const Palette DefaultPalette;
+        static constexpr uint16_t MemoryBankSize = 0x4000;
+        using MemoryBank = std::array<uint8_t, MemoryBankSize>;
 
     public:
         ZXSpectrumEmulator();
@@ -55,13 +57,16 @@ namespace epoch::zxspectrum
         
         void keyEvent(Key key, KeyAction action) override;
 
+        [[nodiscard]] Z80Cpu* cpu() const { return m_cpu.get(); }
+        [[nodiscard]] Ula* ula() const { return m_ula.get(); }
+        [[nodiscard]] std::array<MemoryBank, 8>& ram() { return m_ram; }
+        [[nodiscard]] const std::array<MemoryBank, 8>& ram() const { return m_ram; }
+
     private:
         const std::unique_ptr<Ula> m_ula;
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
 
-        static constexpr uint16_t MemoryBankSize = 0x4000;
-        using MemoryBank = std::array<uint8_t, MemoryBankSize>;
         MemoryBank m_rom48k{};
         std::array<MemoryBank, 8> m_ram{};
 
