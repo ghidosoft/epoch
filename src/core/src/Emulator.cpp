@@ -20,11 +20,12 @@
 
 namespace epoch
 {
-    Emulator::Emulator(EmulatorInfo info) : m_info{ info }
+    Emulator::Emulator(EmulatorInfo info) : m_info{ std::move(info) }
     {
-        assert(info.frameClocks > 0);
-        assert(info.width > 0);
-        assert(info.height > 0);
+        assert(m_info.frameClocks > 0);
+        assert(m_info.width > 0);
+        assert(m_info.height > 0);
+        assert(m_info.framesPerSecond > 0.0);
     }
 
     Emulator::~Emulator() = default;

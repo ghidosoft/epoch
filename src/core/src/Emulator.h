@@ -30,6 +30,7 @@ namespace epoch
         int width;
         int height;
         std::size_t frameClocks;
+        double framesPerSecond;
     };
 
     class Emulator

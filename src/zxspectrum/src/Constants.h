@@ -22,7 +22,7 @@
 namespace epoch::zxspectrum
 {
     constexpr std::size_t TStatesPerFrame = 69888;
-    constexpr std::size_t TStatesPerSecond = 69888 * 50;
+    constexpr double FramesPerSecond = 50.0;
 
     constexpr int ScreenWidth = 256;
     constexpr int ScreenHeight = 192;
