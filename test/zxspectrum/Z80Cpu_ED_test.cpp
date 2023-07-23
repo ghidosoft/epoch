@@ -249,4 +249,113 @@ namespace epoch::zxspectrum
         EXPECT_EQ(sut.registers().ir, 2);
         EXPECT_EQ(sut.registers().interruptMode, 2);
     }
+
+    TEST(Z80Cpu_ED, Opcode_10100001_CPI) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0xa1, 0xed, 0xa1 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x38;
+        bus.ram()[0x0101] = 0xf1;
+        sut.registers().af = 0xc8ff;
+        sut.registers().bc = 0x0002;
+        sut.registers().hl = 0x0100;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0xc887);
+        EXPECT_EQ(sut.registers().bc, 0x0001);
+        EXPECT_EQ(sut.registers().hl, 0x0101);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 4);
+        EXPECT_EQ(sut.registers().af, 0xc8a3);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
+        EXPECT_EQ(sut.registers().hl, 0x0102);
+        EXPECT_EQ(bus.ram(0x0100), 0x38);
+        EXPECT_EQ(bus.ram(0x0101), 0xf1);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_10101001_CPD) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0xa9, 0xed, 0xa9 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x38;
+        bus.ram()[0x0101] = 0xf1;
+        sut.registers().af = 0xc8ff;
+        sut.registers().bc = 0x0002;
+        sut.registers().hl = 0x0101;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.registers().af, 0xc8a7);
+        EXPECT_EQ(sut.registers().bc, 0x0001);
+        EXPECT_EQ(sut.registers().hl, 0x0100);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 4);
+        EXPECT_EQ(sut.registers().af, 0xc883);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
+        EXPECT_EQ(sut.registers().hl, 0x00ff);
+        EXPECT_EQ(bus.ram(0x0100), 0x38);
+        EXPECT_EQ(bus.ram(0x0101), 0xf1);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_10110001_CPIR) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0xb1 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x38;
+        bus.ram()[0x0101] = 0xf1;
+        sut.registers().af = 0xc8ff;
+        sut.registers().bc = 0x0002;
+        sut.registers().hl = 0x0100;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0);
+        EXPECT_EQ(sut.registers().ir, 2);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 4);
+        EXPECT_EQ(sut.registers().af, 0xc8a3);
+        EXPECT_EQ(sut.registers().bc, 0x0000);
+        EXPECT_EQ(sut.registers().hl, 0x0102);
+        EXPECT_EQ(bus.ram(0x0100), 0x38);
+        EXPECT_EQ(bus.ram(0x0101), 0xf1);
+        sut.step(); // execute additional NOP
+        EXPECT_EQ(sut.registers().pc, 3);
+    }
+
+    TEST(Z80Cpu_ED, Opcode_10111001_CPDR) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xed, 0xb9 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x38;
+        bus.ram()[0x0101] = 0xf0;
+        bus.ram()[0x0102] = 0xf1;
+        bus.ram()[0x0103] = 0x32;
+        bus.ram()[0x0104] = 0x33;
+        bus.ram()[0x0105] = 0x34;
+        bus.ram()[0x0106] = 0x35;
+        sut.registers().af = 0xf1ff;
+        sut.registers().bc = 0x0007;
+        sut.registers().hl = 0x0106;
+
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0);
+        EXPECT_EQ(sut.registers().ir, 2);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0);
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 0);
+
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 2);
+        EXPECT_EQ(sut.registers().ir, 10);
+        EXPECT_EQ(sut.registers().af, 0xf147);
+        EXPECT_EQ(sut.registers().bc, 0x0002);
+        EXPECT_EQ(sut.registers().hl, 0x0101);
+
+        sut.step(); // execute additional NOP
+        EXPECT_EQ(sut.registers().pc, 3);
+        EXPECT_EQ(sut.registers().af, 0xf147);
+        EXPECT_EQ(sut.registers().bc, 0x0002);
+        EXPECT_EQ(sut.registers().hl, 0x0101);
+    }
 }

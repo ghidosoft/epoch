@@ -1247,8 +1247,36 @@ namespace epoch::zxspectrum
             }
             else if (z == 0b001)
             {
-                // TODO CPI CPD CPIR CPDR
-                assert(false);
+                switch (y)
+                {
+                case 0b100:
+                    // CPI
+                    cpi();
+                    break;
+                case 0b101:
+                    // CPD
+                    cpd();
+                    break;
+                case 0b110:
+                    // CPIR
+                    cpi();
+                    if (m_registers.af.p() && !m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                case 0b111:
+                    // CPDR
+                    cpd();
+                    if (m_registers.af.p() && !m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                    // Rest is NOP
+                }
             }
             else if (z == 0b010)
             {
@@ -1597,6 +1625,36 @@ namespace epoch::zxspectrum
         m_registers.af.n(false);
         m_registers.af.p(m_registers.bc.value);
         m_remainingCycles += 2;
+    }
+
+    void Z80Cpu::cpi()
+    {
+        const auto c = m_registers.af.c();
+        const auto a = m_registers.af.high();
+        const auto b = busRead(m_registers.hl.value++);
+        auto n = sub8(a, b);
+        n -= m_registers.af.h(); // Use HF set by sub8
+        m_registers.af.y(n & (1 << 1));
+        m_registers.af.x(n & (1 << 3));
+        m_registers.bc.value--;
+        m_registers.af.p(m_registers.bc.value);
+        m_registers.af.c(c);
+        m_remainingCycles += 2;
+    }
+
+    void Z80Cpu::cpd()
+    {
+        const auto c = m_registers.af.c();
+        const auto a = m_registers.af.high();
+        const auto b = busRead(m_registers.hl.value--);
+        auto n = sub8(a, b);
+        n -= m_registers.af.h(); // Use HF set by sub8
+        m_registers.af.y(n & (1 << 1));
+        m_registers.af.x(n & (1 << 3));
+        m_registers.bc.value--;
+        m_registers.af.p(m_registers.bc.value);
+        m_registers.af.c(c);
+        m_remainingCycles += 5;
     }
 
     uint8_t Z80Cpu::prefixCbRead(const int8_t d, const int z)

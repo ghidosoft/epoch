@@ -7,9 +7,9 @@ This is a ZX Spectrum 48K emulator written from scratch in C++.
 Rendering is done using GLFW and OpenGL Core 4.1, sound using PortAudio.
 
 ## Features
-- Z80 emulation: all currently implemented instructions (excluding cpd, cpr, daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because MEMPTR is not implemented
+- Instruction level Z80 emulation: almost all instructions (excluding daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because WZ/MEMPTR is not yet completely implemented
 - Load/Save snapshots (.sna)
-- WIP
+- Sound (WIP)
 
 First 48K ROM running screenshot:
 
