@@ -19,6 +19,7 @@
 
 #include <array>
 #include <atomic>
+#include <cstring>
 #include <mutex>
 #include <span>
 
