@@ -76,22 +76,6 @@ namespace epoch::zxspectrum
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
 
-    void ZXSpectrumEmulator::clock()
-    {
-        if (!m_ula->isCpuStalled())
-        {
-            m_cpu->interruptRequest(m_ula->interruptRequested());
-            m_cpu->clock();
-        }
-        m_ula->clock();
-        if (m_ula->frameReady())
-        {
-            updateScreenBuffer();
-        }
-
-        m_clockCounter++;
-    }
-
     void ZXSpectrumEmulator::reset()
     {
         m_ula->reset();
@@ -243,6 +227,23 @@ namespace epoch::zxspectrum
             m_ula->setKeyState(7, 0, action != KeyAction::release);
             break;
         }
+    }
+
+    void ZXSpectrumEmulator::doClock()
+    {
+        if (!m_ula->isCpuStalled())
+        {
+            m_cpu->interruptRequest(m_ula->interruptRequested());
+            m_cpu->clock();
+        }
+        m_ula->clock();
+        m_audioSample = m_ula->audioOutput();
+        if (m_ula->frameReady())
+        {
+            updateScreenBuffer();
+        }
+
+        m_clockCounter++;
     }
 
     uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const

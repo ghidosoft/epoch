@@ -26,6 +26,7 @@ namespace epoch
 
 namespace epoch::frontend
 {
+    class AudioPlayer;
     class GraphicContext;
     class Gui;
     class Window;
@@ -45,6 +46,9 @@ namespace epoch::frontend
     public:
         int run();
 
+        static constexpr auto AudioSampleRate = 48000;
+        static constexpr auto AudioChannels = 1;
+
     private:
         void render();
         void renderGui();
@@ -55,6 +59,7 @@ namespace epoch::frontend
         std::unique_ptr<Window> m_window{};
         std::unique_ptr<GraphicContext> m_context{};
         std::unique_ptr<Gui> m_gui{};
+        std::unique_ptr<AudioPlayer> m_audio{};
 
         bool m_running{ true };
     };

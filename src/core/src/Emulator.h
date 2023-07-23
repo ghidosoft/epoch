@@ -47,12 +47,15 @@ namespace epoch
 
     public:
         virtual void reset() = 0;
-        virtual void clock() = 0;
+        void clock();
 
         virtual void loadSnapshot(const std::string& path) = 0;
         virtual void saveSnapshot(const std::string& path) = 0;
 
         void frame();
+        float generateNextAudioSample();
+
+        [[nodiscard]] float audioSample() const { return m_audioSample; }
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
@@ -62,7 +65,14 @@ namespace epoch
         [[nodiscard]] const EmulatorInfo& info() const;
 
     protected:
+        virtual void doClock() = 0;
+
         const EmulatorInfo m_info;
+        float m_audioSample{};
+
+    private:
+        double m_clockDuration;
+        double m_elapsed{};
     };
 }
 

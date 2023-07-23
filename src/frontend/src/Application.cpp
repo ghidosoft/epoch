@@ -19,6 +19,7 @@
 #include <epoch/core.h>
 #include <imgui.h>
 
+#include "Audio.h"
 #include "GraphicContext.h"
 #include "Gui.h"
 #include "Window.h"
@@ -35,6 +36,7 @@ namespace epoch::frontend
         });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
+        m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCursorPosCallback(
             [&](const float x, const float y){ m_gui->setCursorPos(x, y); });
@@ -54,7 +56,14 @@ namespace epoch::frontend
         {
             if (m_running)
             {
-                m_emulator->frame();
+                // m_emulator->frame();
+                // TODO: generate n audio samples
+                auto samples = m_audio->neededSamples();
+                while (samples > 0)
+                {
+                    m_audio->push(m_emulator->generateNextAudioSample());
+                    samples--;
+                }
             }
             m_context->updateScreen(m_emulator->screenBuffer());
             render();

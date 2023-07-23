@@ -30,11 +30,6 @@ namespace epoch::frontend
     public:
         void read(T* outputBuffer, unsigned long outputSize)
         {
-            {
-                std::lock_guard guard(m_mutex);
-                m_ahead = outputSize >= m_ahead ? 0 : m_ahead - outputSize;
-            }
-
             if (const auto count = std::min(outputSize, N - m_readHead - 1); count > 0)
             {
                 std::memcpy(outputBuffer, &m_buffer[m_readHead], count * sizeof(float));
@@ -49,6 +44,19 @@ namespace epoch::frontend
                     std::memcpy(outputBuffer, m_buffer.data(), outputSize * sizeof(float));
                 }
                 m_readHead = outputSize;
+            }
+
+            {
+                std::lock_guard guard(m_mutex);
+                if (outputSize >= m_ahead)
+                {
+                    m_ahead = 0;
+                    m_readHead = m_writeHead = 0; // TODO (?)
+                }
+                else
+                {
+                    m_ahead -= outputSize;
+                }
             }
         }
 
@@ -79,11 +87,16 @@ namespace epoch::frontend
             }
         }
 
+        void write(T sample)
+        {
+            write(std::span<const T, 1>{ &sample, 1 });
+        }
+
         [[nodiscard]] unsigned long ahead() const { return m_ahead; }
 
     private:
-        unsigned long m_readHead{};
-        unsigned long m_writeHead{};
+        std::atomic<unsigned long> m_readHead{};
+        std::atomic<unsigned long> m_writeHead{};
 
         std::atomic<unsigned long> m_ahead{};
 

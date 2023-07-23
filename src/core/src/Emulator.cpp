@@ -26,9 +26,16 @@ namespace epoch
         assert(m_info.width > 0);
         assert(m_info.height > 0);
         assert(m_info.framesPerSecond > 0.0);
+        m_clockDuration = 1.0 / (static_cast<double>(m_info.frameClocks) * m_info.framesPerSecond);
     }
 
     Emulator::~Emulator() = default;
+
+    void Emulator::clock()
+    {
+        doClock();
+        m_elapsed += m_clockDuration;
+    }
 
     void Emulator::frame()
     {
@@ -36,6 +43,17 @@ namespace epoch
         {
             clock();
         }
+    }
+
+    float Emulator::generateNextAudioSample()
+    {
+        constexpr auto sampleDuration = 1.0 / 48000.0; // TODO: hardcoded sample rate
+        while (m_elapsed < sampleDuration)
+        {
+            clock();
+        }
+        m_elapsed -= sampleDuration;
+        return audioSample();
     }
 
     const EmulatorInfo &Emulator::info() const

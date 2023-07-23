@@ -47,7 +47,6 @@ namespace epoch::zxspectrum
         ZXSpectrumEmulator& operator=(ZXSpectrumEmulator&& other) noexcept = delete;
 
     public:
-        void clock() override;
         void reset() override;
 
         void loadSnapshot(const std::string& path) override;
@@ -61,6 +60,9 @@ namespace epoch::zxspectrum
         [[nodiscard]] Ula* ula() const { return m_ula.get(); }
         [[nodiscard]] std::array<MemoryBank, 8>& ram() { return m_ram; }
         [[nodiscard]] const std::array<MemoryBank, 8>& ram() const { return m_ram; }
+
+    protected:
+        void doClock() override;
 
     private:
         const std::unique_ptr<Ula> m_ula;
