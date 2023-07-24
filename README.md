@@ -13,6 +13,7 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 
 ## Roadmap
 - Tape loading (.tap)
+- 128K spectrum
 - .tzx loading
 - .z80 snapshots
 - Tape saving
