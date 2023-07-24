@@ -18,6 +18,7 @@
 #define SRC_EPOCH_FRONTEND_APPLICATION_H_
 
 #include <memory>
+#include <vector>
 
 namespace epoch
 {
@@ -60,6 +61,7 @@ namespace epoch::frontend
         std::unique_ptr<GraphicContext> m_context{};
         std::unique_ptr<Gui> m_gui{};
         std::unique_ptr<AudioPlayer> m_audio{};
+        std::vector<float> m_audioBuffer{};
 
         bool m_running{ true };
     };

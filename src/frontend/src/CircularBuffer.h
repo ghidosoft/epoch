@@ -19,6 +19,7 @@
 
 #include <array>
 #include <atomic>
+#include <cassert>
 #include <cstring>
 #include <mutex>
 #include <span>
@@ -29,77 +30,85 @@ namespace epoch::frontend
     class CircularBuffer final
     {
     public:
-        void read(T* outputBuffer, unsigned long outputSize)
+        void read(T* outputBuffer, const unsigned long outputSize)
         {
-            if (const auto count = std::min(outputSize, N - m_readHead - 1); count > 0)
+            assert(outputSize <= N);
+            auto remaining = outputSize;
+            auto rh = m_readHead.load();
+            if (const auto count = std::min(outputSize, N - rh); count > 0)
             {
-                std::memcpy(outputBuffer, &m_buffer[m_readHead], count * sizeof(float));
-                m_readHead += count;
-                outputSize -= count;
+                std::memcpy(outputBuffer, &m_buffer[rh], count * sizeof(T));
+                rh = m_readHead += count;
+                remaining -= count;
                 outputBuffer += count;
             }
-            if (m_readHead >= N)
+            if (rh >= N)
             {
-                if (outputSize > 0)
+                if (remaining > 0)
                 {
-                    std::memcpy(outputBuffer, m_buffer.data(), outputSize * sizeof(float));
+                    std::memcpy(outputBuffer, m_buffer.data(), remaining * sizeof(T));
                 }
-                m_readHead = outputSize;
+                m_readHead = remaining;
             }
 
             {
                 std::lock_guard guard(m_mutex);
-                if (outputSize >= m_ahead)
+                if (outputSize >= m_available)
                 {
-                    m_ahead = 0;
-                    m_readHead = m_writeHead = 0; // TODO (?)
+                    m_available = 0;
+                    m_readHead = m_writeHead.load(); // TODO Is this the right thing to do?
                 }
                 else
                 {
-                    m_ahead -= outputSize;
+                    m_available -= outputSize;
                 }
+            }
+        }
+
+        void write(const T* inputData, const unsigned long inputSize)
+        {
+            auto remaining = inputSize;
+            auto wh = m_writeHead.load();
+            const auto count = std::min(inputSize, N - wh);
+            if (count > 0)
+            {
+                std::memcpy(&m_buffer[wh], inputData, count * sizeof(T));
+                wh = m_writeHead += count;
+                remaining -= count;
+                inputData += count;
+            }
+            if (wh >= N)
+            {
+                if (remaining > 0)
+                {
+                    std::memcpy(m_buffer.data(), inputData, remaining * sizeof(T));
+                }
+                m_writeHead = remaining;
+            }
+
+            {
+                std::lock_guard guard(m_mutex);
+                m_available = std::min(m_available + inputSize, N);
             }
         }
 
         void write(const std::span<const T> inputData)
         {
-            auto inputSize = static_cast<unsigned long>(inputData.size());
-            const auto count = std::min(inputSize, N - m_writeHead - 1);
-            const T* inputBuffer = inputData.data();
-            if (count > 0)
-            {
-                std::memcpy(&m_buffer[m_writeHead], inputBuffer, count * sizeof(float));
-                m_writeHead += count;
-                inputSize -= count;
-                inputBuffer += count;
-            }
-            if (m_writeHead >= N)
-            {
-                if (inputSize > 0)
-                {
-                    std::memcpy(m_buffer.data(), inputBuffer, inputSize * sizeof(T));
-                }
-                m_writeHead = inputSize;
-            }
-
-            {
-                std::lock_guard guard(m_mutex);
-                m_ahead += inputSize;
-            }
+            write(inputData.data(), static_cast<unsigned long>(inputData.size()));
         }
 
-        void write(T sample)
+        void write(const T sample)
         {
-            write(std::span<const T, 1>{ &sample, 1 });
+            write(&sample, 1);
         }
 
-        [[nodiscard]] unsigned long ahead() const { return m_ahead; }
+        [[nodiscard]] unsigned long available() const { return m_available; }
 
     private:
         std::atomic<unsigned long> m_readHead{};
         std::atomic<unsigned long> m_writeHead{};
 
-        std::atomic<unsigned long> m_ahead{};
+        std::atomic<unsigned long> m_available{};
 
         std::array<T, N> m_buffer{};
 

@@ -48,9 +48,10 @@ namespace epoch::frontend
         void stop() const;
 
         void push(const float sample) { m_buffer.write(sample); }
-        [[nodiscard]] unsigned long ahead() const { return m_buffer.ahead(); }
+        void push(const std::span<float> samples) { m_buffer.write(samples); }
+        [[nodiscard]] unsigned long ahead() const { return m_buffer.available(); }
 
-        static constexpr unsigned long BufferSize = 1 << 15;
+        static constexpr unsigned long BufferSize = 1 << 14;
 
     private:
         PaStream* m_handle{};
@@ -96,8 +97,8 @@ namespace epoch::frontend
         AudioPlayer& operator=(AudioPlayer&& other) noexcept = delete;
 
     public:
-        void push(const float sample) { m_stream->push(sample); }
-        [[nodiscard]] unsigned long neededSamples() const { return std::max(0l, 1024 - static_cast<long>(m_stream->ahead())); }
+        void push(const std::span<float> sample) const { m_stream->push(sample); }
+        [[nodiscard]] unsigned long neededSamples() const { return std::max(0L, 4096L - static_cast<long>(m_stream->ahead())); }
 
     private:
         AudioContext m_audioContext{};

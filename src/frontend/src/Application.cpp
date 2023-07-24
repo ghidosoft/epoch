@@ -56,13 +56,15 @@ namespace epoch::frontend
         {
             if (m_running)
             {
-                // m_emulator->frame();
-                // TODO: generate n audio samples
-                auto samples = m_audio->neededSamples();
-                while (samples > 0)
+                const auto samples = m_audio->neededSamples();
+                if (samples > 0)
                 {
-                    m_audio->push(m_emulator->generateNextAudioSample());
-                    samples--;
+                    m_audioBuffer.resize(samples);
+                    for (unsigned long i = 0; i < samples; i++)
+                    {
+                        m_audioBuffer[i] = m_emulator->generateNextAudioSample();
+                    }
+                    m_audio->push(m_audioBuffer);
                 }
             }
             m_context->updateScreen(m_emulator->screenBuffer());

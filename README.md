@@ -9,7 +9,7 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 ## Features
 - Instruction level Z80 emulation: almost all instructions (excluding daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because WZ/MEMPTR is not yet completely implemented
 - Load/Save snapshots (.sna)
-- Sound (WIP)
+- Sound
 
 ## Roadmap
 - Tape loading (.tap)
