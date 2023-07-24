@@ -109,6 +109,11 @@ namespace epoch::frontend
         m_mouseButtonCallback = std::move(callback);
     }
 
+    void Window::resize(const int width, const int height) const
+    {
+        glfwSetWindowSize(m_window, width, height);
+    }
+
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));

@@ -59,6 +59,8 @@ namespace epoch::frontend
         void setKeyboardCallback(KeyboardCallback callback);
         void setMouseButtonCallback(MouseButtonCallback callback);
 
+        void resize(int width, int height) const;
+
     private:
         GLFWwindow* m_window{};
 
