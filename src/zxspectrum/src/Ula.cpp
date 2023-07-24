@@ -55,6 +55,7 @@ namespace epoch::zxspectrum
     {
         m_floatingBusValue = {};
         m_border = {};
+        m_ear = m_mic = {};
         m_cpuStalled = {};
 
         m_frameCounter = 0;
@@ -128,7 +129,14 @@ namespace epoch::zxspectrum
     {
         if ((port & 0x01) == 0)
         {
-            m_ear = value & 0b00010000; // ignore mic (d3)
+            const auto newEar = value & 0b00010000;
+            const auto newMic = !(value & 0b00001000);
+            /*if (m_ear != newEar || m_mic != newMic)
+            {
+                m_audioOutput = !m_audioOutput;
+            }*/
+            m_ear = newEar;
+            m_mic = newMic;
             m_border = value & 0x07;
         }
     }
