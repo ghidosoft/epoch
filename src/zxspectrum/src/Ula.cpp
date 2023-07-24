@@ -128,7 +128,7 @@ namespace epoch::zxspectrum
     {
         if ((port & 0x01) == 0)
         {
-            m_ear = value & 0b00011000; // use mic (d3) | ear (d4)
+            m_ear = value & 0b00010000; // ignore mic (d3)
             m_border = value & 0x07;
         }
     }
