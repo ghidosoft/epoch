@@ -2,7 +2,7 @@
 
 ![CMakeBadge](https://github.com/ghidosoft/epoch/actions/workflows/cmake.yml/badge.svg)
 
-This is a ZX Spectrum 48K emulator written from scratch in C++.
+This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C++.
 
 Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound using [PortAudio](http://www.portaudio.com/) and ux uses [Dear ImGui](https://github.com/ocornut/imgui).
 
