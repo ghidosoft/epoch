@@ -21,13 +21,16 @@
 #include <cctype>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 
+#include "TapeInterface.h"
 #include "Ula.h"
 #include "ZXSpectrumEmulator.h"
 #include "Z80Cpu.h"
 
 #define PUT_BYTE(x) os.put(static_cast<uint8_t>(x))
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
+#define GET_BYTE() static_cast<uint8_t>(is.get())
 #define GET_WORD_LE() do { low = static_cast<uint8_t>(is.get()); high = static_cast<uint8_t>(is.get()); } while (false)
 
 namespace epoch::zxspectrum
@@ -39,7 +42,7 @@ namespace epoch::zxspectrum
 
         std::ifstream is(path, std::ios::binary);
         uint8_t high, low;
-        low = static_cast<uint8_t>(is.get());
+        low = GET_BYTE();
         registers.ir = static_cast<uint16_t>(low << 8);
         GET_WORD_LE();
         registers.hl2 = MAKE_WORD(high, low);
@@ -59,18 +62,18 @@ namespace epoch::zxspectrum
         registers.iy = MAKE_WORD(high, low);
         GET_WORD_LE();
         registers.ix = MAKE_WORD(high, low);
-        low = static_cast<uint8_t>(is.get());
+        low = GET_BYTE();
         registers.iff1 = registers.iff2 = low & (1 << 2);
-        low = static_cast<uint8_t>(is.get());
+        low = GET_BYTE();
         registers.ir.value |= low;
         GET_WORD_LE();
         registers.af = MAKE_WORD(high, low);
         GET_WORD_LE();
         registers.sp = MAKE_WORD(high, low);
-        low = static_cast<uint8_t>(is.get());
+        low = GET_BYTE();
         registers.interruptMode = low;
         // Border color
-        low = static_cast<uint8_t>(is.get());
+        low = GET_BYTE();
         ula->ioWrite(0xfe, low);
         // Load memory
         is.read(reinterpret_cast<char*>(emulator->ram()[5].data()), ZXSpectrumEmulator::MemoryBankSize);
@@ -121,6 +124,67 @@ namespace epoch::zxspectrum
         os.write(reinterpret_cast<const char*>(emulator->ram()[0].data()), ZXSpectrumEmulator::MemoryBankSize);
     }
 
+    std::vector<std::size_t> loadTap(const std::filesystem::path& path)
+    {
+        std::vector<std::size_t> result{};
+
+        std::ifstream is(path, std::ios::binary);
+
+        bool first = true;
+
+        while (!is.eof())
+        {
+            if (!first)
+            {
+                result.push_back(3500000); // TODO
+            }
+
+            uint8_t high, low;
+            GET_WORD_LE();
+            if (is.eof()) break;
+            const auto blockSize = MAKE_WORD(high, low);
+            assert(blockSize > 1);
+            std::vector<uint8_t> data;
+            data.resize(blockSize);
+            is.read(reinterpret_cast<char*>(data.data()), blockSize);
+
+            // Pilot
+            if (data[0] == 0x00)
+            {
+                // header block
+                for (auto i = 0; i < 8063; i++)
+                {
+                    result.push_back(2168);
+                }
+            }
+            else
+            {
+                // data block
+                for (auto i = 0; i < 3223; i++)
+                {
+                    result.push_back(2168);
+                }
+            }
+
+            // Sync
+            result.push_back(667);
+            result.push_back(735);
+
+            // Data
+            for (const auto value : data)
+            {
+                for (auto bit = 7; bit >= 0; bit--)
+                {
+                    result.push_back((value & (1 << bit)) ? 1710 : 855);
+                    result.push_back((value & (1 << bit)) ? 1710 : 855);
+                }
+            }
+
+            first = false;
+        }
+        return result;
+    }
+
     void load(const std::string& path, ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
@@ -144,5 +208,18 @@ namespace epoch::zxspectrum
         {
             saveSna(fs, emulator);
         }
+    }
+
+    std::unique_ptr<TapeInterface> loadTape(const std::string& path)
+    {
+        const std::filesystem::path fs{ path };
+        auto ext = fs.extension().string();
+        std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
+        if (ext == ".tap")
+        {
+            const auto pulses = loadTap(fs);
+            return std::make_unique<TapeInterface>(pulses);
+        }
+        return nullptr;
     }
 }

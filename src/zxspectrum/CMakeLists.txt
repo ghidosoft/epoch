@@ -4,6 +4,7 @@ add_library(epoch_zxspectrum
     "src/Constants.h"
     "src/Io.cpp" "src/Io.h"
     "src/Rom.h"
+    "src/TapeInterface.h"
     "src/Ula.cpp" "src/Ula.h"
     "src/Z80Cpu.cpp" "src/Z80Cpu.h"
     "src/Z80Interface.h"

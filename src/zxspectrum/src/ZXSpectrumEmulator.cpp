@@ -18,6 +18,7 @@
 
 #include "Io.h"
 #include "Rom.h"
+#include "TapeInterface.h"
 #include "Ula.h"
 #include "Z80Cpu.h"
 
@@ -80,6 +81,7 @@ namespace epoch::zxspectrum
     {
         m_ula->reset();
         m_cpu->reset();
+        m_tape = {};
         m_clockCounter = 0;
     }
 
@@ -91,6 +93,11 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::saveSnapshot(const std::string& path)
     {
         save(path, this);
+    }
+
+    void ZXSpectrumEmulator::loadTape(const std::string& path)
+    {
+        m_tape = epoch::zxspectrum::loadTape(path);
     }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
@@ -242,6 +249,19 @@ namespace epoch::zxspectrum
         if (m_ula->frameReady())
         {
             updateScreenBuffer();
+        }
+
+        if (m_tape)
+        {
+            if (m_tape->completed())
+            {
+                m_tape = nullptr;
+                m_audioIn = 0.f;
+            }
+            else
+            {
+                m_audioIn = m_tape->clock();
+            }
         }
 
         m_clockCounter++;
