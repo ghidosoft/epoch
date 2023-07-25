@@ -50,11 +50,11 @@ namespace epoch::zxspectrum
         [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x < -HorizontalRetrace + 64; } // 32 t-states
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic) * .2f) * 2.f - 1.f; }
+        [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear || m_audioIn) * .8f + static_cast<float>(m_mic) * .2f) * 2.f - 1.f; }
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
-        void setEar(const bool value) { m_ear = value; }
+        void setAudioIn(const bool value) { m_audioIn = value; }
 
     private:
         MemoryBank& m_rom48k;
@@ -63,7 +63,7 @@ namespace epoch::zxspectrum
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};
         std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
-        bool m_ear{}, m_mic{};
+        bool m_ear{}, m_mic{}, m_audioIn{};
         int m_cpuStalled{};
 
         uint64_t m_frameCounter{};

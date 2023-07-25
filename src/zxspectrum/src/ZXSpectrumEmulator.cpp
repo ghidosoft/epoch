@@ -237,7 +237,8 @@ namespace epoch::zxspectrum
             m_cpu->clock();
         }
         m_ula->clock();
-        m_audioSample = m_ula->audioOutput();
+        m_ula->setAudioIn(m_audioIn > AudioInThreshold);
+        m_audioOut = m_ula->audioOutput();
         if (m_ula->frameReady())
         {
             updateScreenBuffer();

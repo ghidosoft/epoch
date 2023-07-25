@@ -53,7 +53,7 @@ namespace epoch
             clock();
         }
         m_elapsed -= sampleDuration;
-        return audioSample();
+        return audioOut();
     }
 
     const EmulatorInfo &Emulator::info() const

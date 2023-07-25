@@ -36,6 +36,8 @@ namespace epoch::zxspectrum
 
     constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
     constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
+
+    constexpr auto AudioInThreshold = 0.2f;
 }
 
 #endif

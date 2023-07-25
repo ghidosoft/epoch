@@ -91,6 +91,7 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Restore snapshot")) { m_emulator->loadSnapshot("test.sna"); }
                 if (ImGui::MenuItem("Take snapshot")) { m_emulator->saveSnapshot("test.sna"); }
+                // if (ImGui::MenuItem("Load tape")) { m_emulator->loadTape("test.tap"); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
                 ImGui::EndMenu();

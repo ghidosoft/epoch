@@ -16,7 +16,6 @@
 
 #include "Ula.h"
 
-#include <bit>
 #include <cassert>
 
 namespace epoch::zxspectrum
@@ -119,7 +118,7 @@ namespace epoch::zxspectrum
                     result &= m_keyboardState[i];
                 }
             }
-            if (m_ear) result |= 0b01000000;
+            if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
         return 0xff;

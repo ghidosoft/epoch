@@ -55,7 +55,8 @@ namespace epoch
         void frame();
         float generateNextAudioSample();
 
-        [[nodiscard]] float audioSample() const { return m_audioSample; }
+        [[nodiscard]] float audioOut() const { return m_audioOut; }
+        void audioIn(const float sample) { m_audioIn = sample; }
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
@@ -68,7 +69,8 @@ namespace epoch
         virtual void doClock() = 0;
 
         const EmulatorInfo m_info;
-        float m_audioSample{};
+        float m_audioOut{};
+        float m_audioIn{};
 
     private:
         double m_clockDuration;
