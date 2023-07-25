@@ -40,6 +40,28 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
+    - name: Upload Ubuntu Epoch binary
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: epoch_ubuntu
+        path: build/src/epoch
+        retention-days: 2
+    - name: Upload Windows Epoch binary
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: epoch_windows
+        path: build/src/epoch.exe
+        retention-days: 2
+    - name: Upload MacOS Epoch binary
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v3
+      with:
+        name: epoch_macos
+        path: build/src/epoch
+        retention-days: 2
+
     - name: Upload Ubuntu ZEX binary
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v3
