@@ -136,7 +136,8 @@ namespace epoch::zxspectrum
         {
             if (!first)
             {
-                result.push_back(3500000); // TODO
+                result.push_back(1750000); // TODO
+                result.push_back(1750000); // TODO
             }
 
             uint8_t high, low;
@@ -149,7 +150,7 @@ namespace epoch::zxspectrum
             is.read(reinterpret_cast<char*>(data.data()), blockSize);
 
             // Pilot
-            if (data[0] == 0x00)
+            if (data[0] < 128)
             {
                 // header block
                 for (auto i = 0; i < 8063; i++)

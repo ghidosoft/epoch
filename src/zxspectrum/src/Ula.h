@@ -50,7 +50,7 @@ namespace epoch::zxspectrum
         [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x < -HorizontalRetrace + 64; } // 32 t-states
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear || m_audioIn) * .8f + static_cast<float>(m_mic) * .2f) * 2.f - 1.f; }
+        [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .2f) * 2.f - 1.f; }
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
