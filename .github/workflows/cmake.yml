@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: epoch_windows
-        path: build/src/epoch.exe
+        path: build/src/Release/epoch.exe
         retention-days: 2
     - name: Upload MacOS Epoch binary
       if: matrix.os == 'macos-latest'
