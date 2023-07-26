@@ -11,6 +11,7 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 - Load/Save snapshots (.sna)
 - Tape loading (.tap, .tzx)
 - Sound
+- Drag&drop file loading
 
 ## Roadmap
 - 128K spectrum

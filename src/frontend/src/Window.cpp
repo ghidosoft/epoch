@@ -53,9 +53,10 @@ namespace epoch::frontend
 
         glfwSetWindowUserPointer(m_window, this);
 
+        glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
+        glfwSetDropCallback(m_window, s_dropCallback);
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
         glfwSetKeyCallback(m_window, s_keyCallback);
-        glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
         glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
         // TODO: setup other callbacks
 
@@ -99,6 +100,11 @@ namespace epoch::frontend
         m_cursorPosCallback = std::move(callback);
     }
 
+    void Window::setFileDropCallback(FileDropCallback callback)
+    {
+        m_fileDropCallback = std::move(callback);
+    }
+
     void Window::setKeyboardCallback(KeyboardCallback callback)
     {
         m_keyboardCallback = std::move(callback);
@@ -112,6 +118,24 @@ namespace epoch::frontend
     void Window::resize(const int width, const int height) const
     {
         glfwSetWindowSize(m_window, width, height);
+    }
+
+    void Window::s_cursorPosCallback(GLFWwindow* glfwWindow, const double x, const double y)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_cursorPosCallback)
+        {
+            window->m_cursorPosCallback(static_cast<float>(x), static_cast<float>(y));
+        }
+    }
+
+    void Window::s_dropCallback(GLFWwindow *glfwWindow, int count, const char** paths)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_fileDropCallback && count >= 1)
+        {
+            window->m_fileDropCallback(paths[0]);
+        }
     }
 
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
@@ -135,15 +159,6 @@ namespace epoch::frontend
                     keyAction = KeyAction::repeat;
                 window->m_keyboardCallback(static_cast<Key>(key), keyAction);
             }
-        }
-    }
-
-    void Window::s_cursorPosCallback(GLFWwindow* glfwWindow, const double x, const double y)
-    {
-        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        if (window->m_cursorPosCallback)
-        {
-            window->m_cursorPosCallback(static_cast<float>(x), static_cast<float>(y));
         }
     }
 
