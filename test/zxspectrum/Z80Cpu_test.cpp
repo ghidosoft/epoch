@@ -616,7 +616,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af, 0xff01);
+        EXPECT_EQ(sut.registers().af, 0xff29);
     }
 
     TEST(Z80Cpu, Opcode00111111_CCF) {
