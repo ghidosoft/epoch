@@ -23,6 +23,7 @@
 #include <fstream>
 #include <vector>
 
+#include "IoTzx.h"
 #include "TapeInterface.h"
 #include "Ula.h"
 #include "ZXSpectrumEmulator.h"
@@ -31,7 +32,7 @@
 #define PUT_BYTE(x) os.put(static_cast<uint8_t>(x))
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE() do { low = static_cast<uint8_t>(is.get()); high = static_cast<uint8_t>(is.get()); } while (false)
+#define GET_WORD_LE() do { low = GET_BYTE(); high = GET_BYTE(); } while (false)
 
 namespace epoch::zxspectrum
 {
@@ -186,6 +187,17 @@ namespace epoch::zxspectrum
         return result;
     }
 
+    std::vector<std::size_t> loadTzx(const std::filesystem::path& path)
+    {
+        std::vector<std::size_t> result{};
+
+        std::ifstream is(path, std::ios::binary);
+
+        loadTzx(is, result);
+
+        return result;
+    }
+
     void load(const std::string& path, ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
@@ -216,9 +228,15 @@ namespace epoch::zxspectrum
         const std::filesystem::path fs{ path };
         auto ext = fs.extension().string();
         std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
+        std::vector<std::size_t> pulses;
         if (ext == ".tap")
         {
             const auto pulses = loadTap(fs);
+            return std::make_unique<TapeInterface>(pulses);
+        }
+        else if (ext == ".tzx")
+        {
+            const auto pulses = loadTzx(fs);
             return std::make_unique<TapeInterface>(pulses);
         }
         return nullptr;

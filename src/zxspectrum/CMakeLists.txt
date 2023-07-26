@@ -3,6 +3,7 @@ add_library(epoch_zxspectrum
 
     "src/Constants.h"
     "src/Io.cpp" "src/Io.h"
+    "src/IoTzx.cpp" "src/IoTzx.h"
     "src/Rom.h"
     "src/TapeInterface.h"
     "src/Ula.cpp" "src/Ula.h"

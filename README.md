@@ -9,14 +9,16 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 ## Features
 - Instruction level Z80 emulation: all instructions (excluding BIT N, (HL)) passes zexdoc and zexall, bit (hl) doesn't because WZ/MEMPTR is not yet completely implemented
 - Load/Save snapshots (.sna)
-- Tape loading (.tap)
+- Tape loading (.tap, .tzx)
 - Sound
 
 ## Roadmap
 - 128K spectrum
-- .tzx loading
 - .z80 snapshots
+- Fast loading
+- Emulation speed controls
 - Tape saving
+- Tape UX
 - Debugging UX (memory, registers)
 - Disassembler
 
