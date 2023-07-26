@@ -7,7 +7,7 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound using [PortAudio](http://www.portaudio.com/) and ux uses [Dear ImGui](https://github.com/ocornut/imgui).
 
 ## Features
-- Instruction level Z80 emulation: almost all instructions (excluding daa) passes zexdoc and zexall, bit (hl) doesn't pass zexall because WZ/MEMPTR is not yet completely implemented
+- Instruction level Z80 emulation: all instructions (excluding BIT N, (HL)) passes zexdoc and zexall, bit (hl) doesn't because WZ/MEMPTR is not yet completely implemented
 - Load/Save snapshots (.sna)
 - Tape loading (.tap)
 - Sound

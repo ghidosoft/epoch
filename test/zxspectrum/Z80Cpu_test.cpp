@@ -589,11 +589,14 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 1);
         EXPECT_EQ(sut.registers().ir, 1);
-        EXPECT_EQ(sut.registers().af.high(), 0x35);
-        EXPECT_TRUE(sut.registers().af.c());
-        EXPECT_TRUE(sut.registers().af.p());
-        EXPECT_FALSE(sut.registers().af.s());
-        EXPECT_FALSE(sut.registers().af.z());
+        EXPECT_EQ(sut.registers().af, 0x3525);
+
+        sut.reset();
+        sut.registers().af = 0xd5ff;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 1);
+        EXPECT_EQ(sut.registers().ir, 1);
+        EXPECT_EQ(sut.registers().af, 0x6f3f);
     }
 
     TEST(Z80Cpu, Opcode00101111_CPL) {
