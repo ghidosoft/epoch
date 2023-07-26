@@ -20,6 +20,7 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 - Emulation speed controls
 - Tape saving
 - Tape UX
+- Joystick emulation
 - Debugging UX (memory, registers)
 - Disassembler
 
