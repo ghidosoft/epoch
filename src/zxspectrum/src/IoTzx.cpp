@@ -122,6 +122,14 @@ namespace epoch::zxspectrum
             // Text description
             is.seekg(GET_BYTE(), std::ios::cur);
             return;
+        case 0x32:
+            // Archive info
+            {
+                uint8_t high, low;
+                GET_WORD_LE();
+                is.seekg(MAKE_WORD(high, low), std::ios::cur);
+            }
+            return;
         default:
             throw std::runtime_error("Unsupported TZX block type");
         }
