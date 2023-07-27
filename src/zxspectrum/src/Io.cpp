@@ -204,9 +204,9 @@ namespace epoch::zxspectrum
         const std::filesystem::path fs{ path };
         auto ext = fs.extension().string();
         std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
-        emulator->reset();
         if (ext == ".sna")
         {
+            emulator->reset();
             loadSna(fs, emulator);
             return nullptr;
         }

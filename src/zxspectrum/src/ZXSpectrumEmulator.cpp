@@ -78,151 +78,152 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
     {
+        const auto state = action != KeyAction::release;
         switch (key)
         {
         case Key::LeftShift:
         case Key::RightShift:
-            m_ula->setKeyState(0, 0, action != KeyAction::release);
+            m_ula->setKeyState(0, 0, state);
             break;
         case Key::Z:
-            m_ula->setKeyState(0, 1, action != KeyAction::release);
+            m_ula->setKeyState(0, 1, state);
             break;
         case Key::X:
-            m_ula->setKeyState(0, 2, action != KeyAction::release);
+            m_ula->setKeyState(0, 2, state);
             break;
         case Key::C:
-            m_ula->setKeyState(0, 3, action != KeyAction::release);
+            m_ula->setKeyState(0, 3, state);
             break;
         case Key::V:
-            m_ula->setKeyState(0, 4, action != KeyAction::release);
+            m_ula->setKeyState(0, 4, state);
             break;
 
         case Key::A:
-            m_ula->setKeyState(1, 0, action != KeyAction::release);
+            m_ula->setKeyState(1, 0, state);
             break;
         case Key::S:
-            m_ula->setKeyState(1, 1, action != KeyAction::release);
+            m_ula->setKeyState(1, 1, state);
             break;
         case Key::D:
-            m_ula->setKeyState(1, 2, action != KeyAction::release);
+            m_ula->setKeyState(1, 2, state);
             break;
         case Key::F:
-            m_ula->setKeyState(1, 3, action != KeyAction::release);
+            m_ula->setKeyState(1, 3, state);
             break;
         case Key::G:
-            m_ula->setKeyState(1, 4, action != KeyAction::release);
+            m_ula->setKeyState(1, 4, state);
             break;
 
         case Key::Q:
-            m_ula->setKeyState(2, 0, action != KeyAction::release);
+            m_ula->setKeyState(2, 0, state);
             break;
         case Key::W:
-            m_ula->setKeyState(2, 1, action != KeyAction::release);
+            m_ula->setKeyState(2, 1, state);
             break;
         case Key::E:
-            m_ula->setKeyState(2, 2, action != KeyAction::release);
+            m_ula->setKeyState(2, 2, state);
             break;
         case Key::R:
-            m_ula->setKeyState(2, 3, action != KeyAction::release);
+            m_ula->setKeyState(2, 3, state);
             break;
         case Key::T:
-            m_ula->setKeyState(2, 4, action != KeyAction::release);
+            m_ula->setKeyState(2, 4, state);
             break;
 
         case Key::D1:
-            m_ula->setKeyState(3, 0, action != KeyAction::release);
+            m_ula->setKeyState(3, 0, state);
             break;
         case Key::D2:
-            m_ula->setKeyState(3, 1, action != KeyAction::release);
+            m_ula->setKeyState(3, 1, state);
             break;
         case Key::D3:
-            m_ula->setKeyState(3, 2, action != KeyAction::release);
+            m_ula->setKeyState(3, 2, state);
             break;
         case Key::D4:
-            m_ula->setKeyState(3, 3, action != KeyAction::release);
+            m_ula->setKeyState(3, 3, state);
             break;
         case Key::D5:
-            m_ula->setKeyState(3, 4, action != KeyAction::release);
+            m_ula->setKeyState(3, 4, state);
             break;
 
         case Key::D6:
-            m_ula->setKeyState(4, 4, action != KeyAction::release);
+            m_ula->setKeyState(4, 4, state);
             break;
         case Key::D7:
-            m_ula->setKeyState(4, 3, action != KeyAction::release);
+            m_ula->setKeyState(4, 3, state);
             break;
         case Key::D8:
-            m_ula->setKeyState(4, 2, action != KeyAction::release);
+            m_ula->setKeyState(4, 2, state);
             break;
         case Key::D9:
-            m_ula->setKeyState(4, 1, action != KeyAction::release);
+            m_ula->setKeyState(4, 1, state);
             break;
         case Key::D0:
-            m_ula->setKeyState(4, 0, action != KeyAction::release);
+            m_ula->setKeyState(4, 0, state);
             break;
 
         case Key::Y:
-            m_ula->setKeyState(5, 4, action != KeyAction::release);
+            m_ula->setKeyState(5, 4, state);
             break;
         case Key::U:
-            m_ula->setKeyState(5, 3, action != KeyAction::release);
+            m_ula->setKeyState(5, 3, state);
             break;
         case Key::I:
-            m_ula->setKeyState(5, 2, action != KeyAction::release);
+            m_ula->setKeyState(5, 2, state);
             break;
         case Key::O:
-            m_ula->setKeyState(5, 1, action != KeyAction::release);
+            m_ula->setKeyState(5, 1, state);
             break;
         case Key::P:
-            m_ula->setKeyState(5, 0, action != KeyAction::release);
+            m_ula->setKeyState(5, 0, state);
             break;
 
         case Key::H:
-            m_ula->setKeyState(6, 4, action != KeyAction::release);
+            m_ula->setKeyState(6, 4, state);
             break;
         case Key::J:
-            m_ula->setKeyState(6, 3, action != KeyAction::release);
+            m_ula->setKeyState(6, 3, state);
             break;
         case Key::K:
-            m_ula->setKeyState(6, 2, action != KeyAction::release);
+            m_ula->setKeyState(6, 2, state);
             break;
         case Key::L:
-            m_ula->setKeyState(6, 1, action != KeyAction::release);
+            m_ula->setKeyState(6, 1, state);
             break;
         case Key::Enter:
-            m_ula->setKeyState(6, 0, action != KeyAction::release);
+            m_ula->setKeyState(6, 0, state);
             break;
 
         case Key::B:
-            m_ula->setKeyState(7, 4, action != KeyAction::release);
+            m_ula->setKeyState(7, 4, state);
             break;
         case Key::N:
-            m_ula->setKeyState(7, 3, action != KeyAction::release);
+            m_ula->setKeyState(7, 3, state);
             break;
         case Key::M:
-            m_ula->setKeyState(7, 2, action != KeyAction::release);
+            m_ula->setKeyState(7, 2, state);
             break;
         case Key::LeftControl:
-            m_ula->setKeyState(7, 1, action != KeyAction::release);
+            m_ula->setKeyState(7, 1, state);
             break;
         case Key::Space:
-            m_ula->setKeyState(7, 0, action != KeyAction::release);
+            m_ula->setKeyState(7, 0, state);
             break;
 
         case Key::Right:
-            m_ula->setKempstonState(0, action != KeyAction::release);
+            m_ula->setKempstonState(0, state);
             break;
         case Key::Left:
-            m_ula->setKempstonState(1, action != KeyAction::release);
+            m_ula->setKempstonState(1, state);
             break;
         case Key::Down:
-            m_ula->setKempstonState(2, action != KeyAction::release);
+            m_ula->setKempstonState(2, state);
             break;
         case Key::Up:
-            m_ula->setKempstonState(3, action != KeyAction::release);
+            m_ula->setKempstonState(3, state);
             break;
         case Key::RightControl:
-            m_ula->setKempstonState(4, action != KeyAction::release);
+            m_ula->setKempstonState(4, state);
             break;
         }
     }
