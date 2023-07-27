@@ -227,11 +227,26 @@ namespace epoch::zxspectrum
             m_ula->setKeyState(7, 2, action != KeyAction::release);
             break;
         case Key::LeftControl:
-        case Key::RightControl:
             m_ula->setKeyState(7, 1, action != KeyAction::release);
             break;
         case Key::Space:
             m_ula->setKeyState(7, 0, action != KeyAction::release);
+            break;
+
+        case Key::Right:
+            m_ula->setKempstonState(0, action != KeyAction::release);
+            break;
+        case Key::Left:
+            m_ula->setKempstonState(1, action != KeyAction::release);
+            break;
+        case Key::Down:
+            m_ula->setKempstonState(2, action != KeyAction::release);
+            break;
+        case Key::Up:
+            m_ula->setKempstonState(3, action != KeyAction::release);
+            break;
+        case Key::RightControl:
+            m_ula->setKempstonState(4, action != KeyAction::release);
             break;
         }
     }

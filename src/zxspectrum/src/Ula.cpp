@@ -121,6 +121,10 @@ namespace epoch::zxspectrum
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
+        else if ((port & 0xff) == 0x1f)
+        {
+            return m_kempston;
+        }
         return 0xff;
     }
 
@@ -151,6 +155,19 @@ namespace epoch::zxspectrum
         else
         {
             m_keyboardState[row] |= 1 << col;
+        }
+    }
+
+    void Ula::setKempstonState(const int button, const bool state)
+    {
+        assert(button < 5);
+        if (state)
+        {
+            m_kempston |= 1 << button;
+        }
+        else
+        {
+            m_kempston &= ~(1 << button);
         }
     }
 }

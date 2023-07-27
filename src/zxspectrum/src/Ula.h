@@ -54,6 +54,7 @@ namespace epoch::zxspectrum
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
+        void setKempstonState(int button, bool state);
         void setAudioIn(const bool value) { m_audioIn = value; }
 
     private:
@@ -64,6 +65,7 @@ namespace epoch::zxspectrum
         uint8_t m_border{};
         std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
         bool m_ear{}, m_mic{}, m_audioIn{};
+        uint8_t m_kempston{};
         int m_cpuStalled{};
 
         uint64_t m_frameCounter{};
