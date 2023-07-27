@@ -12,6 +12,7 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 - Tape loading (.tap, .tzx)
 - Sound
 - Drag&drop file loading
+- Kempston joystick emulation (arrows and right-control for fire)
 
 ## Roadmap
 - 128K spectrum
@@ -20,7 +21,6 @@ Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound
 - Emulation speed controls
 - Tape saving
 - Tape UX
-- Joystick emulation
 - Debugging UX (memory, registers)
 - Disassembler
 
