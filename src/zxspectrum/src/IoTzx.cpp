@@ -36,15 +36,24 @@ namespace epoch::zxspectrum
         pulses.push_back(sync2);
     }
 
-    void generateDataBlock(std::vector<std::size_t>& pulses, const std::span<uint8_t> data, const std::size_t zero, const std::size_t one)
+    void generateDataBlock(std::vector<std::size_t>& pulses, const std::span<uint8_t> data, const std::size_t zero, const std::size_t one, const int bitsLastByte = 8)
     {
-        for (const auto value : data)
+        assert(bitsLastByte > 0 && bitsLastByte <= 8);
+        if (data.empty()) return;
+        for (auto i = 0; i < data.size() - 1; i++)
         {
+            const auto value = data[i];
             for (auto bit = 7; bit >= 0; bit--)
             {
                 pulses.push_back((value & (1 << bit)) ? one : zero);
                 pulses.push_back((value & (1 << bit)) ? one : zero);
             }
+        }
+        for (auto bit = 7; bit >= (8 - bitsLastByte); bit--)
+        {
+            const auto value = data[data.size() - 1];
+            pulses.push_back((value & (1 << bit)) ? one : zero);
+            pulses.push_back((value & (1 << bit)) ? one : zero);
         }
     }
 
@@ -91,8 +100,7 @@ namespace epoch::zxspectrum
         const auto one = MAKE_WORD(high, low);
         GET_WORD_LE();
         const auto pilotPulseCount = MAKE_WORD(high, low);
-        const auto bitsInTheLastByte = GET_BYTE(); // TODO
-        assert(bitsInTheLastByte == 8);
+        const auto bitsLastByte = GET_BYTE();
         GET_WORD_LE();
         const auto pause = MAKE_WORD(high, low);
 
@@ -106,7 +114,7 @@ namespace epoch::zxspectrum
         is.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
 
         generatePilot(pulses, pilotPulseLength, pilotPulseCount, sync1, sync2);
-        generateDataBlock(pulses, bytes, zero, one);
+        generateDataBlock(pulses, bytes, zero, one, bitsLastByte);
         generatePause(pulses, pause);
     }
 
