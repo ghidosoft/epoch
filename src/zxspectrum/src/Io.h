@@ -25,10 +25,8 @@ namespace epoch::zxspectrum
     class TapeInterface;
     class ZXSpectrumEmulator;
 
-    void load(const std::string& path, ZXSpectrumEmulator* emulator);
+    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator);
     void save(const std::string& path, const ZXSpectrumEmulator* emulator);
-
-    std::unique_ptr<TapeInterface> loadTape(const std::string& path);
 }
 
 #endif

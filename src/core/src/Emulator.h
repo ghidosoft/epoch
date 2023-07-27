@@ -49,9 +49,8 @@ namespace epoch
         virtual void reset() = 0;
         void clock();
 
-        virtual void loadSnapshot(const std::string& path) = 0;
-        virtual void saveSnapshot(const std::string& path) = 0;
-        virtual void loadTape(const std::string& path) = 0;
+        virtual void load(const std::string& path) = 0;
+        virtual void save(const std::string& path) = 0;
 
         void frame();
         float generateNextAudioSample();

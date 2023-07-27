@@ -41,7 +41,7 @@ namespace epoch::frontend
         m_window->setCursorPosCallback(
             [&](const float x, const float y) { m_gui->setCursorPos(x, y); });
         m_window->setFileDropCallback(
-            [&](const char* path) { m_emulator->loadTape(path); });
+            [&](const char* path) { m_emulator->load(path); });
         m_window->setKeyboardCallback(
             [&](const Key key, const KeyAction action) { m_emulator->keyEvent(key, action); });
         m_window->setMouseButtonCallback(
@@ -91,11 +91,11 @@ namespace epoch::frontend
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Load tape .tap")) { m_emulator->loadTape("test.tap"); }
-                if (ImGui::MenuItem("Load tape .txz")) { m_emulator->loadTape("test.tzx"); }
+                if (ImGui::MenuItem("Load tape test.tap")) { m_emulator->load("test.tap"); }
+                if (ImGui::MenuItem("Load tape test.txz")) { m_emulator->load("test.tzx"); }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Restore snapshot")) { m_emulator->loadSnapshot("test.sna"); }
-                if (ImGui::MenuItem("Take snapshot")) { m_emulator->saveSnapshot("test.sna"); }
+                if (ImGui::MenuItem("Restore test.sna")) { m_emulator->load("test.sna"); }
+                if (ImGui::MenuItem("Take test.sna")) { m_emulator->save("test.sna"); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
                 ImGui::EndMenu();

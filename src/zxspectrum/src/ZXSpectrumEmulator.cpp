@@ -85,19 +85,14 @@ namespace epoch::zxspectrum
         m_clockCounter = 0;
     }
 
-    void ZXSpectrumEmulator::loadSnapshot(const std::string& path)
+    void ZXSpectrumEmulator::load(const std::string& path)
     {
-        load(path, this);
+        m_tape = epoch::zxspectrum::load(path, this);
     }
 
-    void ZXSpectrumEmulator::saveSnapshot(const std::string& path)
+    void ZXSpectrumEmulator::save(const std::string& path)
     {
-        save(path, this);
-    }
-
-    void ZXSpectrumEmulator::loadTape(const std::string& path)
-    {
-        m_tape = epoch::zxspectrum::loadTape(path);
+        epoch::zxspectrum::save(path, this);
     }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)

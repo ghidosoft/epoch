@@ -198,7 +198,7 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    void load(const std::string& path, ZXSpectrumEmulator* emulator)
+    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
         const std::filesystem::path fs{ path };
@@ -208,6 +208,17 @@ namespace epoch::zxspectrum
         if (ext == ".sna")
         {
             loadSna(fs, emulator);
+            return nullptr;
+        }
+        else if (ext == ".tap")
+        {
+            const auto pulses = loadTap(fs);
+            return std::make_unique<TapeInterface>(pulses);
+        }
+        else if (ext == ".tzx")
+        {
+            const auto pulses = loadTzx(fs);
+            return std::make_unique<TapeInterface>(pulses);
         }
     }
 
@@ -221,24 +232,5 @@ namespace epoch::zxspectrum
         {
             saveSna(fs, emulator);
         }
-    }
-
-    std::unique_ptr<TapeInterface> loadTape(const std::string& path)
-    {
-        const std::filesystem::path fs{ path };
-        auto ext = fs.extension().string();
-        std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
-        std::vector<std::size_t> pulses;
-        if (ext == ".tap")
-        {
-            const auto pulses = loadTap(fs);
-            return std::make_unique<TapeInterface>(pulses);
-        }
-        else if (ext == ".tzx")
-        {
-            const auto pulses = loadTzx(fs);
-            return std::make_unique<TapeInterface>(pulses);
-        }
-        return nullptr;
     }
 }

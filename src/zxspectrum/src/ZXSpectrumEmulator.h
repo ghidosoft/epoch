@@ -50,9 +50,8 @@ namespace epoch::zxspectrum
     public:
         void reset() override;
 
-        void loadSnapshot(const std::string& path) override;
-        void saveSnapshot(const std::string& path) override;
-        void loadTape(const std::string& path) override;
+        void load(const std::string& path) override;
+        void save(const std::string& path) override;
 
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override { return m_screenBuffer; }
         
