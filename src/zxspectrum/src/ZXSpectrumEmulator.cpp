@@ -53,26 +53,7 @@ namespace epoch::zxspectrum
         m_ula{std::make_unique<Ula>(m_rom48k, m_ram)},
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
-        // Assembled with https://www.asm80.com/
-        // TODO: remove this simple ROM test
-        static const uint8_t bytes[] = {
-            0x11, 0x00, 0x58,   // LD   de, 22528
-            0x3E, 0x07,         // LD   a, 7
-            0xD3, 0xFE,         // OUT  $fe, a
-            0x12,               // LD   (de), a
-            0x11, 0x00, 0x40,   // LD   de, 16384
-            0x3E, 0xFF,         // LD   a, 255
-            0x06, 0x08,         // LD   b, 8
-            // loop:
-            0x12,               // LD   (de), a
-            0x14,               // INC  d
-            0x10, 0xFC,         // DJNZ loop
-            // main:
-            0x18, 0xFE,         // JR   main
-        };
-        // std::memcpy(m_rom48k.data(), bytes, sizeof(bytes));
         std::memcpy(m_rom48k.data(), ROM_48K, sizeof(ROM_48K));
-        // std::memcpy(m_rom48k.data(), ZX_Test_Rom, sizeof(ZX_Test_Rom));
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
