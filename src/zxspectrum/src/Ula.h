@@ -65,7 +65,7 @@ namespace epoch::zxspectrum
         uint8_t m_border{};
         std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
         bool m_ear{}, m_mic{}, m_audioIn{};
-        uint8_t m_kempston{};
+        uint8_t m_kempstonState{};
         int m_cpuStalled{};
 
         uint64_t m_frameCounter{};

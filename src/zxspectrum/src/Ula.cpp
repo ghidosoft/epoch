@@ -107,7 +107,12 @@ namespace epoch::zxspectrum
 
     uint8_t Ula::ioRead(const uint16_t port)
     {
-        if ((port & 0x01) == 0)
+        if ((port & 0b11100000) == 0)
+        {
+            // Kempston joystick takes priority
+            return m_kempstonState;
+        }
+        else if ((port & 0x01) == 0)
         {
             const uint8_t portHigh = port >> 8;
             uint8_t result = 0b00011111;
@@ -120,10 +125,6 @@ namespace epoch::zxspectrum
             }
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
-        }
-        else if ((port & 0xff) == 0x1f)
-        {
-            return m_kempston;
         }
         return 0xff;
     }
@@ -163,11 +164,11 @@ namespace epoch::zxspectrum
         assert(button < 5);
         if (state)
         {
-            m_kempston |= 1 << button;
+            m_kempstonState |= 1 << button;
         }
         else
         {
-            m_kempston &= ~(1 << button);
+            m_kempstonState &= ~(1 << button);
         }
     }
 }
