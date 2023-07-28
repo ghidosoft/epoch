@@ -941,6 +941,7 @@ namespace epoch::zxspectrum
                 // LD SP, HL
                 m_registers.sp = getHL();
                 m_remainingCycles++;
+                m_remainingCycles++;
                 break;
             }
         }
