@@ -1224,7 +1224,6 @@ namespace epoch::zxspectrum
             else if (z == 0b001)
             {
                 uint8_t value = 0;
-                m_registers.af.low(s_flagsLookupSZP[value]);
                 switch (y)
                 {
                 case 0b000:
