@@ -1902,26 +1902,28 @@ namespace epoch::zxspectrum
 
     uint8_t Z80Cpu::prefixCbRead(const int8_t d, const int z)
     {
-        if (z == 0b110)
+        switch (m_currentPrefix)
         {
-            m_remainingCycles++;
-            // (HL)
-            switch (m_currentPrefix)
+        case Z80OpcodePrefix::none:
+            if (z == 0b110)
             {
-            case Z80OpcodePrefix::none:
+                m_remainingCycles++;
+                // (HL)
                 return busRead(m_registers.hl);
-            case Z80OpcodePrefix::ix:
-                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
-            case Z80OpcodePrefix::iy:
-                return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
             }
-            assert(false);
-            return 0;
+            else
+            {
+                return *m_registersPointers[0][z];
+            }
+        case Z80OpcodePrefix::ix:
+            m_remainingCycles++;
+            return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
+        case Z80OpcodePrefix::iy:
+            m_remainingCycles++;
+            return busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
         }
-        else
-        {
-            return *m_registersPointers[0][z];
-        }
+        assert(false);
+        return 0;
     }
 
     void Z80Cpu::prefixCbWrite(const int8_t d, const int z, const uint8_t value)
