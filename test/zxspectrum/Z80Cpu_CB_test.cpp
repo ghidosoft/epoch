@@ -28,6 +28,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff80);
         EXPECT_EQ(sut.registers().bc, 0xc200);
         sut.step();
@@ -63,6 +64,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 15);
         EXPECT_EQ(sut.registers().af, 0xff80);
         EXPECT_EQ(bus.ram(0x0020), 0xc2);
         sut.step();
@@ -95,6 +97,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xffa1);
         EXPECT_EQ(sut.registers().bc, 0xb000);
         sut.step();
@@ -111,6 +114,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff84);
         EXPECT_EQ(sut.registers().bc, 0xc300);
         sut.step();
@@ -133,6 +137,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff84);
         EXPECT_EQ(sut.registers().bc, 0x00c3);
         sut.step();
@@ -149,6 +154,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xffa1);
         EXPECT_EQ(sut.registers().bc, 0xb000);
         sut.step();
@@ -165,6 +171,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff80);
         EXPECT_EQ(sut.registers().bc, 0xc200);
         sut.step();
@@ -187,6 +194,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff25);
         EXPECT_EQ(sut.registers().bc, 0x3000);
         sut.step();
@@ -221,6 +229,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff84);
         EXPECT_EQ(sut.registers().bc, 0xc300);
         sut.step();
@@ -255,6 +264,7 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 8);
         EXPECT_EQ(sut.registers().af, 0xff25);
         EXPECT_EQ(sut.registers().bc, 0x3000);
         sut.step();

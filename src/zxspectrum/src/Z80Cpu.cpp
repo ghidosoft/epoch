@@ -1882,7 +1882,7 @@ namespace epoch::zxspectrum
         m_registers.bc.value--;
         m_registers.af.p(m_registers.bc.value);
         m_registers.af.c(c);
-        m_remainingCycles += 2;
+        m_remainingCycles += 5;
     }
 
     void Z80Cpu::cpd()
@@ -1904,6 +1904,7 @@ namespace epoch::zxspectrum
     {
         if (z == 0b110)
         {
+            m_remainingCycles++;
             // (HL)
             switch (m_currentPrefix)
             {
@@ -1927,6 +1928,7 @@ namespace epoch::zxspectrum
     {
         if (z == 0b110)
         {
+            //  m_remainingCycles++; // Already in prefixCbRead
             // (HL)
             switch (m_currentPrefix)
             {
