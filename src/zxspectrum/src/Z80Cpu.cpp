@@ -1186,7 +1186,7 @@ namespace epoch::zxspectrum
             if (z == 0b000)
             {
                 const auto value = ioRead(m_registers.bc);
-                m_registers.af.low(s_flagsLookupSZP[value]);
+                m_registers.af.low(s_flagsLookupSZP[value] | (m_registers.af & Z80Flags::c));
                 switch (y)
                 {
                 case 0b000:
