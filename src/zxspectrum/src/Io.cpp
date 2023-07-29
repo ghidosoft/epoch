@@ -85,6 +85,118 @@ namespace epoch::zxspectrum
         registers.sp += 2;
     }
 
+    static void loadZ80(const std::filesystem::path& path, ZXSpectrumEmulator* emulator)
+    {
+        const auto ula = emulator->ula();
+        auto& registers = emulator->cpu()->registers();
+
+        std::ifstream is(path, std::ios::binary);
+        uint8_t high, low;
+
+        registers.af.high(GET_BYTE());
+        registers.af.low(GET_BYTE());
+        GET_WORD_LE();
+        registers.bc = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.hl = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.pc = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.sp = MAKE_WORD(high, low);
+        registers.ir.high(GET_BYTE());
+        registers.ir.low(GET_BYTE() & 0x7f);
+
+        low = GET_BYTE();
+        if (low == 0xff) low = 0x01; // Because of compatibility, if byte 12 is 255, it has to be regarded as being 1.
+        registers.ir.value |= (low & 0x01) << 7;
+        const bool basicSamRomv1 = low & (1 << 4);
+        const bool compressedv1 = low & (1 << 5);
+        const auto border = static_cast<uint8_t>((low >> 1) & 0b111);
+        ula->ioWrite(0xfe, border);
+
+        GET_WORD_LE();
+        registers.de = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.bc2 = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.de2 = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.hl2 = MAKE_WORD(high, low);
+        registers.af2.high(GET_BYTE());
+        registers.af2.low(GET_BYTE());
+        GET_WORD_LE();
+        registers.iy = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        registers.ix = MAKE_WORD(high, low);
+
+        registers.iff1 = GET_BYTE();
+        registers.iff2 = GET_BYTE();
+
+        low = GET_BYTE();
+        registers.interruptMode = low & 0b11;
+
+        assert(registers.pc == 0); // unsupported z80 version 1
+        if (registers.pc == 0)
+        {
+            auto pos = is.tellg();
+            // version 2/3
+            GET_WORD_LE();
+            const auto additionalHeaderLength = MAKE_WORD(high, low);
+            GET_WORD_LE();
+            registers.pc = MAKE_WORD(high, low);
+            const auto hardwareMode = GET_BYTE();
+            assert(hardwareMode == 0 || hardwareMode == 1); // Only ZX Spectrum 48K supported
+
+            pos += additionalHeaderLength + 2;
+            is.seekg(pos, std::ios::beg);
+
+            do
+            {
+                GET_WORD_LE();
+                if (is.eof()) break;
+                const auto blockLength = MAKE_WORD(high, low);
+                assert(blockLength != 0xffff); // uncompressed not yet supported
+                const auto pageNumber = GET_BYTE();
+                uint8_t* page{};
+                if (pageNumber == 0x04)
+                {
+                    page = emulator->ram()[2].data();
+                }
+                else if (pageNumber == 0x05)
+                {
+                    page = emulator->ram()[0].data();
+                }
+                else if (pageNumber == 0x08)
+                {
+                    page = emulator->ram()[5].data();
+                }
+                assert(page);
+                std::vector<uint8_t> buffer;
+                buffer.resize(blockLength);
+                is.read(reinterpret_cast<char*>(buffer.data()), blockLength);
+                auto dest = 0;
+                auto i = 0;
+                while (i < blockLength)
+                {
+                    if (i < blockLength - 4 && buffer[i] == 0xed && buffer[i + 1] == 0xed)
+                    {
+                        i += 2;
+                        const auto repeat = buffer[i++];
+                        const auto value = buffer[i++];
+                        std::memset(&page[dest], value, repeat);
+                        dest += repeat;
+                    }
+                    else
+                    {
+                        page[dest++] = buffer[i++];
+                    }
+                }
+                assert(i == blockLength);
+                assert(dest == 0x4000);
+            } while (!is.eof());
+        }
+    }
+
     static void saveSna(const std::filesystem::path& path, const ZXSpectrumEmulator* emulator)
     {
         const auto& registers = emulator->cpu()->registers();
@@ -208,6 +320,12 @@ namespace epoch::zxspectrum
         {
             emulator->reset();
             loadSna(fs, emulator);
+            return nullptr;
+        }
+        else if (ext == ".z80")
+        {
+            emulator->reset();
+            loadZ80(fs, emulator);
             return nullptr;
         }
         else if (ext == ".tap")
