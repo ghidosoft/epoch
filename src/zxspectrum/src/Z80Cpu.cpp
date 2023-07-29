@@ -1523,13 +1523,69 @@ namespace epoch::zxspectrum
             }
             else if (z == 0b010)
             {
-                // TODO INI IND INIR INDR
-                assert(false);
+                switch (y)
+                {
+                case 0b100:
+                    // INI
+                    ini();
+                    break;
+                case 0b101:
+                    // IND
+                    ind();
+                    break;
+                case 0b110:
+                    // INIR
+                    ini();
+                    if (!m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                case 0b111:
+                    // INDR
+                    ind();
+                    if (!m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                    // Rest is NOP
+                }
             }
             else if (z == 0b011)
             {
-                // TODO OUTI OUTD OTIR OTDR
-                assert(false);
+                switch (y)
+                {
+                case 0b100:
+                    // OUTI
+                    outi();
+                    break;
+                case 0b101:
+                    // OUTD
+                    outd();
+                    break;
+                case 0b110:
+                    // OUTR
+                    outi();
+                    if (!m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                case 0b111:
+                    // OUTDR
+                    outd();
+                    if (!m_registers.af.z())
+                    {
+                        m_registers.pc -= 2;
+                        m_remainingCycles += 5;
+                    }
+                    break;
+                    // Rest is NOP
+                }
             }
             // Rest is NOP
         }
@@ -1898,6 +1954,86 @@ namespace epoch::zxspectrum
         m_registers.af.p(m_registers.bc.value);
         m_registers.af.c(c);
         m_remainingCycles += 5;
+    }
+
+    void Z80Cpu::ini()
+    {
+        const auto b = static_cast<uint8_t>(m_registers.bc.high() - 1);
+        m_registers.bc.high(b);
+        const auto c = m_registers.bc.low();
+
+        const auto n = ioRead(m_registers.bc); // use BC after decrementing B
+        busWrite(m_registers.hl.value++, n);
+
+        m_registers.af.low(
+            (s_flagsLookupSZP[b] & (Z80Flags::s | Z80Flags::z | Z80Flags::y | Z80Flags::x)) |
+            ((n >> (7 - 1)) & Z80Flags::n)
+        );
+        if (n + ((c + 1) & 0xff) > 0xff)
+        {
+            m_registers.af.value |= Z80Flags::h | Z80Flags::c;
+        }
+        m_registers.af.value |= s_flagsLookupSZP[((n + ((c + 1) & 0xff)) & 0x07) ^ b] & Z80Flags::p;
+    }
+
+    void Z80Cpu::ind()
+    {
+        const auto b = static_cast<uint8_t>(m_registers.bc.high() - 1);
+        m_registers.bc.high(b);
+        const auto c = m_registers.bc.low();
+
+        const auto n = ioRead(m_registers.bc); // use BC after decrementing B
+        busWrite(m_registers.hl.value--, n);
+
+        m_registers.af.low(
+            (s_flagsLookupSZP[b] & (Z80Flags::s | Z80Flags::z | Z80Flags::y | Z80Flags::x)) |
+            ((n >> (7 - 1)) & Z80Flags::n)
+        );
+        if (n + ((c - 1) & 0xff) > 0xff)
+        {
+            m_registers.af.value |= Z80Flags::h | Z80Flags::c;
+        }
+        m_registers.af.value |= s_flagsLookupSZP[((n + ((c - 1) & 0xff)) & 0x07) ^ b] & Z80Flags::p;
+    }
+
+    void Z80Cpu::outi()
+    {
+        const auto n = busRead(m_registers.hl.value++);
+        ioWrite(m_registers.bc, n); // use BC before decrementing B
+
+        const auto b = static_cast<uint8_t>(m_registers.bc.high() - 1);
+        m_registers.bc.high(b);
+        const auto l = m_registers.hl.low();
+
+        m_registers.af.low(
+            (s_flagsLookupSZP[b] & (Z80Flags::s | Z80Flags::z | Z80Flags::y | Z80Flags::x)) |
+            ((n >> (7 - 1)) & Z80Flags::n)
+        );
+        if (n + l > 0xff)
+        {
+            m_registers.af.value |= Z80Flags::h | Z80Flags::c;
+        }
+        m_registers.af.value |= s_flagsLookupSZP[((n + l) & 0x07) ^ b] & Z80Flags::p;
+    }
+
+    void Z80Cpu::outd()
+    {
+        const auto n = busRead(m_registers.hl.value--);
+        ioWrite(m_registers.bc, n); // use BC before decrementing B
+
+        const auto b = static_cast<uint8_t>(m_registers.bc.high() - 1);
+        m_registers.bc.high(b);
+        const auto l = m_registers.hl.low();
+
+        m_registers.af.low(
+            (s_flagsLookupSZP[b] & (Z80Flags::s | Z80Flags::z | Z80Flags::y | Z80Flags::x)) |
+            ((n >> (7 - 1)) & Z80Flags::n)
+        );
+        if (n + l > 0xff)
+        {
+            m_registers.af.value |= Z80Flags::h | Z80Flags::c;
+        }
+        m_registers.af.value |= s_flagsLookupSZP[((n + l) & 0x07) ^ b] & Z80Flags::p;
     }
 
     uint8_t Z80Cpu::prefixCbRead(const int8_t d, const int z)
