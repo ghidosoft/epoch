@@ -419,7 +419,8 @@ namespace epoch::zxspectrum
             // Exit HALT state
             m_registers.pc++;
         }
-        m_registers.ir.low((m_registers.ir.low() + 1) & 0x7f);
+        const auto r = m_registers.ir.low();
+        m_registers.ir.low((((r & 0x7f) + 1) & 0x7f) | (r & 0x80));
         m_registers.iff1 = false;
         switch (m_registers.interruptMode)
         {
@@ -441,7 +442,8 @@ namespace epoch::zxspectrum
 
     uint8_t Z80Cpu::fetchOpcode()
     {
-        m_registers.ir.low((m_registers.ir.low() + 1) & 0x7f);
+        const auto r = m_registers.ir.low();
+        m_registers.ir.low((((r & 0x7f) + 1) & 0x7f) | (r & 0x80));
         m_remainingCycles += 4;
         return m_bus.read(m_registers.pc++);
     }
