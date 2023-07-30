@@ -428,7 +428,6 @@ namespace epoch::zxspectrum
         {
         case 0:
             // Simply ignored (interrupts stay disabled)
-            // m_registers.iff1 = m_registers.iff2; // Simply restore interrupts
             break;
         case 1:
             push16(m_registers.pc);
