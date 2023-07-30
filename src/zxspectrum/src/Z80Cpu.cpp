@@ -354,6 +354,7 @@ namespace epoch::zxspectrum
         }
 
         m_clockCounter++;
+        assert(m_remainingCycles > 0);
         m_remainingCycles--;
     }
 
@@ -422,15 +423,18 @@ namespace epoch::zxspectrum
         const auto r = m_registers.ir.low();
         m_registers.ir.low((((r & 0x7f) + 1) & 0x7f) | (r & 0x80));
         m_registers.iff1 = false;
+        m_remainingCycles++; // 'use' the current cycle
         switch (m_registers.interruptMode)
         {
+        case 0:
+            // Simply ignored (interrupts stay disabled)
+            // m_registers.iff1 = m_registers.iff2; // Simply restore interrupts
+            break;
         case 1:
-            m_remainingCycles++;
             push16(m_registers.pc);
             m_registers.pc = 0x0038;
             break;
         case 2:
-            m_remainingCycles++;
             push16(m_registers.pc);
             m_registers.pc = read16(m_registers.ir & 0xff00); // ignore low byte
             break;
