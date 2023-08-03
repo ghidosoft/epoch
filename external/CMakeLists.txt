@@ -45,6 +45,7 @@ FetchContent_Declare(
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   URL https://github.com/btzy/nativefiledialog-extended/archive/v1.1.0.zip
 )
+set(NFD_PORTAL ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(nfd)
 
 FetchContent_Declare(
