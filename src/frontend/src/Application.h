@@ -30,6 +30,7 @@ namespace epoch::frontend
     class AudioPlayer;
     class GraphicContext;
     class Gui;
+    class Platform;
     class Window;
 
     class Application final
@@ -58,6 +59,7 @@ namespace epoch::frontend
         std::shared_ptr<Emulator> m_emulator{};
 
         std::unique_ptr<Window> m_window{};
+        std::unique_ptr<Platform> m_platform{}; // must be after Window
         std::unique_ptr<GraphicContext> m_context{};
         std::unique_ptr<Gui> m_gui{};
         std::unique_ptr<AudioPlayer> m_audio{};

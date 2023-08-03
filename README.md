@@ -4,8 +4,6 @@
 
 This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C++.
 
-Rendering is done using [GLFW](https://www.glfw.org/) and OpenGL Core 4.1, sound using [PortAudio](http://www.portaudio.com/) and ux uses [Dear ImGui](https://github.com/ocornut/imgui).
-
 ## Features
 - Instruction level Z80 emulation: all instructions (excluding BIT N, (HL)) passes zexdoc and zexall, bit (hl) doesn't because WZ/MEMPTR is not yet completely implemented
 - Load/Save snapshots (.sna)
@@ -30,9 +28,17 @@ First 48K ROM running screenshot:
 
 ![ZX Spectrum 48K](docs/images/zx48k_main.png)
 
-## Build
+## Building
 
-This project uses CMake. Builds on Windows (Visual Studio 2022), GNU/Linux (Ubuntu 22.04) and MacOS (12.6.7).
+This project uses CMake 3.22. All dependencies are loaded using CMake `FetchContent`.
+
+Builds on Windows (Visual Studio 2022), GNU/Linux (Ubuntu 22.04) and MacOS (12.6.7).
+
+### Windows
+
+* Install Visual Studio 2022 with CMake and C workload
+* Open the folder with Visual Studio
+* Build!
 
 ### Ubuntu 22.04 build
 
@@ -42,6 +48,14 @@ sudo apt install build-essential cmake ninja-build
 
 # Requisites
 sudo apt install libasound-dev xorg-dev
+```
+
+Build commands:
+
+```bash
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
 ```
 
 ## License
@@ -57,3 +71,9 @@ See the GNU General Public License for more details.
 
 You should have received a [copy](LICENSE) of the GNU General Public License along with Epoch.
 If not, see https://www.gnu.org/licenses/.
+
+## Used libraries
+* [Dear ImGui](https://github.com/ocornut/imgui) for the GUI
+* [GLFW](https://www.glfw.org/) for graphics and input
+* [Native File Dialog Extended](https://github.com/btzy/nativefiledialog-extended) for file dialog
+* [PortAudio](http://www.portaudio.com/) for audio

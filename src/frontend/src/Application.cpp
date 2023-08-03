@@ -22,6 +22,7 @@
 #include "Audio.h"
 #include "GraphicContext.h"
 #include "Gui.h"
+#include "Platform.h"
 #include "Window.h"
 
 namespace epoch::frontend
@@ -34,6 +35,7 @@ namespace epoch::frontend
             .width = emulatorInfo.width,
             .height = emulatorInfo.height,
         });
+        m_platform = std::make_unique<Platform>();
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
@@ -91,8 +93,13 @@ namespace epoch::frontend
         {
             if (ImGui::BeginMenu("File"))
             {
-                if (ImGui::MenuItem("Load tape test.tap")) { m_emulator->load("test.tap"); }
-                if (ImGui::MenuItem("Load tape test.txz")) { m_emulator->load("test.tzx"); }
+                if (ImGui::MenuItem("Load"))
+                {
+                    if (const auto path = m_platform->openDialog(); !path.empty())
+                    {
+                        m_emulator->load(path);
+                    }
+                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Restore test.sna")) { m_emulator->load("test.sna"); }
                 if (ImGui::MenuItem("Take test.sna")) { m_emulator->save("test.sna"); }

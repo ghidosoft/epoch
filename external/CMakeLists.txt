@@ -41,6 +41,13 @@ if(NOT imgui_POPULATED)
 endif()
 
 FetchContent_Declare(
+  nfd
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  URL https://github.com/btzy/nativefiledialog-extended/archive/v1.1.0.zip
+)
+FetchContent_MakeAvailable(nfd)
+
+FetchContent_Declare(
   portaudio
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   URL https://github.com/PortAudio/portaudio/archive/v19.7.0.zip
