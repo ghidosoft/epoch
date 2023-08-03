@@ -1,6 +1,6 @@
 # Epoch: ZX Spectrum emulator
 
-![CMakeBadge](https://github.com/ghidosoft/epoch/actions/workflows/cmake.yml/badge.svg)
+![CMakeBadge](https://github.com/ghidosoft/epoch/actions/workflows/build.yml/badge.svg)
 
 This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C++.
 
