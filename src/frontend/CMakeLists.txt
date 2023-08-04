@@ -4,6 +4,7 @@ add_library(epoch_frontend
     "src/Application.cpp" "src/Application.h"
     "src/Audio.cpp" "src/Audio.h"
     "src/CircularBuffer.h"
+    "src/EmulationController.cpp" "src/EmulationController.h"
     "src/GraphicContext.cpp" "src/GraphicContext.h"
     "src/Gui.cpp" "src/Gui.h"
     "src/Platform.cpp" "src/Platform.h"

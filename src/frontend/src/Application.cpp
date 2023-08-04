@@ -20,6 +20,7 @@
 #include <imgui.h>
 
 #include "Audio.h"
+#include "EmulationController.h"
 #include "GraphicContext.h"
 #include "Gui.h"
 #include "Platform.h"
@@ -40,6 +41,8 @@ namespace epoch::frontend
         m_gui = std::make_unique<Gui>();
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
+        m_controller = std::make_unique<EmulationController>(m_emulator);
+
         m_window->setCursorPosCallback(
             [&](const float x, const float y) { m_gui->setCursorPos(x, y); });
         m_window->setFileDropCallback(
@@ -56,6 +59,7 @@ namespace epoch::frontend
     {
         m_context->init(m_emulator->info().width, m_emulator->info().height);
         m_emulator->reset();
+        m_controller->start();
         while (m_window->nextFrame())
         {
             if (m_running)

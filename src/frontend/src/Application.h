@@ -28,6 +28,7 @@ namespace epoch
 namespace epoch::frontend
 {
     class AudioPlayer;
+    class EmulationController;
     class GraphicContext;
     class Gui;
     class Platform;
@@ -64,6 +65,8 @@ namespace epoch::frontend
         std::unique_ptr<Gui> m_gui{};
         std::unique_ptr<AudioPlayer> m_audio{};
         std::vector<float> m_audioBuffer{};
+
+        std::unique_ptr<EmulationController> m_controller{};
 
         bool m_running{ true };
     };
