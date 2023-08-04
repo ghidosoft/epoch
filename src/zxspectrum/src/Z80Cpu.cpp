@@ -21,6 +21,10 @@
 #include <optional>
 #include <sstream>
 
+// TODO: endianness
+constexpr auto POINTER_OFFSET_HIGH = 1;
+constexpr auto POINTER_OFFSET_LOW = 0;
+
 namespace epoch::zxspectrum
 {
     static const uint8_t s_flagsLookupSZP[256] = {
@@ -303,36 +307,36 @@ namespace epoch::zxspectrum
 
     Z80Cpu::Z80Cpu(Z80Interface& bus) :
         m_bus{ bus },
-        m_registersPointers{{ // TODO: endianness
+        m_registersPointers{{
             {
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
-                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.de.value),
-                reinterpret_cast<uint8_t*>(&m_registers.hl.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.hl.value),
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.hl.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.hl.value) + POINTER_OFFSET_LOW,
                 nullptr, // (HL)
-                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + POINTER_OFFSET_HIGH,
             },
             {
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
-                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.de.value),
-                reinterpret_cast<uint8_t*>(&m_registers.ix.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.ix.value),
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.ix.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.ix.value) + POINTER_OFFSET_LOW,
                 nullptr, // (IX)
-                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + POINTER_OFFSET_HIGH,
             },
             {
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.bc.value),
-                reinterpret_cast<uint8_t*>(&m_registers.de.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.de.value),
-                reinterpret_cast<uint8_t*>(&m_registers.iy.value) + 1,
-                reinterpret_cast<uint8_t*>(&m_registers.iy.value),
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.bc.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.de.value) + POINTER_OFFSET_LOW,
+                reinterpret_cast<uint8_t*>(&m_registers.iy.value) + POINTER_OFFSET_HIGH,
+                reinterpret_cast<uint8_t*>(&m_registers.iy.value) + POINTER_OFFSET_LOW,
                 nullptr, // (IY)
-                reinterpret_cast<uint8_t*>(&m_registers.af.value) + 1,
+                reinterpret_cast<uint8_t*>(&m_registers.af.value) + POINTER_OFFSET_HIGH,
             },
         }}
     {
