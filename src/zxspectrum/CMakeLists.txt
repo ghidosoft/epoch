@@ -10,6 +10,7 @@ add_library(epoch_zxspectrum
     "src/Ula.cpp" "src/Ula.h"
     "src/Z80Cpu.cpp" "src/Z80Cpu.h"
     "src/Z80Interface.h"
+    "src/Z80Tables.h"
     "src/ZXSpectrumEmulator.cpp" "src/ZXSpectrumEmulator.h"
 )
 
@@ -20,7 +21,5 @@ add_library(Epoch::ZXSpectrum ALIAS epoch_zxspectrum)
 
 add_executable(epoch_zxspectrum_zex
     "src/zex.cpp"
-    "src/Z80Cpu.h"
-    "src/Z80Interface.h"
 )
 target_link_libraries(epoch_zxspectrum_zex PUBLIC Epoch::Core Epoch::ZXSpectrum)
