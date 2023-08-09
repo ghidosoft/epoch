@@ -47,7 +47,7 @@ namespace epoch::frontend
             m_last = now;
             m_ticks++;
             m_elapsed += elapsed;
-            if (m_elapsed > 1)
+            if (m_ticks > 10)
             {
                 m_tickDuration = m_elapsed / static_cast<double>(m_ticks);
                 m_ticksPerSecond = static_cast<double>(m_ticks) / m_elapsed;
@@ -57,7 +57,7 @@ namespace epoch::frontend
             }
         }
 
-        [[nodiscard]] double tickDuration() const { return m_ticks == 0 ? m_tickDuration : m_elapsed / static_cast<double>(m_ticks); }
+        [[nodiscard]] double tickDuration() const { return m_elapsed / static_cast<double>(m_ticks); }
 
     private:
         double m_elapsed{};
