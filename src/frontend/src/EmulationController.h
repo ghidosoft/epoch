@@ -17,8 +17,8 @@
 #ifndef SRC_FRONTEND_EMULATIONCONTROLLER_H_
 #define SRC_FRONTEND_EMULATIONCONTROLLER_H_
 
-#include <atomic>
 #include <condition_variable>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -32,6 +32,43 @@ namespace epoch
 
 namespace epoch::frontend
 {
+    class ClockTimer final
+    {
+    public:
+        ClockTimer()
+        {
+            m_last = std::chrono::high_resolution_clock::now();
+        }
+
+        void tick()
+        {
+            const auto now = std::chrono::high_resolution_clock::now();
+            const auto elapsed = std::chrono::duration<double, std::ratio<1>>(now - m_last).count();
+            m_last = now;
+            m_ticks++;
+            m_elapsed += elapsed;
+            if (m_elapsed > 1)
+            {
+                m_tickDuration = m_elapsed / static_cast<double>(m_ticks);
+                m_ticksPerSecond = static_cast<double>(m_ticks) / m_elapsed;
+                std::cout << "Tick duration " << m_tickDuration << " (" << m_ticksPerSecond << " ticks/s)\n";
+                m_elapsed = 0;
+                m_ticks = 0;
+            }
+        }
+
+        [[nodiscard]] double tickDuration() const { return m_ticks == 0 ? m_tickDuration : m_elapsed / static_cast<double>(m_ticks); }
+
+    private:
+        double m_elapsed{};
+        int m_ticks{};
+
+        double m_tickDuration{};
+        double m_ticksPerSecond{};
+
+        std::chrono::time_point<std::chrono::high_resolution_clock> m_last{};
+    };
+
     class EmulationController final
     {
     public:
@@ -46,15 +83,16 @@ namespace epoch::frontend
 
     public:
         void start();
-        void pause();
+        void suspend();
         void resume();
+        void setSpeed(double speed);
 
     private:
         void run();
 
     private:
         std::shared_ptr<Emulator> m_emulator;
-        std::atomic<bool> m_shouldExit{};
+        bool m_shouldExit{};
 
         bool m_paused{};
 
@@ -63,6 +101,11 @@ namespace epoch::frontend
         std::condition_variable m_conditionVariable;
 
         CircularBuffer<float, 16384> m_audioBuffer{};
+        double m_speed{ 1. };
+
+        ClockTimer m_timer{};
+
+        const double m_frameDuration;
     };
 }
 

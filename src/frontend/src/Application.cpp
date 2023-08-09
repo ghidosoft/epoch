@@ -62,7 +62,7 @@ namespace epoch::frontend
         m_controller->start();
         while (m_window->nextFrame())
         {
-            if (m_running)
+            /*if (m_running)
             {
                 const auto samples = m_audio->neededSamples();
                 if (samples > 0)
@@ -74,7 +74,7 @@ namespace epoch::frontend
                     }
                     m_audio->push(m_audioBuffer);
                 }
-            }
+            }*/
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
@@ -101,12 +101,24 @@ namespace epoch::frontend
                 {
                     if (const auto path = m_platform->openDialog(); !path.empty())
                     {
+                        m_controller->suspend();
                         m_emulator->load(path);
+                        m_controller->resume();
                     }
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Restore test.sna")) { m_emulator->load("test.sna"); }
-                if (ImGui::MenuItem("Take test.sna")) { m_emulator->save("test.sna"); }
+                if (ImGui::MenuItem("Restore test.sna"))
+                {
+                    m_controller->suspend();
+                    m_emulator->load("test.sna");
+                    m_controller->resume();
+                }
+                if (ImGui::MenuItem("Take test.sna"))
+                {
+                    m_controller->suspend();
+                    m_emulator->save("test.sna");
+                    m_controller->resume();
+                }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
                 ImGui::EndMenu();
@@ -114,7 +126,12 @@ namespace epoch::frontend
             if (ImGui::BeginMenu("Emulator"))
             {
                 if (ImGui::MenuItem("Run", nullptr, &m_running)) {}
-                if (ImGui::MenuItem("Reset")) { m_emulator->reset(); }
+                if (ImGui::MenuItem("Reset"))
+                {
+                    m_controller->suspend();
+                    m_emulator->reset();
+                    m_controller->resume();
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))

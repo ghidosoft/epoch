@@ -22,11 +22,11 @@ namespace epoch
 {
     Emulator::Emulator(EmulatorInfo info) : m_info{ std::move(info) }
     {
-        assert(m_info.frameClocks > 0);
+        assert(m_info.clocksPerFrame > 0);
         assert(m_info.width > 0);
         assert(m_info.height > 0);
         assert(m_info.framesPerSecond > 0.0);
-        m_clockDuration = 1.0 / (static_cast<double>(m_info.frameClocks) * m_info.framesPerSecond);
+        m_clockDuration = 1.0 / (static_cast<double>(m_info.clocksPerFrame) * m_info.framesPerSecond);
     }
 
     Emulator::~Emulator() = default;
@@ -39,7 +39,7 @@ namespace epoch
 
     void Emulator::frame()
     {
-        for (std::size_t i = 0; i < m_info.frameClocks; i++)
+        for (std::size_t i = 0; i < m_info.clocksPerFrame; i++)
         {
             clock();
         }

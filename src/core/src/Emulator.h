@@ -29,7 +29,7 @@ namespace epoch
         std::string name;
         int width;
         int height;
-        std::size_t frameClocks;
+        std::size_t clocksPerFrame;
         double framesPerSecond;
     };
 
