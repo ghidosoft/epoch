@@ -14,22 +14,30 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_H_
-#define SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
 
-#include <cstdint>
+#include <cstddef>
 
 namespace epoch::zxspectrum
 {
-    class Z80Interface
-    {
-    public:
-        virtual ~Z80Interface() = default;
-        virtual uint8_t read(uint16_t address) = 0;
-        virtual void write(uint16_t address, uint8_t value) = 0;
-        virtual uint8_t ioRead(uint16_t port) = 0;
-        virtual void ioWrite(uint16_t port, uint8_t value) = 0;
-    };
+    constexpr std::size_t TStatesPerFrame = 69888;
+    constexpr double FramesPerSecond = 50.0;
+
+    constexpr int ScreenWidth = 256;
+    constexpr int ScreenHeight = 192;
+    constexpr int BorderLeft = 48;
+    constexpr int BorderRight = 48;
+    constexpr int BorderTop = 48;
+    constexpr int BorderBottom = 56;
+
+    constexpr int VerticalRetrace = 16;
+    constexpr int HorizontalRetrace = 48;
+
+    constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
+    constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
+
+    constexpr auto AudioInThreshold = 0.2f;
 }
 
 #endif

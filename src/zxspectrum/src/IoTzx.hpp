@@ -14,9 +14,15 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_EPOCH_FRONTEND_H_
-#define INCLUDE_EPOCH_FRONTEND_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
 
-#include "../../src/Application.h"
+#include <istream>
+#include <vector>
+
+namespace epoch::zxspectrum
+{
+    void loadTzx(std::istream& is, std::vector<std::size_t>& pulses);
+}
 
 #endif

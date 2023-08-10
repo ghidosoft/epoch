@@ -21,7 +21,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "Z80Cpu.h"
+#include "Z80Cpu.hpp"
 
 class ZexZ80Interface : public epoch::zxspectrum::Z80Interface
 {

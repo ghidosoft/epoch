@@ -16,8 +16,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/zxspectrum/src/Z80Cpu.h"
-#include "TestZ80Interface.h"
+#include "../../src/zxspectrum/src/Z80Cpu.hpp"
+#include "TestZ80Interface.hpp"
 
 namespace epoch::zxspectrum
 {

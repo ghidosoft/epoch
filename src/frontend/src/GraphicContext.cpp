@@ -14,12 +14,12 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "GraphicContext.h"
+#include "GraphicContext.hpp"
 
 #include <cassert>
 #include <cstdint>
 
-#include "Shader.h"
+#include "Shader.hpp"
 
 static const char* VERTEX_SHADER = R"GLSL(
 #version 330 core

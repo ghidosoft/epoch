@@ -14,19 +14,12 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_H_
-#define SRC_EPOCH_ZXSPECTRUM_IO_H_
+#ifndef INCLUDE_EPOCH_CORE_HPP_
+#define INCLUDE_EPOCH_CORE_HPP_
 
-#include <memory>
-#include <string>
-
-namespace epoch::zxspectrum
-{
-    class TapeInterface;
-    class ZXSpectrumEmulator;
-
-    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator);
-    void save(const std::string& path, const ZXSpectrumEmulator* emulator);
-}
+#include "../../src/Color.hpp"
+#include "../../src/Emulator.hpp"
+#include "../../src/Keyboard.hpp"
+#include "../../src/Palette.hpp"
 
 #endif

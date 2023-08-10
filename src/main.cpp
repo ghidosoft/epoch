@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <epoch/frontend.h>
-#include <epoch/zxspectrum.h>
+#include <epoch/frontend.hpp>
+#include <epoch/zxspectrum.hpp>
 
 int main()
 {

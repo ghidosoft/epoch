@@ -14,14 +14,14 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Gui.h"
+#include "Gui.hpp"
 
 #include <cassert>
 #include <stdexcept>
 
 #include <imgui.h>
 
-#include "Shader.h"
+#include "Shader.hpp"
 
 static const char* IMGUI_VERTEX_SHADER = R"GLSL(
 #version 410 core

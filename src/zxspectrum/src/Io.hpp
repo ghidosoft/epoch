@@ -14,19 +14,19 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IOSNAPSHOT_H_
-#define SRC_EPOCH_ZXSPECTRUM_IOSNAPSHOT_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_IO_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_IO_HPP_
 
-#include <filesystem>
+#include <memory>
+#include <string>
 
 namespace epoch::zxspectrum
 {
+    class TapeInterface;
     class ZXSpectrumEmulator;
 
-    void loadSna(const std::filesystem::path& path, ZXSpectrumEmulator* emulator);
-    void loadZ80(const std::filesystem::path& path, ZXSpectrumEmulator* emulator);
-
-    void saveSna(const std::filesystem::path& path, const ZXSpectrumEmulator* emulator);
+    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator);
+    void save(const std::string& path, const ZXSpectrumEmulator* emulator);
 }
 
 #endif

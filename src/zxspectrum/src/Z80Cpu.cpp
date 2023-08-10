@@ -14,14 +14,14 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Z80Cpu.h"
+#include "Z80Cpu.hpp"
 
 #include <bit>
 #include <cassert>
 #include <optional>
 #include <sstream>
 
-#include "Z80Tables.h"
+#include "Z80Tables.hpp"
 
 // TODO: endianness
 constexpr auto POINTER_OFFSET_HIGH = 1;

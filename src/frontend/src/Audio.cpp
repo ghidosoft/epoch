@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Audio.h"
+#include "Audio.hpp"
 
 #include <cassert>
 #include <iostream>

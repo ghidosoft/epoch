@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Window.h"
+#include "Window.hpp"
 
 #include <iostream>
 #include <stdexcept>

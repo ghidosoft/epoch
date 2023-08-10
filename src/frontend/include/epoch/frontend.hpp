@@ -14,28 +14,9 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_FRONTEND_PLATFORM_H_
-#define SRC_FRONTEND_PLATFORM_H_
+#ifndef INCLUDE_EPOCH_FRONTEND_HPP_
+#define INCLUDE_EPOCH_FRONTEND_HPP_
 
-#include <string>
-
-namespace epoch::frontend
-{
-    class Platform final
-    {
-    public:
-        Platform();
-        ~Platform();
-
-    public:
-        Platform(const Platform& other) = delete;
-        Platform(Platform&& other) noexcept = delete;
-        Platform& operator=(const Platform& other) = delete;
-        Platform& operator=(Platform&& other) noexcept = delete;
-
-    public:
-        [[nodiscard]] std::string openDialog() const;
-    };
-}
+#include "../../src/Application.hpp"
 
 #endif

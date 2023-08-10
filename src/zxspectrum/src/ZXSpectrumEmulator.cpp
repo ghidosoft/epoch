@@ -14,13 +14,13 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "ZXSpectrumEmulator.h"
+#include "ZXSpectrumEmulator.hpp"
 
-#include "Io.h"
-#include "Rom.h"
-#include "TapeInterface.h"
-#include "Ula.h"
-#include "Z80Cpu.h"
+#include "Io.hpp"
+#include "Rom.hpp"
+#include "TapeInterface.hpp"
+#include "Ula.hpp"
+#include "Z80Cpu.hpp"
 
 #include <cstring>
 

@@ -14,26 +14,38 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_CORE_PALETTE_H_
-#define SRC_EPOCH_CORE_PALETTE_H_
+#ifndef SRC_FRONTEND_GUI_HPP_
+#define SRC_FRONTEND_GUI_HPP_
 
-#include <span>
-#include <vector>
+#include <memory>
 
-#include "Color.h"
+#include <glad/glad.h>
 
-namespace epoch
+struct ImGuiContext;
+
+namespace epoch::frontend
 {
-    class Palette final
+    class Shader;
+
+    class Gui final
     {
     public:
-        explicit Palette(std::span<Color> colors);
+        Gui();
+        ~Gui();
 
-        [[nodiscard]] Color map(std::size_t index) const;
-        [[nodiscard]] std::size_t size() const;
+        void newFrame(int width, int height);
+        void render();
+
+        void setCursorPos(float x, float y);
+        void setMouseButton(int button, bool down);
 
     private:
-        std::vector<Color> m_palette{};
+        std::unique_ptr<Shader> m_shader{};
+        GLuint m_vao{};
+        GLuint m_vertexBuffer{}, m_indexBuffer{};
+        GLuint m_fontTexture{};
+
+        ImGuiContext* m_context{};
     };
 }
 

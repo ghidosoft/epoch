@@ -1,5 +1,5 @@
 add_executable(epoch_zxspectrum_test
-    "TestZ80Interface.h"
+    "TestZ80Interface.hpp"
     "Z80Cpu_CB_test.cpp"
     "Z80Cpu_DD_test.cpp"
     "Z80Cpu_ED_test.cpp"

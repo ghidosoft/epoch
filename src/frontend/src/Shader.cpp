@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Shader.h"
+#include "Shader.hpp"
 
 #include <cassert>
 #include <sstream>

@@ -14,12 +14,22 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_EPOCH_CORE_H_
-#define INCLUDE_EPOCH_CORE_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_Z80INTERFACE_HPP_
 
-#include "../../src/Color.h"
-#include "../../src/Emulator.h"
-#include "../../src/Keyboard.h"
-#include "../../src/Palette.h"
+#include <cstdint>
+
+namespace epoch::zxspectrum
+{
+    class Z80Interface
+    {
+    public:
+        virtual ~Z80Interface() = default;
+        virtual uint8_t read(uint16_t address) = 0;
+        virtual void write(uint16_t address, uint8_t value) = 0;
+        virtual uint8_t ioRead(uint16_t port) = 0;
+        virtual void ioWrite(uint16_t port, uint8_t value) = 0;
+    };
+}
 
 #endif

@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "IoTzx.h"
+#include "IoTzx.hpp"
 
 #include <cassert>
 #include <cstring>

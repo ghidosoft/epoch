@@ -1,17 +1,17 @@
 add_library(epoch_zxspectrum
-    "include/epoch/zxspectrum.h"
+    "include/epoch/zxspectrum.hpp"
 
-    "src/Constants.h"
-    "src/Io.cpp" "src/Io.h"
-    "src/IoSnapshot.cpp" "src/IoSnapshot.h"
-    "src/IoTzx.cpp" "src/IoTzx.h"
-    "src/Rom.h"
-    "src/TapeInterface.h"
-    "src/Ula.cpp" "src/Ula.h"
-    "src/Z80Cpu.cpp" "src/Z80Cpu.h"
-    "src/Z80Interface.h"
-    "src/Z80Tables.h"
-    "src/ZXSpectrumEmulator.cpp" "src/ZXSpectrumEmulator.h"
+    "src/Constants.hpp"
+    "src/Io.cpp" "src/Io.hpp"
+    "src/IoSnapshot.cpp" "src/IoSnapshot.hpp"
+    "src/IoTzx.cpp" "src/IoTzx.hpp"
+    "src/Rom.hpp"
+    "src/TapeInterface.hpp"
+    "src/Ula.cpp" "src/Ula.hpp"
+    "src/Z80Cpu.cpp" "src/Z80Cpu.hpp"
+    "src/Z80Interface.hpp"
+    "src/Z80Tables.hpp"
+    "src/ZXSpectrumEmulator.cpp" "src/ZXSpectrumEmulator.hpp"
 )
 
 target_include_directories(epoch_zxspectrum INTERFACE include)

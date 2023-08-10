@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_FRONTEND_SHADER_H_
-#define SRC_FRONTEND_SHADER_H_
+#ifndef SRC_FRONTEND_SHADER_HPP_
+#define SRC_FRONTEND_SHADER_HPP_
 
 #include <map>
 #include <string>

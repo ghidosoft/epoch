@@ -14,16 +14,16 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Application.h"
+#include "Application.hpp"
 
-#include <epoch/core.h>
+#include <epoch/core.hpp>
 #include <imgui.h>
 
-#include "Audio.h"
-#include "GraphicContext.h"
-#include "Gui.h"
-#include "Platform.h"
-#include "Window.h"
+#include "Audio.hpp"
+#include "GraphicContext.hpp"
+#include "Gui.hpp"
+#include "Platform.hpp"
+#include "Window.hpp"
 
 namespace epoch::frontend
 {

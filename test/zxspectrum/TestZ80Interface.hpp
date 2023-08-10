@@ -22,7 +22,7 @@
 #include <cstring>
 #include <span>
 
-#include "../../src/zxspectrum/src/Z80Cpu.h"
+#include "../../src/zxspectrum/src/Z80Cpu.hpp"
 
 namespace epoch::zxspectrum
 {

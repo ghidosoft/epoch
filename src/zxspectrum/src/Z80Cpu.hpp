@@ -14,13 +14,13 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_Z80CPU_H_
-#define SRC_EPOCH_ZXSPECTRUM_Z80CPU_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_Z80CPU_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_Z80CPU_HPP_
 
 #include <array>
 #include <cstdint>
 
-#include "Z80Interface.h"
+#include "Z80Interface.hpp"
 
 namespace epoch::zxspectrum
 {

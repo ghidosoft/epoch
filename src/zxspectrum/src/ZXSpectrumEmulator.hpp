@@ -14,15 +14,15 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_H_
-#define SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
 
 #include <array>
 #include <memory>
 
-#include <epoch/core.h>
+#include <epoch/core.hpp>
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 namespace epoch::zxspectrum
 {

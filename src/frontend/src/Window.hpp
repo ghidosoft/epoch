@@ -14,13 +14,13 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_FRONTEND_WINDOW_H_
-#define SRC_FRONTEND_WINDOW_H_
+#ifndef SRC_FRONTEND_WINDOW_HPP_
+#define SRC_FRONTEND_WINDOW_HPP_
 
 #include <functional>
 #include <string>
 
-#include <epoch/core.h>
+#include <epoch/core.hpp>
 
 struct GLFWwindow;
 

@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_FRONTEND_APPLICATION_H_
-#define SRC_EPOCH_FRONTEND_APPLICATION_H_
+#ifndef SRC_EPOCH_FRONTEND_APPLICATION_HPP_
+#define SRC_EPOCH_FRONTEND_APPLICATION_HPP_
 
 #include <memory>
 #include <vector>

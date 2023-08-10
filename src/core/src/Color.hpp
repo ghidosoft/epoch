@@ -14,38 +14,20 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_FRONTEND_GUI_H_
-#define SRC_FRONTEND_GUI_H_
+#ifndef SRC_EPOCH_CORE_COLOR_HPP_
+#define SRC_EPOCH_CORE_COLOR_HPP_
 
-#include <memory>
+#include <cstdint>
 
-#include <glad/glad.h>
-
-struct ImGuiContext;
-
-namespace epoch::frontend
+namespace epoch
 {
-    class Shader;
-
-    class Gui final
+    union Color
     {
-    public:
-        Gui();
-        ~Gui();
+        uint32_t rgba;
 
-        void newFrame(int width, int height);
-        void render();
-
-        void setCursorPos(float x, float y);
-        void setMouseButton(int button, bool down);
-
-    private:
-        std::unique_ptr<Shader> m_shader{};
-        GLuint m_vao{};
-        GLuint m_vertexBuffer{}, m_indexBuffer{};
-        GLuint m_fontTexture{};
-
-        ImGuiContext* m_context{};
+        Color() : rgba{} {}
+        explicit Color(const uint32_t color) : rgba{ color } {}
+        Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255) : rgba((a << 24) | (b << 16) | (g << 8) | r) {}
     };
 }
 

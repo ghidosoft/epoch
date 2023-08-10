@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_ROM_H_
-#define SRC_EPOCH_ZXSPECTRUM_ROM_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_ROM_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_ROM_HPP_
 
 // 48K rom downloaded from https://mdfs.net/Software/Spectrum/ROMImages/48k.rom
 

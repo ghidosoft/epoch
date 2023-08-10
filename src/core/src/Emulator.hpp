@@ -14,13 +14,13 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_CORE_EMULATOR_H_
-#define SRC_EPOCH_CORE_EMULATOR_H_
+#ifndef SRC_EPOCH_CORE_EMULATOR_HPP_
+#define SRC_EPOCH_CORE_EMULATOR_HPP_
 
 #include <span>
 #include <string>
 
-#include "Keyboard.h"
+#include "Keyboard.hpp"
 
 namespace epoch
 {

@@ -1,14 +1,14 @@
 add_library(epoch_frontend
-    "include/epoch/frontend.h"
+    "include/epoch/frontend.hpp"
 
-    "src/Application.cpp" "src/Application.h"
-    "src/Audio.cpp" "src/Audio.h"
-    "src/CircularBuffer.h"
-    "src/GraphicContext.cpp" "src/GraphicContext.h"
-    "src/Gui.cpp" "src/Gui.h"
-    "src/Platform.cpp" "src/Platform.h"
-    "src/Shader.cpp" "src/Shader.h"
-    "src/Window.cpp" "src/Window.h"
+    "src/Application.cpp" "src/Application.hpp"
+    "src/Audio.cpp" "src/Audio.hpp"
+    "src/CircularBuffer.hpp"
+    "src/GraphicContext.cpp" "src/GraphicContext.hpp"
+    "src/Gui.cpp" "src/Gui.hpp"
+    "src/Platform.cpp" "src/Platform.hpp"
+    "src/Shader.cpp" "src/Shader.hpp"
+    "src/Window.cpp" "src/Window.hpp"
 )
 
 target_include_directories(epoch_frontend INTERFACE include)

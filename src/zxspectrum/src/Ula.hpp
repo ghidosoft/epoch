@@ -14,15 +14,15 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_ULA_H_
-#define SRC_EPOCH_ZXSPECTRUM_ULA_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
 
 #include <array>
 #include <cstdint>
 #include <span>
 
-#include "Constants.h"
-#include "Z80Interface.h"
+#include "Constants.hpp"
+#include "Z80Interface.hpp"
 
 namespace epoch::zxspectrum
 {

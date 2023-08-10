@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_CORE_KEYBOARD_H_
-#define SRC_EPOCH_CORE_KEYBOARD_H_
+#ifndef SRC_EPOCH_CORE_KEYBOARD_HPP_
+#define SRC_EPOCH_CORE_KEYBOARD_HPP_
 
 namespace epoch
 {

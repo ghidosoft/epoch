@@ -14,15 +14,27 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_TZX_H_
-#define SRC_EPOCH_ZXSPECTRUM_IO_TZX_H_
+#ifndef SRC_EPOCH_CORE_PALETTE_HPP_
+#define SRC_EPOCH_CORE_PALETTE_HPP_
 
-#include <istream>
+#include <span>
 #include <vector>
 
-namespace epoch::zxspectrum
+#include "Color.hpp"
+
+namespace epoch
 {
-    void loadTzx(std::istream& is, std::vector<std::size_t>& pulses);
+    class Palette final
+    {
+    public:
+        explicit Palette(std::span<Color> colors);
+
+        [[nodiscard]] Color map(std::size_t index) const;
+        [[nodiscard]] std::size_t size() const;
+
+    private:
+        std::vector<Color> m_palette{};
+    };
 }
 
 #endif

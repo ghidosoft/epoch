@@ -14,9 +14,9 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_EPOCH_ZXSPECTRUM_H_
-#define INCLUDE_EPOCH_ZXSPECTRUM_H_
+#ifndef INCLUDE_EPOCH_ZXSPECTRUM_HPP_
+#define INCLUDE_EPOCH_ZXSPECTRUM_HPP_
 
-#include "../../src/ZXSpectrumEmulator.h"
+#include "../../src/ZXSpectrumEmulator.hpp"
 
 #endif

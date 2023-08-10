@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Platform.h"
+#include "Platform.hpp"
 
 #include <stdexcept>
 

@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_FRONTEND_CIRCULARBUFFER_H_
-#define SRC_FRONTEND_CIRCULARBUFFER_H_
+#ifndef SRC_FRONTEND_CIRCULARBUFFER_HPP_
+#define SRC_FRONTEND_CIRCULARBUFFER_HPP_
 
 #include <array>
 #include <atomic>

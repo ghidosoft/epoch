@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_H_
-#define SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
 
 #include <vector>
 

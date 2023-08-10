@@ -14,21 +14,19 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_CORE_COLOR_H_
-#define SRC_EPOCH_CORE_COLOR_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_IOSNAPSHOT_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_IOSNAPSHOT_HPP_
 
-#include <cstdint>
+#include <filesystem>
 
-namespace epoch
+namespace epoch::zxspectrum
 {
-    union Color
-    {
-        uint32_t rgba;
+    class ZXSpectrumEmulator;
 
-        Color() : rgba{} {}
-        explicit Color(const uint32_t color) : rgba{ color } {}
-        Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 255) : rgba((a << 24) | (b << 16) | (g << 8) | r) {}
-    };
+    void loadSna(const std::filesystem::path& path, ZXSpectrumEmulator* emulator);
+    void loadZ80(const std::filesystem::path& path, ZXSpectrumEmulator* emulator);
+
+    void saveSna(const std::filesystem::path& path, const ZXSpectrumEmulator* emulator);
 }
 
 #endif

@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Io.h"
+#include "Io.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -23,11 +23,11 @@
 #include <fstream>
 #include <vector>
 
-#include "IoSnapshot.h"
-#include "IoTzx.h"
-#include "TapeInterface.h"
-#include "Ula.h"
-#include "ZXSpectrumEmulator.h"
+#include "IoSnapshot.hpp"
+#include "IoTzx.hpp"
+#include "TapeInterface.hpp"
+#include "Ula.hpp"
+#include "ZXSpectrumEmulator.hpp"
 
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())

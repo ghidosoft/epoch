@@ -14,30 +14,28 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_CONSTANTS_H_
-#define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_H_
+#ifndef SRC_FRONTEND_PLATFORM_HPP_
+#define SRC_FRONTEND_PLATFORM_HPP_
 
-#include <cstddef>
+#include <string>
 
-namespace epoch::zxspectrum
+namespace epoch::frontend
 {
-    constexpr std::size_t TStatesPerFrame = 69888;
-    constexpr double FramesPerSecond = 50.0;
+    class Platform final
+    {
+    public:
+        Platform();
+        ~Platform();
 
-    constexpr int ScreenWidth = 256;
-    constexpr int ScreenHeight = 192;
-    constexpr int BorderLeft = 48;
-    constexpr int BorderRight = 48;
-    constexpr int BorderTop = 48;
-    constexpr int BorderBottom = 56;
+    public:
+        Platform(const Platform& other) = delete;
+        Platform(Platform&& other) noexcept = delete;
+        Platform& operator=(const Platform& other) = delete;
+        Platform& operator=(Platform&& other) noexcept = delete;
 
-    constexpr int VerticalRetrace = 16;
-    constexpr int HorizontalRetrace = 48;
-
-    constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
-    constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
-
-    constexpr auto AudioInThreshold = 0.2f;
+    public:
+        [[nodiscard]] std::string openDialog() const;
+    };
 }
 
 #endif

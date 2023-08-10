@@ -14,7 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "Palette.h"
+#include "Palette.hpp"
 
 namespace epoch
 {

@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_Z80TABLES_H_
-#define SRC_EPOCH_ZXSPECTRUM_Z80TABLES_H_
+#ifndef SRC_EPOCH_ZXSPECTRUM_Z80TABLES_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_Z80TABLES_HPP_
 
 #include <cstdint>
 
