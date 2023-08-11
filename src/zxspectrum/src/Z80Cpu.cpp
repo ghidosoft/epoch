@@ -1758,7 +1758,7 @@ namespace epoch::zxspectrum
     void Z80Cpu::outd()
     {
         const auto n = busRead(m_registers.hl);
-        m_registers.hl = m_registers.hl + 1;
+        m_registers.hl = m_registers.hl - 1;
         ioWrite(m_registers.bc, n); // use BC before decrementing B
 
         const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
@@ -1826,6 +1826,9 @@ namespace epoch::zxspectrum
             *m_registersPointers[0][z] = value;
             switch (m_currentPrefix)
             {
+            case Z80OpcodePrefix::none:
+                // nothing
+                break;
             case Z80OpcodePrefix::ix:
                 busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
                 break;
