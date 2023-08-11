@@ -62,7 +62,7 @@ namespace epoch::zxspectrum
         low = GET_BYTE();
         registers.iff1 = registers.iff2 = low & (1 << 2);
         low = GET_BYTE();
-        registers.ir.value |= low;
+        registers.ir = (registers.ir | low);
         GET_WORD_LE();
         registers.af = MAKE_WORD(high, low);
         GET_WORD_LE();
@@ -89,8 +89,8 @@ namespace epoch::zxspectrum
         std::ifstream is(path, std::ios::binary);
         uint8_t high, low;
 
-        registers.af.high(GET_BYTE());
-        registers.af.low(GET_BYTE());
+        registers.af.high = GET_BYTE();
+        registers.af.low = GET_BYTE();
         GET_WORD_LE();
         registers.bc = MAKE_WORD(high, low);
         GET_WORD_LE();
@@ -99,12 +99,12 @@ namespace epoch::zxspectrum
         registers.pc = MAKE_WORD(high, low);
         GET_WORD_LE();
         registers.sp = MAKE_WORD(high, low);
-        registers.ir.high(GET_BYTE());
-        registers.ir.low(GET_BYTE() & 0x7f);
+        registers.ir.high = GET_BYTE();
+        registers.ir.low = GET_BYTE() & 0x7f;
 
         low = GET_BYTE();
         if (low == 0xff) low = 0x01; // Because of compatibility, if byte 12 is 255, it has to be regarded as being 1.
-        registers.ir.value |= (low & 0x01) << 7;
+        registers.ir = (registers.ir | ((low & 0x01) << 7));
         const bool basicSamRomv1 = low & (1 << 4);
         const bool compressedv1 = low & (1 << 5);
         const auto border = static_cast<uint8_t>((low >> 1) & 0b111);
@@ -118,8 +118,8 @@ namespace epoch::zxspectrum
         registers.de2 = MAKE_WORD(high, low);
         GET_WORD_LE();
         registers.hl2 = MAKE_WORD(high, low);
-        registers.af2.high(GET_BYTE());
-        registers.af2.low(GET_BYTE());
+        registers.af2.high = GET_BYTE();
+        registers.af2.low =GET_BYTE();
         GET_WORD_LE();
         registers.iy = MAKE_WORD(high, low);
         GET_WORD_LE();
@@ -198,29 +198,29 @@ namespace epoch::zxspectrum
         const auto& registers = emulator->cpu()->registers();
 
         std::ofstream os(path, std::ios::binary);
-        PUT_BYTE(registers.ir.high());
-        PUT_BYTE(registers.hl2.low());
-        PUT_BYTE(registers.hl2.high());
-        PUT_BYTE(registers.de2.low());
-        PUT_BYTE(registers.de2.high());
-        PUT_BYTE(registers.bc2.low());
-        PUT_BYTE(registers.bc2.high());
-        PUT_BYTE(registers.af2.low());
-        PUT_BYTE(registers.af2.high());
-        PUT_BYTE(registers.hl.low());
-        PUT_BYTE(registers.hl.high());
-        PUT_BYTE(registers.de.low());
-        PUT_BYTE(registers.de.high());
-        PUT_BYTE(registers.bc.low());
-        PUT_BYTE(registers.bc.high());
-        PUT_BYTE(registers.iy.low());
-        PUT_BYTE(registers.iy.high());
-        PUT_BYTE(registers.ix.low());
-        PUT_BYTE(registers.ix.high());
+        PUT_BYTE(registers.ir.high);
+        PUT_BYTE(registers.hl2.low);
+        PUT_BYTE(registers.hl2.high);
+        PUT_BYTE(registers.de2.low);
+        PUT_BYTE(registers.de2.high);
+        PUT_BYTE(registers.bc2.low);
+        PUT_BYTE(registers.bc2.high);
+        PUT_BYTE(registers.af2.low);
+        PUT_BYTE(registers.af2.high);
+        PUT_BYTE(registers.hl.low);
+        PUT_BYTE(registers.hl.high);
+        PUT_BYTE(registers.de.low);
+        PUT_BYTE(registers.de.high);
+        PUT_BYTE(registers.bc.low);
+        PUT_BYTE(registers.bc.high);
+        PUT_BYTE(registers.iy.low);
+        PUT_BYTE(registers.iy.high);
+        PUT_BYTE(registers.ix.low);
+        PUT_BYTE(registers.ix.high);
         PUT_BYTE(registers.iff2 ? (1 << 2) : 0);
-        PUT_BYTE(registers.ir.low());
-        PUT_BYTE(registers.af.low());
-        PUT_BYTE(registers.af.high());
+        PUT_BYTE(registers.ir.low);
+        PUT_BYTE(registers.af.low);
+        PUT_BYTE(registers.af.high);
         auto sp = registers.sp;
         emulator->ula()->write(--sp, registers.pc >> 8);
         emulator->ula()->write(--sp, registers.pc & 0xff);

@@ -45,14 +45,12 @@ namespace epoch::zxspectrum
         struct WordRegister
         {
             WordRegister() = default;
-            WordRegister(const uint16_t v) : value(v) {}
-            uint16_t value{};
-            [[nodiscard]] uint8_t low() const { return value & 0xff; }
-            [[nodiscard]] uint8_t high() const { return (value >> 8) & 0xff; }
-            void low(const uint8_t v) { value = (value & 0xff00) | v; }
-            void high(const uint8_t v) { value = (value & 0x00ff) | static_cast<uint16_t>(v << 8); }
+            WordRegister(const uint16_t v) : low{ static_cast<uint8_t>(v & 0xff) }, high{ static_cast<uint8_t>(v >> 8) } {}
+            uint8_t low{};
+            uint8_t high{};
+            [[nodiscard]] uint16_t value() const { return static_cast<uint16_t>(low) | static_cast<uint16_t>(high << 8); }
 
-            operator uint16_t() const { return value; }
+            operator uint16_t() const { return value(); }
         };
 
         struct WordFlagsRegister : WordRegister
@@ -60,23 +58,23 @@ namespace epoch::zxspectrum
             WordFlagsRegister() = default;
             WordFlagsRegister(const uint16_t v) : WordRegister(v) {}
 
-            [[nodiscard]] bool s() const { return value & Z80Flags::s; }
-            [[nodiscard]] bool z() const { return value & Z80Flags::z; }
-            [[nodiscard]] bool y() const { return value & Z80Flags::y; }
-            [[nodiscard]] bool h() const { return value & Z80Flags::h; }
-            [[nodiscard]] bool x() const { return value & Z80Flags::x; }
-            [[nodiscard]] bool p() const { return value & Z80Flags::p; }
-            [[nodiscard]] bool n() const { return value & Z80Flags::n; }
-            [[nodiscard]] bool c() const { return value & Z80Flags::c; }
+            [[nodiscard]] bool s() const { return low & Z80Flags::s; }
+            [[nodiscard]] bool z() const { return low & Z80Flags::z; }
+            [[nodiscard]] bool y() const { return low & Z80Flags::y; }
+            [[nodiscard]] bool h() const { return low & Z80Flags::h; }
+            [[nodiscard]] bool x() const { return low & Z80Flags::x; }
+            [[nodiscard]] bool p() const { return low & Z80Flags::p; }
+            [[nodiscard]] bool n() const { return low & Z80Flags::n; }
+            [[nodiscard]] bool c() const { return low & Z80Flags::c; }
 
-            void s(const bool f) { value = (value & ~Z80Flags::s) | static_cast<uint16_t>(f << 7); }
-            void z(const bool f) { value = (value & ~Z80Flags::z) | static_cast<uint16_t>(f << 6); }
-            void y(const bool f) { value = (value & ~Z80Flags::y) | static_cast<uint16_t>(f << 5); }
-            void h(const bool f) { value = (value & ~Z80Flags::h) | static_cast<uint16_t>(f << 4); }
-            void x(const bool f) { value = (value & ~Z80Flags::x) | static_cast<uint16_t>(f << 3); }
-            void p(const bool f) { value = (value & ~Z80Flags::p) | static_cast<uint16_t>(f << 2); }
-            void n(const bool f) { value = (value & ~Z80Flags::n) | static_cast<uint16_t>(f << 1); }
-            void c(const bool f) { value = (value & ~Z80Flags::c) | static_cast<uint16_t>(f << 0); }
+            void s(const bool f) { low = (low & ~Z80Flags::s) | static_cast<uint8_t>(f << 7); }
+            void z(const bool f) { low = (low & ~Z80Flags::z) | static_cast<uint8_t>(f << 6); }
+            void y(const bool f) { low = (low & ~Z80Flags::y) | static_cast<uint8_t>(f << 5); }
+            void h(const bool f) { low = (low & ~Z80Flags::h) | static_cast<uint8_t>(f << 4); }
+            void x(const bool f) { low = (low & ~Z80Flags::x) | static_cast<uint8_t>(f << 3); }
+            void p(const bool f) { low = (low & ~Z80Flags::p) | static_cast<uint8_t>(f << 2); }
+            void n(const bool f) { low = (low & ~Z80Flags::n) | static_cast<uint8_t>(f << 1); }
+            void c(const bool f) { low = (low & ~Z80Flags::c) | static_cast<uint8_t>(f << 0); }
         };
 
         // PC Program counter

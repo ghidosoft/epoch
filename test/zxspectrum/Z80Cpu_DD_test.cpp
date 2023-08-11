@@ -179,13 +179,13 @@ namespace epoch::zxspectrum
     TEST(Z80Cpu_DD, Opcode10000101_ADD_IXL) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xdd, 0x85 } };
         Z80Cpu sut{ bus };
-        sut.registers().af.high(0xff);
+        sut.registers().af.high = 0xff;
         sut.registers().ix = 0xcc03;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 2);
         EXPECT_EQ(sut.registers().ir, 2);
         EXPECT_EQ(sut.clockCounter(), 8);
-        EXPECT_EQ(sut.registers().af.high(), 0x02);
+        EXPECT_EQ(sut.registers().af.high, 0x02);
         EXPECT_TRUE(sut.registers().af.c());
         EXPECT_TRUE(sut.registers().af.h());
         EXPECT_FALSE(sut.registers().af.n());

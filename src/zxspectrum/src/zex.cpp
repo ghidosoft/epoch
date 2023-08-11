@@ -1148,15 +1148,15 @@ int main()
         cpu.step();
         if (cpu.registers().pc == 0x0005)
         {
-            const auto c = cpu.registers().bc.low();
+            const auto c = cpu.registers().bc.low;
             if (c == 0x02)
             {
-                std::cout << cpu.registers().de.low();
+                std::cout << cpu.registers().de.low;
                 std::cout.flush();
             }
             else if (c == 0x09)
             {
-                auto address = cpu.registers().de.value;
+                uint16_t address = cpu.registers().de;
                 uint8_t value;
                 while ((value = ram[address++]) != '$')
                 {
