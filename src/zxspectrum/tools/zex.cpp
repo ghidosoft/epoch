@@ -21,30 +21,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "../src/Z80Cpu.hpp"
-
-class ZexZ80Interface : public epoch::zxspectrum::Z80Interface
-{
-public:
-    explicit ZexZ80Interface(std::array<uint8_t, 0x10000>& ram) : m_ram{ ram.data()}
-    {
-    }
-
-    uint8_t read(const uint16_t address) override
-    {
-        return m_ram[address];
-    }
-    void write(const uint16_t address, const uint8_t value) override
-    {
-        m_ram[address] = value;
-    }
-
-    uint8_t ioRead(uint16_t port) override { return 0; }
-    void ioWrite(uint16_t port, uint8_t value) override {}
-
-private:
-    uint8_t *m_ram;
-};
+#include "utils.hpp"
 
 // Source: https://mdfs.net/Software/Z80/Exerciser/
 
@@ -1140,7 +1117,7 @@ int main()
     ram[0x0007] = 0xe4;
     ram[0xe400] = 0xc9; // RET
     std::memcpy(ram.data() + 0x0100, ZEX_ROM, sizeof(ZEX_ROM));
-    ZexZ80Interface interface { ram };
+    RamZ80Interface interface { ram };
     epoch::zxspectrum::Z80Cpu cpu{ interface };
     cpu.reset();
     cpu.registers().pc = 0x0100;
