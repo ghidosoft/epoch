@@ -18,7 +18,6 @@
 
 #include <bit>
 #include <cassert>
-#include <optional>
 #include <sstream>
 
 #include "Z80Tables.hpp"
@@ -159,7 +158,7 @@ namespace epoch::zxspectrum
             break;
         case 2:
             push16(m_registers.pc);
-            m_registers.pc = read16(m_registers.ir.high << 8);
+            m_registers.pc = read16(static_cast<uint16_t>(m_registers.ir.high << 8));
             break;
         default:
             assert(false);
