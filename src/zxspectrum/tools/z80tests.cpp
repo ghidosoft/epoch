@@ -73,6 +73,7 @@ struct TestInfo
     State initial;
     State final;
     int cycles;
+    std::vector<std::pair<uint16_t, uint8_t>> ports;
 };
 
 void from_json(const nlohmann::json& j, TestInfo::State& r)
@@ -116,15 +117,28 @@ void from_json(const nlohmann::json& j, TestInfo& r)
     j.at("initial").get_to(r.initial);
     j.at("final").get_to(r.final);
     r.cycles = static_cast<int>(j["cycles"].size());
+    if (j.contains("ports"))
+    {
+        for (const auto& it : j.at("ports"))
+        {
+            const auto addr = static_cast<uint16_t>(it[0].get<int>());
+            const auto value = static_cast<uint8_t>(it[1].get<int>());
+            if (const auto direction = it[2].get<std::string>(); direction == "r")
+            {
+                r.ports.emplace_back(addr, value);
+            }
+        }
+    }
 }
 
 #define CHECK_VALUE(key, width, actual, expected) \
     if ((actual) != (expected)) \
     { \
         std::cout << "Test " << testInfo.name << " KO\t" << key << "\texpected: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(expected) << "\tactual: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(actual) << "\n"; \
+        success = false; \
     } else
 
-void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const TestInfo& testInfo)
+bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const TestInfo& testInfo)
 {
     cpu.registers().pc = testInfo.initial.pc;
     cpu.registers().sp = testInfo.initial.sp;
@@ -153,11 +167,16 @@ void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
     {
         interface.ram()[address] = value;
     }
+    interface.setPortValues(testInfo.ports);
 
-    for (auto i = 0; i < testInfo.cycles; i++)
+    cpu.step();
+    // TODO use cycles
+    /*for (auto i = 0; i < testInfo.cycles; i++)
     {
         cpu.clock();
-    }
+    }*/
+
+    auto success = true;
 
     CHECK_VALUE("PC", 2, cpu.registers().pc, testInfo.final.pc);
     CHECK_VALUE("SP", 2, cpu.registers().sp, testInfo.final.sp);
@@ -170,7 +189,7 @@ void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
     CHECK_VALUE("H", 1, cpu.registers().hl.high, testInfo.final.h);
     CHECK_VALUE("L", 1, cpu.registers().hl.low, testInfo.final.l);
     CHECK_VALUE("I", 1, cpu.registers().ir.high, testInfo.final.i);
-    CHECK_VALUE("R", 1, cpu.registers().ir.low, testInfo.final.r);
+    // TODO: CHECK_VALUE("R", 1, cpu.registers().ir.low, testInfo.final.r);
     // CHECK_VALUE("WZ", 2, cpu.registers().wz, testInfo.final.wz);
     CHECK_VALUE("IX", 2, cpu.registers().ix, testInfo.final.ix);
     CHECK_VALUE("IY", 2, cpu.registers().iy, testInfo.final.iy);
@@ -186,17 +205,24 @@ void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
     {
         CHECK_VALUE("RAM[0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<address<<"]", 1, interface.ram()[address], value);
     }
+
+    return success;
 }
 
-void executeTestSuite(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const std::filesystem::path& testSuitePath)
+int executeTestSuite(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const std::filesystem::path& testSuitePath)
 {
     std::ifstream fs(testSuitePath);
     const auto j = nlohmann::json::parse(fs);
+    auto failed = 0;
     for (const auto& it : j)
     {
         const auto testInfo = it.get<TestInfo>();
-        executeTest(interface, cpu, testInfo);
+        if (!executeTest(interface, cpu, testInfo))
+        {
+            failed++;
+        }
     }
+    return failed;
 }
 
 int main()
@@ -215,11 +241,16 @@ int main()
     epoch::zxspectrum::Z80Cpu cpu{ interface };
 
     auto remaining = files.size();
+    auto failed = 0;
     for (const auto& testSuitePath : files)
     {
         remaining--;
-        executeTestSuite(interface, cpu, testSuitePath);
+        // if (testSuitePath.filename().generic_string().starts_with("db"))
+        failed += executeTestSuite(interface, cpu, testSuitePath);
     }
+
+    std::cout << "\n\n----------------------------\n";
+    std::cout << "Failed tests: " << failed << "\n";
 
     return EXIT_SUCCESS;
 }

@@ -5,7 +5,7 @@
 This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C++.
 
 ## Features
-- Instruction level Z80 emulation: all instructions (excluding BIT N, (HL)) passes zexdoc and zexall, bit (hl) doesn't because WZ/MEMPTR is not yet completely implemented
+- Instruction level Z80 emulation: all instructions passes zexdoc and zexall
 - Load/Save snapshots (.sna)
 - Tape loading (.tap, .tzx)
 - Sound

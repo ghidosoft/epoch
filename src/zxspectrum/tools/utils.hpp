@@ -19,6 +19,8 @@
 
 #include <cassert>
 #include <span>
+#include <utility>
+#include <vector>
 
 #include "../src/Z80Cpu.hpp"
 
@@ -41,13 +43,24 @@ public:
         m_ram[address] = value;
     }
 
-    uint8_t ioRead(uint16_t port) override { return 0; }
+    uint8_t ioRead(const uint16_t port) override
+    {
+        for (const auto& [address, value] : m_portValues)
+        {
+            if (port == address)
+                return value;
+        }
+        return 0x00;
+    }
     void ioWrite(uint16_t port, uint8_t value) override {}
 
     std::span<uint8_t> ram() { return m_ram; }
 
+    void setPortValues(std::span<const std::pair<uint16_t, uint8_t>> ports) { m_portValues.assign(ports.begin(), ports.end()); }
+
 private:
     std::array<uint8_t, 0x10000> m_ram;
+    std::vector<std::pair<uint16_t, uint8_t>> m_portValues;
 };
 
 #endif
