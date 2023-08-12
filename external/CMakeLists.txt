@@ -1,10 +1,9 @@
 include(FetchContent)
 
 FetchContent_Declare(
-  glfw
-  GIT_REPOSITORY    https://github.com/glfw/glfw.git
-  GIT_TAG           3.3.8
-  GIT_SHALLOW       TRUE
+    glfw
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/glfw/glfw/archive/3.3.8.zip
 )
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
@@ -15,18 +14,18 @@ FetchContent_MakeAvailable(glfw)
 add_subdirectory(glad)
 
 FetchContent_Declare(
-  googletest
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.zip
+    googletest
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/google/googletest/archive/refs/tags/v1.13.0.zip
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(
-  imgui
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL https://github.com/ocornut/imgui/archive/v1.89.7.zip
+    imgui
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/ocornut/imgui/archive/v1.89.7.zip
 )
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
@@ -41,17 +40,17 @@ if(NOT imgui_POPULATED)
 endif()
 
 FetchContent_Declare(
-  nfd
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL https://github.com/btzy/nativefiledialog-extended/archive/v1.1.0.zip
+    nfd
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/btzy/nativefiledialog-extended/archive/v1.1.0.zip
 )
 set(NFD_PORTAL ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(nfd)
 
 FetchContent_Declare(
-  portaudio
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  URL https://github.com/PortAudio/portaudio/archive/v19.7.0.zip
+    portaudio
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/PortAudio/portaudio/archive/v19.7.0.zip
 )
 set(PA_BUILD_SHARED OFF CACHE BOOL "Build PortAudio shared library" FORCE)
 FetchContent_MakeAvailable(portaudio)
