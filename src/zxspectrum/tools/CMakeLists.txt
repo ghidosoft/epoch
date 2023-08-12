@@ -1,0 +1,7 @@
+add_executable(epoch_zxspectrum_zexall zex.cpp)
+target_link_libraries(epoch_zxspectrum_zexall PUBLIC Epoch::ZXSpectrum)
+target_compile_definitions(epoch_zxspectrum_zexall PUBLIC ZEX_ROM=zexall)
+
+add_executable(epoch_zxspectrum_zexdoc zex.cpp)
+target_link_libraries(epoch_zxspectrum_zexdoc PUBLIC Epoch::ZXSpectrum)
+target_compile_definitions(epoch_zxspectrum_zexdoc PUBLIC ZEX_ROM=zexdoc)

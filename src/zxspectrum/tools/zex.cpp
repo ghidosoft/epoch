@@ -21,7 +21,7 @@
 #include <cstring>
 #include <iostream>
 
-#include "Z80Cpu.hpp"
+#include "../src/Z80Cpu.hpp"
 
 class ZexZ80Interface : public epoch::zxspectrum::Z80Interface
 {
@@ -1127,8 +1127,10 @@ static const uint8_t zexall[] = {
   0x0c, 0x8e, 0xa1, 0x5a, 0x05, 0xdf, 0x1b, 0x2d, 0x02, 0xef, 0x8d
 };
 
-// #define ROM zexdoc
-#define ROM zexall
+#ifndef ZEX_ROM
+// #define ZEX_ROM zexdoc
+#define ZEX_ROM zexall
+#endif
 
 int main()
 {
@@ -1137,7 +1139,7 @@ int main()
     ram[0x0006] = 0x00;
     ram[0x0007] = 0xe4;
     ram[0xe400] = 0xc9; // RET
-    std::memcpy(ram.data() + 0x0100, ROM, sizeof(ROM));
+    std::memcpy(ram.data() + 0x0100, ZEX_ROM, sizeof(ZEX_ROM));
     ZexZ80Interface interface { ram };
     epoch::zxspectrum::Z80Cpu cpu{ interface };
     cpu.reset();

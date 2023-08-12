@@ -67,7 +67,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ubuntu_zex_binary
-        path: build/src/zxspectrum/epoch_zxspectrum_zex
+        path: build/src/zxspectrum/tools/epoch_zxspectrum_zexall
         retention-days: 2
 
   zexall:
@@ -81,7 +81,7 @@ jobs:
 
       # See https://github.com/actions/upload-artifact/issues/38
       - name: Restore permissions
-        run: chmod +x epoch_zxspectrum_zex
+        run: chmod +x epoch_zxspectrum_zexall
       - name: Run Z80 Excerciser tests
-        run: ./epoch_zxspectrum_zex
-        # run: ./epoch_zxspectrum_zex | tee zex.txt
+        run: ./epoch_zxspectrum_zexall
+        # run: ./epoch_zxspectrum_zexall | tee zex.txt
