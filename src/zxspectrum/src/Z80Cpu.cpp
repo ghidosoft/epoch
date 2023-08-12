@@ -869,9 +869,9 @@ namespace epoch::zxspectrum
             const uint8_t result = value & (1 << y);
             m_registers.af.s(result & Z80Flags::s);
             m_registers.af.z(!result);
-            m_registers.af.y(result & Z80Flags::y);
+            m_registers.af.y(value & Z80Flags::y);
             m_registers.af.h(true);
-            m_registers.af.x(result & Z80Flags::x);
+            m_registers.af.x(value & Z80Flags::x);
             m_registers.af.p(!result);
             m_registers.af.n(false);
             if (m_currentPrefix != Z80OpcodePrefix::none || z == 0b110)
