@@ -121,7 +121,7 @@ void from_json(const nlohmann::json& j, TestInfo& r)
 #define CHECK_VALUE(key, width, actual, expected) \
     if ((actual) != (expected)) \
     { \
-        std::cout << "Test " << testInfo.name << " KO: " << key << "\texpected: " << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(expected) << " - actual: " << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(actual) << "\n"; \
+        std::cout << "Test " << testInfo.name << " KO\t" << key << "\texpected: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(expected) << "\tactual: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(actual) << "\n"; \
     } else
 
 void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const TestInfo& testInfo)
@@ -184,7 +184,7 @@ void executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
 
     for (const auto& [address, value] : testInfo.final.ram)
     {
-        CHECK_VALUE("RAM["<<std::hex<<std::setw(4)<<std::setfill('0')<<address<<"]", 2, interface.ram()[address], value);
+        CHECK_VALUE("RAM[0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<address<<"]", 1, interface.ram()[address], value);
     }
 }
 
