@@ -1694,9 +1694,8 @@ namespace epoch::zxspectrum
     void Z80Cpu::ini()
     {
         m_remainingCycles++;
-        const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
         const auto n = ioRead(m_registers.bc); // use BC before decrementing B
-        m_registers.bc.high = b;
+        const auto b = --m_registers.bc.high;
         const auto c = m_registers.bc.low;
 
         busWrite(m_registers.hl, n);
@@ -1716,9 +1715,8 @@ namespace epoch::zxspectrum
     void Z80Cpu::ind()
     {
         m_remainingCycles++;
-        const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
         const auto n = ioRead(m_registers.bc); // use BC before decrementing B
-        m_registers.bc.high = b;
+        const auto b = --m_registers.bc.high;
         const auto c = m_registers.bc.low;
 
         busWrite(m_registers.hl, n);
@@ -1741,8 +1739,7 @@ namespace epoch::zxspectrum
         const auto n = busRead(m_registers.hl);
         m_registers.hl = m_registers.hl + 1;
 
-        const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
-        m_registers.bc.high = b;
+        const auto b = --m_registers.bc.high;
         ioWrite(m_registers.bc, n); // use BC after decrementing B
         const auto l = m_registers.hl.low;
 
@@ -1763,8 +1760,7 @@ namespace epoch::zxspectrum
         const auto n = busRead(m_registers.hl);
         m_registers.hl = m_registers.hl - 1;
 
-        const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
-        m_registers.bc.high = b;
+        const auto b = --m_registers.bc.high;
         ioWrite(m_registers.bc, n); // use BC after decrementing B
         const auto l = m_registers.hl.low;
 
