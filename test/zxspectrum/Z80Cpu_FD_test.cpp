@@ -64,6 +64,34 @@ namespace epoch::zxspectrum
         EXPECT_FALSE(sut.registers().af.n());
     }
 
+    TEST(Z80Cpu_FD, Opcode00110100_INC_IYd) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xfd, 0x34, 0x00 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x5678] = 0x25;
+        sut.registers().iy = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 3);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 23);
+        EXPECT_EQ(sut.registers().iy, 0x5678);
+        EXPECT_EQ(sut.registers().af.low, 0x21);
+        EXPECT_EQ(bus.ram(0x5678), 0x26);
+    }
+
+    TEST(Z80Cpu_FD, Opcode00110110_LD_IYd_n) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xfd, 0x36, 0x00, 0x95 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x5678] = 0x25;
+        sut.registers().iy = 0x5678;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 19);
+        EXPECT_EQ(sut.registers().iy, 0x5678);
+        EXPECT_EQ(sut.registers().af.low, 0xff);
+        EXPECT_EQ(bus.ram(0x5678), 0x95);
+    }
+
     TEST(Z80Cpu_FD, Opcode00111001_ADD_IY_SP) {
         TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xfd, 0x39 } };
         Z80Cpu sut{ bus };

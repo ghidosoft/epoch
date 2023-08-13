@@ -386,13 +386,13 @@ namespace epoch::zxspectrum
                     break;
                 case Z80OpcodePrefix::ix:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
-                    m_remainingCycles += 5;
+                    m_remainingCycles += 6;
                     n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
                     busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), n + 1);
                     break;
                 case Z80OpcodePrefix::iy:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
-                    m_remainingCycles += 5;
+                    m_remainingCycles += 6;
                     n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
                     busWrite(m_registers.wz= static_cast<uint16_t>(m_registers.iy + d), n + 1);
                     break;
@@ -424,13 +424,13 @@ namespace epoch::zxspectrum
                     break;
                 case Z80OpcodePrefix::ix:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
-                    m_remainingCycles += 5;
+                    m_remainingCycles += 6;
                     n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d));
                     busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), n - 1);
                     break;
                 case Z80OpcodePrefix::iy:
                     d = static_cast<int8_t>(busRead(m_registers.pc++));
-                    m_remainingCycles += 5;
+                    m_remainingCycles += 6;
                     n = busRead(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d));
                     busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), n - 1);
                     break;
@@ -460,7 +460,7 @@ namespace epoch::zxspectrum
                     {
                         const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                         const auto value = busRead(m_registers.pc++);
-                        // m_remainingCycles += 5;
+                        m_remainingCycles += 2;
                         busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.ix + d), value);
                         break;
                     }
@@ -468,7 +468,7 @@ namespace epoch::zxspectrum
                     {
                         const auto d = static_cast<int8_t>(busRead(m_registers.pc++));
                         const auto value = busRead(m_registers.pc++);
-                        // m_remainingCycles += 5;
+                        m_remainingCycles += 2;
                         busWrite(m_registers.wz = static_cast<uint16_t>(m_registers.iy + d), value);
                         break;
                     }

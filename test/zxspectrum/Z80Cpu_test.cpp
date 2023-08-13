@@ -79,7 +79,6 @@ namespace epoch::zxspectrum
         sut.step();
         sut.step();
         sut.step();
-
         EXPECT_EQ(sut.registers().pc, 8);
         EXPECT_EQ(sut.registers().ir, 8);
         EXPECT_EQ(sut.clockCounter(), 32);
