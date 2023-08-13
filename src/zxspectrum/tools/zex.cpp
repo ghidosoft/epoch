@@ -1111,6 +1111,8 @@ static const uint8_t zexall[] = {
 
 int main()
 {
+    constexpr std::string_view errorNeedle{ "ERROR" };
+    constexpr std::string_view okNeedle{ "OK" };
     std::array<uint8_t, 0x10000> ram{};
     ram[0x0005] = 0xc3; // JP $E400
     ram[0x0006] = 0x00;
@@ -1122,6 +1124,7 @@ int main()
     cpu.reset();
     cpu.registers().pc = 0x0100;
     const auto startTime = std::chrono::high_resolution_clock::now();
+    auto failed = 0, success = 0;
     do
     {
         cpu.step();
@@ -1140,6 +1143,20 @@ int main()
                 while ((value = ram[address++]) != '$')
                 {
                     if (value != '\r') std::cout << value;
+                    if (address + okNeedle.size() <= ram.size())
+                    {
+                        if (std::memcmp(okNeedle.data(), &ram[address], okNeedle.size()) == 0)
+                        {
+                            success++;
+                        }
+                    }
+                    if (address + errorNeedle.size() <= ram.size())
+                    {
+                        if (std::memcmp(errorNeedle.data(), &ram[address], errorNeedle.size()) == 0)
+                        {
+                            failed++;
+                        }
+                    }
                 }
                 std::cout.flush();
             }
@@ -1153,9 +1170,11 @@ int main()
     const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
     const auto durationSec = static_cast<double>(duration.count()) / 1e6;
     std::cout << std::endl;
-    std::cout << "=======================================" << std::endl;
-    std::cout << "Duration:     " << durationSec << " s" << std::endl;
-    std::cout << "Clock cycles: " << cpu.clockCounter() << std::endl;
-    std::cout << "Frequency:    " << static_cast<double>(cpu.clockCounter()) / durationSec * 1e-6 << " MHz" << std::endl;
-    return EXIT_SUCCESS;
+    std::cout << "=======================================\n";
+    std::cout << "OK tests:     " << success << "\n";
+    std::cout << "Failed tests: " << failed << "\n";
+    std::cout << "Duration:     " << durationSec << " s\n";
+    std::cout << "Clock cycles: " << cpu.clockCounter() << "\n";
+    std::cout << "Frequency:    " << static_cast<double>(cpu.clockCounter()) / durationSec * 1e-6 << " MHz\n";
+    return failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }
