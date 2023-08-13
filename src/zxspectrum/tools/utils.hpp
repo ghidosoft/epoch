@@ -19,7 +19,7 @@
 
 #include <cassert>
 #include <span>
-#include <utility>
+#include <stdexcept>
 #include <vector>
 
 #include "../src/Z80Cpu.hpp"
@@ -27,6 +27,13 @@
 class RamZ80Interface : public epoch::zxspectrum::Z80Interface
 {
 public:
+    struct IoOperation
+    {
+        uint16_t port;
+        uint8_t value;
+        bool write;
+    };
+
     RamZ80Interface() = default;
     explicit RamZ80Interface(const std::span<uint8_t> ram)
     {
@@ -45,22 +52,33 @@ public:
 
     uint8_t ioRead(const uint16_t port) override
     {
-        for (const auto& [address, value] : m_portValues)
-        {
-            if (port == address)
-                return value;
-        }
-        return 0x00;
+        if (m_nextIoOperation >= m_ioOperations.size()) throw std::runtime_error("Unexpected IO operation");
+        const auto& op = m_ioOperations[m_nextIoOperation++];
+        if (op.write) throw std::runtime_error("Invalid IO operation (should be read)");
+        if (op.port != port) throw std::runtime_error("Invalid IO read operation port, expected=" + std::to_string(op.port) + " actual=" + std::to_string(port));
+        return op.value;
     }
-    void ioWrite(uint16_t port, uint8_t value) override {}
+    void ioWrite(const uint16_t port, const uint8_t value) override
+    {
+        if (m_nextIoOperation >= m_ioOperations.size()) throw std::runtime_error("Unexpected IO operation");
+        const auto& op = m_ioOperations[m_nextIoOperation++];
+        if (!op.write) throw std::runtime_error("Invalid IO operation (should be write)");
+        if (op.port != port) throw std::runtime_error("Invalid IO write operation port, expected=" + std::to_string(op.port) + " actual=" + std::to_string(port));
+        if (op.value != value) throw std::runtime_error("Invalid IO write operation value, expected=" + std::to_string(op.value) + " actual=" + std::to_string(value));
+    }
 
     std::span<uint8_t> ram() { return m_ram; }
 
-    void setPortValues(std::span<const std::pair<uint16_t, uint8_t>> ports) { m_portValues.assign(ports.begin(), ports.end()); }
+    void setIoOperations(std::span<const IoOperation> ioOperations)
+    {
+        m_ioOperations.assign(ioOperations.begin(), ioOperations.end());
+        m_nextIoOperation = 0;
+    }
 
 private:
     std::array<uint8_t, 0x10000> m_ram;
-    std::vector<std::pair<uint16_t, uint8_t>> m_portValues;
+    std::vector<IoOperation> m_ioOperations;
+    std::size_t m_nextIoOperation{};
 };
 
 #endif

@@ -14,6 +14,7 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -73,7 +74,7 @@ struct TestInfo
     State initial;
     State final;
     int cycles;
-    std::vector<std::pair<uint16_t, uint8_t>> ports;
+    std::vector<RamZ80Interface::IoOperation> ports;
 };
 
 void from_json(const nlohmann::json& j, TestInfo::State& r)
@@ -123,10 +124,8 @@ void from_json(const nlohmann::json& j, TestInfo& r)
         {
             const auto addr = static_cast<uint16_t>(it[0].get<int>());
             const auto value = static_cast<uint8_t>(it[1].get<int>());
-            if (const auto direction = it[2].get<std::string>(); direction == "r")
-            {
-                r.ports.emplace_back(addr, value);
-            }
+            const auto direction = it[2].get<std::string>();
+            r.ports.emplace_back(addr, value, direction == "w");
         }
     }
 }
@@ -140,6 +139,8 @@ void from_json(const nlohmann::json& j, TestInfo& r)
 
 bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const TestInfo& testInfo)
 {
+    cpu.reset();
+
     cpu.registers().pc = testInfo.initial.pc;
     cpu.registers().sp = testInfo.initial.sp;
     cpu.registers().af.high = testInfo.initial.a;
@@ -167,16 +168,23 @@ bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
     {
         interface.ram()[address] = value;
     }
-    interface.setPortValues(testInfo.ports);
-
-    cpu.step();
-    // TODO use cycles
-    /*for (auto i = 0; i < testInfo.cycles; i++)
-    {
-        cpu.clock();
-    }*/
-
+    interface.setIoOperations(testInfo.ports);
     auto success = true;
+
+    try
+    {
+        // cpu.step();
+        // TODO use cycles
+        for (auto i = 0; i < testInfo.cycles; i++)
+        {
+            cpu.clock();
+        }
+    }
+    catch (std::runtime_error& err)
+    {
+        std::cout << "Test " << testInfo.name << " KO\t" << err.what() << "\n";
+        success = false;
+    }
 
     CHECK_VALUE("PC", 2, cpu.registers().pc, testInfo.final.pc);
     CHECK_VALUE("SP", 2, cpu.registers().sp, testInfo.final.sp);
@@ -240,17 +248,24 @@ int main()
     RamZ80Interface interface;
     epoch::zxspectrum::Z80Cpu cpu{ interface };
 
+    const auto startTime = std::chrono::high_resolution_clock::now();
+
     auto remaining = files.size();
     auto failed = 0;
     for (const auto& testSuitePath : files)
     {
         remaining--;
-        // if (testSuitePath.filename().generic_string().starts_with("db"))
+        // if (testSuitePath.filename().generic_string().starts_with("de"))
         failed += executeTestSuite(interface, cpu, testSuitePath);
     }
 
-    std::cout << "\n\n----------------------------\n";
-    std::cout << "Failed tests: " << failed << "\n";
+    const auto stopTime = std::chrono::high_resolution_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
+    const auto durationSec = static_cast<double>(duration.count()) / 1e6;
+    std::cout << "\n";
+    std::cout << "=======================================\n";
+    std::cout << "Duration:     " << durationSec << " s\n";
+    std::cout << "Failed tests: " << std::dec << failed << "\n";
 
     return EXIT_SUCCESS;
 }
