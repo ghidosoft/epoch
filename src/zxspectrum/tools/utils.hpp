@@ -29,6 +29,8 @@ class RamZ80Interface : public epoch::zxspectrum::Z80Interface
 public:
     struct IoOperation
     {
+        IoOperation() = default;
+        IoOperation(const uint16_t port, const uint8_t value, const bool write) : port(port), value(value), write(write) {}
         uint16_t port;
         uint8_t value;
         bool write;
