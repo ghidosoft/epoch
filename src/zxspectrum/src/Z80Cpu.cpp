@@ -128,7 +128,7 @@ namespace epoch::zxspectrum
             mainQuadrant3();
         }
 
-        if (m_opcode != 0xfb && m_registers.interruptJustEnabled)
+        if (m_registers.interruptJustEnabled && m_opcode != 0xfb)
         {
             m_registers.interruptJustEnabled = false;
         }
@@ -1693,11 +1693,12 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::ini()
     {
+        m_remainingCycles++;
         const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
+        const auto n = ioRead(m_registers.bc); // use BC before decrementing B
         m_registers.bc.high = b;
         const auto c = m_registers.bc.low;
 
-        const auto n = ioRead(m_registers.bc); // use BC after decrementing B
         busWrite(m_registers.hl, n);
         m_registers.hl = m_registers.hl + 1;
 
@@ -1714,11 +1715,12 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::ind()
     {
+        m_remainingCycles++;
         const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
+        const auto n = ioRead(m_registers.bc); // use BC before decrementing B
         m_registers.bc.high = b;
         const auto c = m_registers.bc.low;
 
-        const auto n = ioRead(m_registers.bc); // use BC after decrementing B
         busWrite(m_registers.hl, n);
         m_registers.hl = m_registers.hl - 1;
 
@@ -1735,12 +1737,13 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::outi()
     {
+        m_remainingCycles++;
         const auto n = busRead(m_registers.hl);
         m_registers.hl = m_registers.hl + 1;
-        ioWrite(m_registers.bc, n); // use BC before decrementing B
 
         const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
         m_registers.bc.high = b;
+        ioWrite(m_registers.bc, n); // use BC after decrementing B
         const auto l = m_registers.hl.low;
 
         m_registers.af.low =
@@ -1756,12 +1759,13 @@ namespace epoch::zxspectrum
 
     void Z80Cpu::outd()
     {
+        m_remainingCycles++;
         const auto n = busRead(m_registers.hl);
         m_registers.hl = m_registers.hl - 1;
-        ioWrite(m_registers.bc, n); // use BC before decrementing B
 
         const auto b = static_cast<uint8_t>(m_registers.bc.high - 1);
         m_registers.bc.high = b;
+        ioWrite(m_registers.bc, n); // use BC after decrementing B
         const auto l = m_registers.hl.low;
 
         m_registers.af.low =
