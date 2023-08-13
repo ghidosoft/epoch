@@ -173,8 +173,6 @@ bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
 
     try
     {
-        // cpu.step();
-        // TODO use cycles
         for (auto i = 0; i < testInfo.cycles; i++)
         {
             cpu.clock();
@@ -197,8 +195,8 @@ bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
     CHECK_VALUE("H", 1, cpu.registers().hl.high, testInfo.final.h);
     CHECK_VALUE("L", 1, cpu.registers().hl.low, testInfo.final.l);
     CHECK_VALUE("I", 1, cpu.registers().ir.high, testInfo.final.i);
-    // TODO: CHECK_VALUE("R", 1, cpu.registers().ir.low, testInfo.final.r);
-    // CHECK_VALUE("WZ", 2, cpu.registers().wz, testInfo.final.wz);
+    CHECK_VALUE("R", 1, cpu.registers().ir.low, testInfo.final.r);
+    // TODO: CHECK_VALUE("WZ", 2, cpu.registers().wz, testInfo.final.wz);
     CHECK_VALUE("IX", 2, cpu.registers().ix, testInfo.final.ix);
     CHECK_VALUE("IY", 2, cpu.registers().iy, testInfo.final.iy);
     CHECK_VALUE("AF2", 2, cpu.registers().af2, testInfo.final.af_);

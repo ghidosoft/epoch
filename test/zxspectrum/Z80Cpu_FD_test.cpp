@@ -296,6 +296,7 @@ namespace epoch::zxspectrum
         sut.registers().iy = 0x00ff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 2);
         EXPECT_EQ(sut.clockCounter(), 20);
         EXPECT_EQ(sut.registers().af, 0xff55);
         EXPECT_EQ(sut.registers().iy, 0x00ff);
@@ -308,6 +309,7 @@ namespace epoch::zxspectrum
         sut.registers().iy = 0x00ff;
         sut.step();
         EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 2);
         EXPECT_EQ(sut.clockCounter(), 23);
         EXPECT_EQ(sut.registers().af, 0xffa4);
         EXPECT_EQ(sut.registers().iy, 0x00ff);
@@ -315,5 +317,21 @@ namespace epoch::zxspectrum
         sut.step();
         EXPECT_EQ(sut.registers().af, 0xff2d);
         EXPECT_EQ(bus.ram(0x0100), 0x69);
+    }
+
+    TEST(Z80Cpu_FD, OpcodeCB_RLC_IYd_B) {
+        TestZ80Interface bus{ std::initializer_list<uint8_t>{ 0xfd, 0xcb, 0x00, 0x00 } };
+        Z80Cpu sut{ bus };
+        bus.ram()[0x0100] = 0x38;
+        sut.registers().bc = 0x0000;
+        sut.registers().iy = 0x0100;
+        sut.step();
+        EXPECT_EQ(sut.registers().pc, 4);
+        EXPECT_EQ(sut.registers().ir, 2);
+        EXPECT_EQ(sut.clockCounter(), 23);
+        EXPECT_EQ(sut.registers().af, 0xff20);
+        EXPECT_EQ(sut.registers().bc, 0x7000);
+        EXPECT_EQ(sut.registers().iy, 0x0100);
+        EXPECT_EQ(bus.ram(0x0100), 0x70);
     }
 }

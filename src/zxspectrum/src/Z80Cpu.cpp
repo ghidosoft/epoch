@@ -169,9 +169,14 @@ namespace epoch::zxspectrum
     uint8_t Z80Cpu::fetchOpcode()
     {
         const auto r = m_registers.ir.low;
-        m_registers.ir.low = (((r & 0x7f) + 1) & 0x7f) | (r & 0x80);
         m_remainingCycles += 4;
-        return m_bus.read(m_registers.pc++);
+        const auto opcode = m_bus.read(m_registers.pc++);
+        if (m_currentPrefix == Z80OpcodePrefix::none || opcode != 0xcb)
+        {
+            // DDCBxxxx and FDCBxxxx increment R only by 2 instead of 3
+            m_registers.ir.low = (((r & 0x7f) + 1) & 0x7f) | (r & 0x80);
+        }
+        return opcode;
     }
 
     uint8_t Z80Cpu::busRead(const uint16_t address)
