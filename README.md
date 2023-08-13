@@ -14,6 +14,7 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 
 ## Roadmap
 - 128K spectrum
+- AY sound chip
 - .z80 snapshots
 - Fast loading
 - Emulation speed controls
