@@ -23,6 +23,12 @@
 
 struct ImGuiContext;
 
+namespace epoch
+{
+    enum class Key;
+    enum class KeyAction;
+}
+
 namespace epoch::frontend
 {
     class Shader;
@@ -33,11 +39,15 @@ namespace epoch::frontend
         Gui();
         ~Gui();
 
-        void newFrame(int width, int height);
-        void render();
+        void newFrame(int width, int height) const;
+        void render() const;
 
-        void setCursorPos(float x, float y);
-        void setMouseButton(int button, bool down);
+        void setCursorPos(float x, float y) const;
+        void charEvent(unsigned int c) const;
+        void keyEvent(Key key, KeyAction action) const;
+        void setMouseButton(int button, bool down) const;
+
+        [[nodiscard]] bool wantKeyboardEvents() const;
 
     private:
         std::unique_ptr<Shader> m_shader{};

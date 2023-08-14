@@ -53,6 +53,7 @@ namespace epoch::frontend
 
         glfwSetWindowUserPointer(m_window, this);
 
+        glfwSetCharCallback(m_window, s_charCallback);
         glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
         glfwSetDropCallback(m_window, s_dropCallback);
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
@@ -95,6 +96,11 @@ namespace epoch::frontend
         glfwSetWindowShouldClose(m_window, true);
     }
 
+    void Window::setCharCallback(CharCallback callback)
+    {
+        m_charCallback = std::move(callback);
+    }
+
     void Window::setCursorPosCallback(CursorPosCallback callback)
     {
         m_cursorPosCallback = std::move(callback);
@@ -118,6 +124,15 @@ namespace epoch::frontend
     void Window::resize(const int width, const int height) const
     {
         glfwSetWindowSize(m_window, width, height);
+    }
+
+    void Window::s_charCallback(GLFWwindow* glfwWindow, const unsigned int c)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_charCallback)
+        {
+            window->m_charCallback(c);
+        }
     }
 
     void Window::s_cursorPosCallback(GLFWwindow* glfwWindow, const double x, const double y)
@@ -145,7 +160,7 @@ namespace epoch::frontend
         window->m_height = height;
     }
 
-    void Window::s_keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+    void Window::s_keyCallback(GLFWwindow* glfwWindow, const int key, int scancode, const int action, int mods)
     {
         if (key != GLFW_KEY_UNKNOWN)
         {

@@ -40,12 +40,14 @@ namespace epoch::frontend
         m_gui = std::make_unique<Gui>();
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
+        m_window->setCharCallback(
+            [&](unsigned int c) { m_gui->charEvent(c); });
         m_window->setCursorPosCallback(
             [&](const float x, const float y) { m_gui->setCursorPos(x, y); });
         m_window->setFileDropCallback(
             [&](const char* path) { m_emulator->load(path); });
         m_window->setKeyboardCallback(
-            [&](const Key key, const KeyAction action) { m_emulator->keyEvent(key, action); });
+            [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
         m_window->setMouseButtonCallback(
             [&](const int button, const int action) { m_gui->setMouseButton(button, action == 1); });
     }

@@ -52,10 +52,12 @@ namespace epoch::frontend
 
         void close() const;
 
+        using CharCallback = std::function<void(unsigned int)>;
         using CursorPosCallback = std::function<void(float x, float y)>;
         using FileDropCallback = std::function<void(const char*)>;
         using KeyboardCallback = std::function<void(Key key, KeyAction action)>;
         using MouseButtonCallback = std::function<void(int button, int action)>;
+        void setCharCallback(CharCallback callback);
         void setCursorPosCallback(CursorPosCallback callback);
         void setFileDropCallback(FileDropCallback callback);
         void setKeyboardCallback(KeyboardCallback callback);
@@ -68,12 +70,14 @@ namespace epoch::frontend
 
         int m_width{}, m_height{};
 
+        CharCallback m_charCallback{};
         CursorPosCallback m_cursorPosCallback{};
         KeyboardCallback m_keyboardCallback{};
         MouseButtonCallback m_mouseButtonCallback{};
         FileDropCallback m_fileDropCallback{};
 
     private:
+        static void s_charCallback(GLFWwindow* glfwWindow, unsigned int c);
         static void s_cursorPosCallback(GLFWwindow* glfwWindow, double x, double y);
         static void s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths);
         static void s_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height);
