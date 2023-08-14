@@ -319,12 +319,22 @@ namespace epoch::frontend
         ImGui::GetIO().AddInputCharacter(c);
     }
 
+    void Gui::focusEvent(const bool focused) const
+    {
+        ImGui::GetIO().AddFocusEvent(focused);
+    }
+
     void Gui::keyEvent(const Key key, const KeyAction action) const
     {
         if (action != KeyAction::press && action != KeyAction::release) return;
 
         const auto imguiKey = mapKeyToImGui(key);
         ImGui::GetIO().AddKeyEvent(imguiKey, action == KeyAction::press);
+    }
+
+    void Gui::mouseWheelEvent(const float x, const float y) const
+    {
+        ImGui::GetIO().AddMouseWheelEvent(x, y);
     }
 
     void Gui::setMouseButton(const int button, const bool down) const

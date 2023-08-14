@@ -44,7 +44,9 @@ namespace epoch::frontend
 
         void setCursorPos(float x, float y) const;
         void charEvent(unsigned int c) const;
+        void focusEvent(bool focused) const;
         void keyEvent(Key key, KeyAction action) const;
+        void mouseWheelEvent(float x, float y) const;
         void setMouseButton(int button, bool down) const;
 
         [[nodiscard]] bool wantKeyboardEvents() const;

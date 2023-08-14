@@ -59,7 +59,9 @@ namespace epoch::frontend
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
         glfwSetKeyCallback(m_window, s_keyCallback);
         glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
-        // TODO: setup other callbacks
+        glfwSetScrollCallback(m_window, s_scrollCallback);
+        glfwSetWindowFocusCallback(m_window, s_focusCallback);
+        // TODO: setup other callbacks: cursorEnter, monitor
 
         glfwMakeContextCurrent(m_window);
 
@@ -111,6 +113,11 @@ namespace epoch::frontend
         m_fileDropCallback = std::move(callback);
     }
 
+    void Window::setFocusCallback(FocusCallback callback)
+    {
+        m_focusCallback = std::move(callback);
+    }
+
     void Window::setKeyboardCallback(KeyboardCallback callback)
     {
         m_keyboardCallback = std::move(callback);
@@ -119,6 +126,11 @@ namespace epoch::frontend
     void Window::setMouseButtonCallback(MouseButtonCallback callback)
     {
         m_mouseButtonCallback = std::move(callback);
+    }
+
+    void Window::setMouseWheelCallback(MouseWheelCallback callback)
+    {
+        m_mouseWheelCallback = std::move(callback);
     }
 
     void Window::resize(const int width, const int height) const
@@ -153,6 +165,15 @@ namespace epoch::frontend
         }
     }
 
+    void Window::s_focusCallback(GLFWwindow* glfwWindow, const int focused)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_focusCallback)
+        {
+            window->m_focusCallback(focused);
+        }
+    }
+
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
@@ -183,6 +204,15 @@ namespace epoch::frontend
         if (window->m_mouseButtonCallback)
         {
             window->m_mouseButtonCallback(button, action);
+        }
+    }
+
+    void Window::s_scrollCallback(GLFWwindow* glfwWindow, const double x, const double y)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_mouseWheelCallback)
+        {
+            window->m_mouseWheelCallback(static_cast<float>(x), static_cast<float>(y));
         }
     }
 }

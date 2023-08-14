@@ -41,15 +41,19 @@ namespace epoch::frontend
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCharCallback(
-            [&](unsigned int c) { m_gui->charEvent(c); });
+            [&](const unsigned int c) { m_gui->charEvent(c); });
         m_window->setCursorPosCallback(
             [&](const float x, const float y) { m_gui->setCursorPos(x, y); });
         m_window->setFileDropCallback(
             [&](const char* path) { m_emulator->load(path); });
+        m_window->setFocusCallback(
+            [&](const bool focused) { m_gui->focusEvent(focused); });
         m_window->setKeyboardCallback(
             [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
         m_window->setMouseButtonCallback(
             [&](const int button, const int action) { m_gui->setMouseButton(button, action == 1); });
+        m_window->setMouseWheelCallback(
+            [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
     }
 
     Application::~Application() = default;
