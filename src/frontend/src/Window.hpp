@@ -47,8 +47,13 @@ namespace epoch::frontend
 
     public:
         [[nodiscard]] bool nextFrame() const;
+
         [[nodiscard]] int width() const { return m_width; }
         [[nodiscard]] int height() const { return m_height; }
+        [[nodiscard]] int framebufferWidth() const { return m_framebufferWidth; }
+        [[nodiscard]] int framebufferHeight() const { return m_framebufferHeight; }
+
+        [[nodiscard]] double time() const;
 
         void close() const;
 
@@ -73,6 +78,7 @@ namespace epoch::frontend
         GLFWwindow* m_window{};
 
         int m_width{}, m_height{};
+        int m_framebufferWidth{}, m_framebufferHeight{};
 
         CharCallback m_charCallback{};
         CursorPosCallback m_cursorPosCallback{};
@@ -88,6 +94,7 @@ namespace epoch::frontend
         static void s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths);
         static void s_focusCallback(GLFWwindow* glfwWindow, int focused);
         static void s_framebufferResizeCallback(GLFWwindow* glfwWindow, int width, int height);
+        static void s_resizeCallback(GLFWwindow* glfwWindow, int width, int height);
         static void s_keyCallback(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods);
         static void s_mouseButtonCallback(GLFWwindow* glfwWindow, int button, int action, int mods);
         static void s_scrollCallback(GLFWwindow* glfwWindow, double x, double y);

@@ -224,9 +224,17 @@ namespace epoch::frontend
         if (m_fontTexture) glDeleteTextures(1, &m_fontTexture);
     }
 
-    void Gui::newFrame(const int width, const int height) const
+    void Gui::newFrame(const int width, const int height, const int framebufferWidth, const int framebufferHeight, const double deltaTime) const
     {
-        ImGui::GetIO().DisplaySize = ImVec2{ static_cast<float>(width), static_cast<float>(height) };
+        ImGui::GetIO().DisplaySize = ImVec2{ static_cast<float>(framebufferWidth), static_cast<float>(framebufferHeight) };
+        if (width > 0 && height > 0)
+        {
+            ImGui::GetIO().DisplayFramebufferScale = ImVec2{
+                static_cast<float>(framebufferWidth) / static_cast<float>(width),
+                static_cast<float>(framebufferHeight) / static_cast<float>(height)
+            };
+        }
+        ImGui::GetIO().DeltaTime = static_cast<float>(deltaTime);
         ImGui::NewFrame();
     }
 

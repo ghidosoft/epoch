@@ -58,6 +58,9 @@ namespace epoch::frontend
     private:
         std::shared_ptr<Emulator> m_emulator{};
 
+        double m_time{};
+        double m_deltaTime{};
+
         std::unique_ptr<Window> m_window{};
         std::unique_ptr<Platform> m_platform{}; // must be after Window
         std::unique_ptr<GraphicContext> m_context{};

@@ -62,6 +62,7 @@ namespace epoch::frontend
     {
         m_context->init(m_emulator->info().width, m_emulator->info().height);
         m_emulator->reset();
+        m_time = m_window->time();
         while (m_window->nextFrame())
         {
             if (m_running)
@@ -77,6 +78,10 @@ namespace epoch::frontend
                     m_audio->push(m_audioBuffer);
                 }
             }
+            auto currentTime = m_window->time();
+            if (currentTime <= m_time) currentTime = m_time + 0.00001;
+            m_deltaTime = currentTime - m_time;
+            m_time = currentTime;
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
@@ -85,10 +90,14 @@ namespace epoch::frontend
 
     void Application::render()
     {
-        m_context->viewport(m_window->width(), m_window->height());
+        m_context->viewport(m_window->framebufferWidth(), m_window->framebufferHeight());
         m_context->renderScreen();
 
-        m_gui->newFrame(m_window->width(), m_window->height());
+        m_gui->newFrame(
+            m_window->width(), m_window->height(),
+            m_window->framebufferWidth(), m_window->framebufferHeight(),
+            m_deltaTime
+        );
         renderGui();
         m_gui->render();
     }

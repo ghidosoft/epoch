@@ -23,7 +23,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-static void s_glfwErrorCallback(int code, const char* description)
+static void s_glfwErrorCallback(const int code, const char* description)
 {
     std::cerr << "GLFW error #" << code << ": " << description << std::endl;
 }
@@ -49,7 +49,8 @@ namespace epoch::frontend
             throw std::runtime_error("Cannot create GLFW window.");
         }
 
-        glfwGetFramebufferSize(m_window, &m_width, &m_height);
+        glfwGetWindowSize(m_window, &m_width, &m_height);
+        glfwGetFramebufferSize(m_window, &m_framebufferWidth, &m_framebufferHeight);
 
         glfwSetWindowUserPointer(m_window, this);
 
@@ -57,6 +58,7 @@ namespace epoch::frontend
         glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
         glfwSetDropCallback(m_window, s_dropCallback);
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
+        glfwSetWindowSizeCallback(m_window, s_resizeCallback);
         glfwSetKeyCallback(m_window, s_keyCallback);
         glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
         glfwSetScrollCallback(m_window, s_scrollCallback);
@@ -91,6 +93,11 @@ namespace epoch::frontend
             glfwPollEvents();
         }
         return result;
+    }
+
+    double Window::time() const
+    {
+        return glfwGetTime();
     }
 
     void Window::close() const
@@ -175,6 +182,13 @@ namespace epoch::frontend
     }
 
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->m_framebufferWidth = width;
+        window->m_framebufferHeight = height;
+    }
+
+    void Window::s_resizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
         window->m_width = width;
