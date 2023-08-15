@@ -317,9 +317,25 @@ namespace epoch::frontend
         }
     }
 
-    void Gui::setCursorPos(const float x, const float y) const
+    void Gui::cursorEnterEvent(const bool entered)
     {
-        ImGui::GetIO().MousePos = ImVec2{ x, y };
+        if (entered)
+        {
+            ImGui::GetIO().AddMousePosEvent(m_lastMouseX, m_lastMouseY);
+        }
+        else
+        {
+            m_lastMouseX = ImGui::GetIO().MousePos.x;
+            m_lastMouseY = ImGui::GetIO().MousePos.y;
+            ImGui::GetIO().AddMousePosEvent(-FLT_MAX, -FLT_MAX);
+        }
+    }
+
+    void Gui::cursorPosEvent(const float x, const float y)
+    {
+        m_lastMouseX = x;
+        m_lastMouseY = y;
+        ImGui::GetIO().AddMousePosEvent(x, y);
     }
 
     void Gui::charEvent(const unsigned int c) const
@@ -340,14 +356,15 @@ namespace epoch::frontend
         ImGui::GetIO().AddKeyEvent(imguiKey, action == KeyAction::press);
     }
 
+    void Gui::mouseButtonEvent(const int button, const bool down) const
+    {
+        if (button >= 0 && button < ImGuiMouseButton_COUNT)
+            ImGui::GetIO().AddMouseButtonEvent(button, down);
+    }
+
     void Gui::mouseWheelEvent(const float x, const float y) const
     {
         ImGui::GetIO().AddMouseWheelEvent(x, y);
-    }
-
-    void Gui::setMouseButton(const int button, const bool down) const
-    {
-        ImGui::GetIO().MouseDown[button] = down;
     }
 
     bool Gui::wantKeyboardEvents() const

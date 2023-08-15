@@ -58,6 +58,7 @@ namespace epoch::frontend
         void close() const;
 
         using CharCallback = std::function<void(unsigned int)>;
+        using CursorEnterCallback = std::function<void(bool)>;
         using CursorPosCallback = std::function<void(float x, float y)>;
         using FileDropCallback = std::function<void(const char*)>;
         using FocusCallback = std::function<void(bool)>;
@@ -65,6 +66,7 @@ namespace epoch::frontend
         using MouseButtonCallback = std::function<void(int button, int action)>;
         using MouseWheelCallback = std::function<void(float x, float y)>;
         void setCharCallback(CharCallback callback);
+        void setCursorEnterCallback(CursorEnterCallback callback);
         void setCursorPosCallback(CursorPosCallback callback);
         void setFileDropCallback(FileDropCallback callback);
         void setFocusCallback(FocusCallback callback);
@@ -81,6 +83,7 @@ namespace epoch::frontend
         int m_framebufferWidth{}, m_framebufferHeight{};
 
         CharCallback m_charCallback{};
+        CursorEnterCallback m_cursorEnterCallback{};
         CursorPosCallback m_cursorPosCallback{};
         FileDropCallback m_fileDropCallback{};
         FocusCallback m_focusCallback{};
@@ -90,6 +93,7 @@ namespace epoch::frontend
 
     private:
         static void s_charCallback(GLFWwindow* glfwWindow, unsigned int c);
+        static void s_cursorEnterCallback(GLFWwindow* glfwWindow, int entered);
         static void s_cursorPosCallback(GLFWwindow* glfwWindow, double x, double y);
         static void s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths);
         static void s_focusCallback(GLFWwindow* glfwWindow, int focused);

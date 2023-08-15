@@ -42,12 +42,13 @@ namespace epoch::frontend
         void newFrame(int width, int height, int framebufferWidth, int framebufferHeight, double deltaTime) const;
         void render() const;
 
-        void setCursorPos(float x, float y) const;
+        void cursorEnterEvent(bool entered);
+        void cursorPosEvent(float x, float y);
         void charEvent(unsigned int c) const;
         void focusEvent(bool focused) const;
         void keyEvent(Key key, KeyAction action) const;
+        void mouseButtonEvent(int button, bool down) const;
         void mouseWheelEvent(float x, float y) const;
-        void setMouseButton(int button, bool down) const;
 
         [[nodiscard]] bool wantKeyboardEvents() const;
 
@@ -58,6 +59,8 @@ namespace epoch::frontend
         GLuint m_fontTexture{};
 
         ImGuiContext* m_context{};
+
+        float m_lastMouseX{}, m_lastMouseY{};
     };
 }
 

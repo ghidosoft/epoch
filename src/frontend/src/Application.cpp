@@ -42,8 +42,10 @@ namespace epoch::frontend
 
         m_window->setCharCallback(
             [&](const unsigned int c) { m_gui->charEvent(c); });
+        m_window->setCursorEnterCallback(
+            [&](const bool entered) { m_gui->cursorEnterEvent(entered); });
         m_window->setCursorPosCallback(
-            [&](const float x, const float y) { m_gui->setCursorPos(x, y); });
+            [&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
         m_window->setFileDropCallback(
             [&](const char* path) { m_emulator->load(path); });
         m_window->setFocusCallback(
@@ -51,7 +53,7 @@ namespace epoch::frontend
         m_window->setKeyboardCallback(
             [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
         m_window->setMouseButtonCallback(
-            [&](const int button, const int action) { m_gui->setMouseButton(button, action == 1); });
+            [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
         m_window->setMouseWheelCallback(
             [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
     }

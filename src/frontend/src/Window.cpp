@@ -55,6 +55,7 @@ namespace epoch::frontend
         glfwSetWindowUserPointer(m_window, this);
 
         glfwSetCharCallback(m_window, s_charCallback);
+        glfwSetCursorEnterCallback(m_window, s_cursorEnterCallback);
         glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
         glfwSetDropCallback(m_window, s_dropCallback);
         glfwSetFramebufferSizeCallback(m_window, s_framebufferResizeCallback);
@@ -63,7 +64,7 @@ namespace epoch::frontend
         glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
         glfwSetScrollCallback(m_window, s_scrollCallback);
         glfwSetWindowFocusCallback(m_window, s_focusCallback);
-        // TODO: setup other callbacks: cursorEnter, monitor
+        // TODO: setup other callbacks: monitor
 
         glfwMakeContextCurrent(m_window);
 
@@ -110,6 +111,11 @@ namespace epoch::frontend
         m_charCallback = std::move(callback);
     }
 
+    void Window::setCursorEnterCallback(CursorEnterCallback callback)
+    {
+        m_cursorEnterCallback = std::move(callback);
+    }
+
     void Window::setCursorPosCallback(CursorPosCallback callback)
     {
         m_cursorPosCallback = std::move(callback);
@@ -151,6 +157,15 @@ namespace epoch::frontend
         if (window->m_charCallback)
         {
             window->m_charCallback(c);
+        }
+    }
+
+    void Window::s_cursorEnterCallback(GLFWwindow* glfwWindow, const int entered)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        if (window->m_cursorEnterCallback)
+        {
+            window->m_cursorEnterCallback(entered);
         }
     }
 
