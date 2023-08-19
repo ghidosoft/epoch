@@ -154,11 +154,11 @@ namespace epoch::zxspectrum
             break;
         case 1:
             push16(m_registers.pc);
-            m_registers.pc = 0x0038;
+            m_registers.wz = m_registers.pc = 0x0038;
             break;
         case 2:
             push16(m_registers.pc);
-            m_registers.pc = read16(static_cast<uint16_t>(m_registers.ir.high << 8));
+            m_registers.wz = m_registers.pc = read16(static_cast<uint16_t>(m_registers.ir.high << 8));
             break;
         default:
             assert(false);
@@ -168,12 +168,12 @@ namespace epoch::zxspectrum
 
     uint8_t Z80Cpu::fetchOpcode()
     {
-        const auto r = m_registers.ir.low;
         m_remainingCycles += 4;
         const auto opcode = m_bus.read(m_registers.pc++);
         if (m_currentPrefix == Z80OpcodePrefix::none || opcode != 0xcb)
         {
             // DDCBxxxx and FDCBxxxx increment R only by 2 instead of 3
+            const auto r = m_registers.ir.low;
             m_registers.ir.low = (((r & 0x7f) + 1) & 0x7f) | (r & 0x80);
         }
         return opcode;
@@ -228,7 +228,7 @@ namespace epoch::zxspectrum
                     if (m_registers.bc.high != 0)
                     {
                         m_remainingCycles += 5;
-                        m_registers.pc += d;
+                        m_registers.wz = m_registers.pc += d;
                     }
                 }
                 break;
@@ -303,34 +303,54 @@ namespace epoch::zxspectrum
             case 0b000:
                 // LD (BC), A
                 busWrite(m_registers.bc, m_registers.af.high);
+                m_registers.wz = static_cast<uint16_t>(((m_registers.bc.low + 1) & 0xff) | (m_registers.af.high << 8));
                 break;
             case 0b001:
                 // LD A, (BC)
                 m_registers.af.high = busRead(m_registers.bc);
+                m_registers.wz = m_registers.bc + 1;
                 break;
             case 0b010:
                 // LD (DE), A
                 busWrite(m_registers.de, m_registers.af.high);
+                m_registers.wz = static_cast<uint16_t>(((m_registers.de.low + 1) & 0xff) | (m_registers.af.high << 8));
                 break;
             case 0b011:
                 // LD A, (DE)
                 m_registers.af.high = busRead(m_registers.de);
+                m_registers.wz = m_registers.de + 1;
                 break;
             case 0b100:
                 // LD (nn), HL
-                write16(fetch16(), getHL());
+                {
+                    const auto address = fetch16();
+                    m_registers.wz = address + 1;
+                    write16(address, getHL());
+                }
                 break;
             case 0b101:
                 // LD HL, (nn)
-                setHL(read16(fetch16()));
+                {
+                    const auto address = fetch16();
+                    m_registers.wz = address + 1;
+                    setHL(read16(address));
+                }
                 break;
             case 0b110:
                 // LD (nn), A
-                busWrite(fetch16(), m_registers.af.high);
+                {
+                    const auto address = fetch16();
+                    m_registers.wz = static_cast<uint16_t>(((address + 1) & 0xff) | (m_registers.af.high << 8));
+                    busWrite(address, m_registers.af.high);
+                }
                 break;
             case 0b111:
                 // LD A, (nn)
-                m_registers.af.high = busRead(fetch16());
+                {
+                    const auto address = fetch16();
+                    m_registers.wz = address + 1;
+                    m_registers.af.high = busRead(address);
+                }
                 break;
             }
         }
@@ -630,7 +650,7 @@ namespace epoch::zxspectrum
             m_remainingCycles++;
             if (evaluateCondition(y))
             {
-                m_registers.pc = pop16();
+                m_registers.wz = m_registers.pc = pop16();
             }
         }
         else if (z == 0b001)
@@ -643,7 +663,7 @@ namespace epoch::zxspectrum
                 break;
             case 0b001:
                 // RET
-                m_registers.pc = pop16();
+                m_registers.wz = m_registers.pc = pop16();
                 break;
             case 0b010:
                 // POP DE
@@ -686,6 +706,7 @@ namespace epoch::zxspectrum
             {
                 m_registers.pc = nn;
             }
+            m_registers.wz = nn;
         }
         else if (z == 0b011)
         {
@@ -693,7 +714,7 @@ namespace epoch::zxspectrum
             {
             case 0b000:
                 // JP nn
-                m_registers.pc = fetch16();
+                m_registers.wz = m_registers.pc = fetch16();
                 break;
             case 0b001:
                 // CB prefix
@@ -701,11 +722,19 @@ namespace epoch::zxspectrum
                 break;
             case 0b010:
                 // OUT (n), A
-                ioWrite(busRead(m_registers.pc++) | static_cast<uint16_t>(m_registers.af.high << 8), m_registers.af.high);
+                {
+                    const auto port = static_cast<uint16_t>(busRead(m_registers.pc++) | (m_registers.af.high << 8));
+                    m_registers.wz = static_cast<uint16_t>(((port + 1) & 0xff) | (m_registers.af.high << 8));
+                    ioWrite(port, m_registers.af.high);
+                }
                 break;
             case 0b011:
                 // IN A, (n)
-                m_registers.af.high = ioRead(busRead(m_registers.pc++) | static_cast<uint16_t>(m_registers.af.high << 8));
+                {
+                    const auto n = busRead(m_registers.pc++);
+                    m_registers.wz = static_cast<uint16_t>((m_registers.af.high << 8) + n + 1);
+                    m_registers.af.high = ioRead(static_cast<uint16_t>(n | (m_registers.af.high << 8)));
+                }
                 break;
             case 0b100:
                 // EX (SP), HL
@@ -717,7 +746,7 @@ namespace epoch::zxspectrum
                     busWrite(m_registers.sp, value & 0xff);
                     busWrite(m_registers.sp + 1, value >> 8);
                     m_remainingCycles += 2;
-                    setHL(static_cast<uint16_t>(high << 8) | low);
+                    setHL(m_registers.wz = static_cast<uint16_t>(high << 8) | low);
                 }
                 break;
             case 0b101:
@@ -746,6 +775,7 @@ namespace epoch::zxspectrum
                 push16(m_registers.pc);
                 m_registers.pc = nn;
             }
+            m_registers.wz = nn;
         }
         else if (z == 0b101)
         {
@@ -762,7 +792,7 @@ namespace epoch::zxspectrum
                     const auto nn = fetch16();
                     m_remainingCycles++;
                     push16(m_registers.pc);
-                    m_registers.pc = nn;
+                    m_registers.wz = m_registers.pc = nn;
                 }
                 break;
             case 0b010:
@@ -807,7 +837,7 @@ namespace epoch::zxspectrum
             m_remainingCycles++;
             push16(m_registers.pc);
             static constexpr uint16_t targets[] = {0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38};
-            m_registers.pc = targets[y];
+            m_registers.wz = m_registers.pc = targets[y];
         }
     }
 
@@ -955,6 +985,7 @@ namespace epoch::zxspectrum
                     m_registers.af.high = value;
                     break;
                 }
+                m_registers.wz = static_cast<uint16_t>(m_registers.bc + 1);
             }
             else if (z == 0b001)
             {
@@ -993,6 +1024,7 @@ namespace epoch::zxspectrum
                     value = m_registers.af.high;
                     break;
                 }
+                if (y != 0b110) m_registers.wz = static_cast<uint16_t>(m_registers.bc + 1);
                 ioWrite(m_registers.bc, value);
             }
             else if (z == 0b010)
@@ -1044,6 +1076,7 @@ namespace epoch::zxspectrum
             else if (z == 0b011)
             {
                 const auto nn = fetch16();
+                m_registers.wz = nn + 1;
                 switch (y)
                 {
                 case 0b000:
@@ -1089,7 +1122,7 @@ namespace epoch::zxspectrum
             {
                 // RETI/RETN
                 m_registers.iff1 = m_registers.iff2;
-                m_registers.pc = pop16();
+                m_registers.wz = m_registers.pc = pop16();
             }
             else if (z == 0b110)
             {
@@ -1164,6 +1197,7 @@ namespace epoch::zxspectrum
                         const auto res = static_cast<uint8_t>((a & 0xf0) | (n & 0x0f));
                         m_registers.af.high = res;
                         busWrite(m_registers.hl, static_cast<uint8_t>(a << 4 | n >> 4));
+                        m_registers.wz = m_registers.hl + 1;
                         m_registers.af.low = (m_registers.af.low & 0x01) | SZPFlagsLookup[res];
                     }
                     break;
@@ -1176,6 +1210,7 @@ namespace epoch::zxspectrum
                         const auto res = static_cast<uint8_t>((a & 0xf0) | n >> 4);
                         m_registers.af.high = res;
                         busWrite(m_registers.hl, static_cast<uint8_t>(n << 4 | (a & 0x0f)));
+                        m_registers.wz = m_registers.hl + 1;
                         m_registers.af.low = (m_registers.af.low & 0x01) | SZPFlagsLookup[res];
                     }
                     break;
@@ -1206,7 +1241,7 @@ namespace epoch::zxspectrum
                     ldi();
                     if (m_registers.af.p())
                     {
-                        m_registers.pc -= 2;
+                        m_registers.wz = (m_registers.pc -= 2) + 1;
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1215,7 +1250,7 @@ namespace epoch::zxspectrum
                     ldd();
                     if (m_registers.af.p())
                     {
-                        m_registers.pc -= 2;
+                        m_registers.wz = (m_registers.pc -= 2) + 1;
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1229,26 +1264,30 @@ namespace epoch::zxspectrum
                 case 0b100:
                     // CPI
                     cpi();
+                    m_registers.wz++;
                     break;
                 case 0b101:
                     // CPD
                     cpd();
+                    m_registers.wz--;
                     break;
                 case 0b110:
                     // CPIR
                     cpi();
+                    m_registers.wz++;
                     if (m_registers.af.p() && !m_registers.af.z())
                     {
-                        m_registers.pc -= 2;
+                        m_registers.wz = (m_registers.pc -= 2) + 1;
                         m_remainingCycles += 5;
                     }
                     break;
                 case 0b111:
                     // CPDR
                     cpd();
+                    m_registers.wz--;
                     if (m_registers.af.p() && !m_registers.af.z())
                     {
-                        m_registers.pc -= 2;
+                        m_registers.wz = (m_registers.pc -= 2) + 1;
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1261,14 +1300,17 @@ namespace epoch::zxspectrum
                 {
                 case 0b100:
                     // INI
+                    m_registers.wz = m_registers.bc + 1;
                     ini();
                     break;
                 case 0b101:
                     // IND
+                    m_registers.wz = m_registers.bc - 1;
                     ind();
                     break;
                 case 0b110:
                     // INIR
+                    m_registers.wz = m_registers.bc + 1;
                     ini();
                     if (!m_registers.af.z())
                     {
@@ -1278,6 +1320,7 @@ namespace epoch::zxspectrum
                     break;
                 case 0b111:
                     // INDR
+                    m_registers.wz = m_registers.bc - 1;
                     ind();
                     if (!m_registers.af.z())
                     {
@@ -1295,14 +1338,17 @@ namespace epoch::zxspectrum
                 case 0b100:
                     // OUTI
                     outi();
+                    m_registers.wz = m_registers.bc + 1;
                     break;
                 case 0b101:
                     // OUTD
                     outd();
+                    m_registers.wz = m_registers.bc - 1;
                     break;
                 case 0b110:
                     // OUTR
                     outi();
+                    m_registers.wz = m_registers.bc + 1;
                     if (!m_registers.af.z())
                     {
                         m_registers.pc -= 2;
@@ -1312,6 +1358,7 @@ namespace epoch::zxspectrum
                 case 0b111:
                     // OUTDR
                     outd();
+                    m_registers.wz = m_registers.bc - 1;
                     if (!m_registers.af.z())
                     {
                         m_registers.pc -= 2;
@@ -1470,6 +1517,7 @@ namespace epoch::zxspectrum
         }
         const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
         const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
+        m_registers.wz = a + 1;
         m_registers.af.y(highResult & Z80Flags::y);
         m_registers.af.h((carryIn >> 4) & 0x01);
         m_registers.af.x(highResult & Z80Flags::x);
@@ -1497,6 +1545,7 @@ namespace epoch::zxspectrum
         const auto carryIn = (highResult & 0xff) ^ highA ^ highB;
         const auto overflow = (carryIn >> 7) ^ static_cast<uint8_t>(carry);
         const auto result = ((highResult & 0xff) << 8) | (lowResult & 0xff);
+        m_registers.wz = a + 1;
         m_registers.af.s(result & 0x8000);
         m_registers.af.z(result == 0);
         m_registers.af.y(highResult & Z80Flags::y);
@@ -1615,7 +1664,7 @@ namespace epoch::zxspectrum
         if (condition)
         {
             m_remainingCycles += 5;
-            m_registers.pc += d;
+            m_registers.wz = m_registers.pc += d;
         }
     }
 
