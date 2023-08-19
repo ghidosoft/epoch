@@ -31,8 +31,8 @@ namespace epoch::zxspectrum
     constexpr int BorderTop = 48;
     constexpr int BorderBottom = 56;
 
-    constexpr int VerticalRetrace = 16;
-    constexpr int HorizontalRetrace = 48;
+    constexpr int VerticalRetrace = 16; // 16 lines
+    constexpr int HorizontalRetrace = 48 * 2; // Pixels (48 T-states)
 
     constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
     constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
