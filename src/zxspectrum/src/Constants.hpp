@@ -33,6 +33,7 @@ namespace epoch::zxspectrum
 
     constexpr int VerticalRetrace = 16; // 16 lines
     constexpr int HorizontalRetrace = 48 * 2; // Pixels (48 T-states)
+    constexpr int InterruptActiveTStates = 32;
 
     constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
     constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;

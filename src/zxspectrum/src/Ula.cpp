@@ -35,6 +35,7 @@ namespace epoch::zxspectrum
             m_borderBuffer[m_y * Width + m_x + 1] = m_border;
         }
 
+        // 2 pixels per T-state
         m_x++;
         m_x++;
 

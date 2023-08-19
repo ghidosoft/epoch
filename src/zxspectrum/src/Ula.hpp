@@ -47,7 +47,7 @@ namespace epoch::zxspectrum
         [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
         [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; } // 16 frames
 
-        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x < -HorizontalRetrace + 64; } // 32 t-states
+        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x >= BorderLeft && m_x < BorderLeft + InterruptActiveTStates * 2; }
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
         [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f)/* * 2.f - 1.f*/; }
