@@ -28,6 +28,7 @@
 std::set<std::filesystem::path> findJsons(const std::filesystem::path& path)
 {
     std::set<std::filesystem::path> results{};
+    if (!std::filesystem::is_directory(path)) return results;
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
         if (entry.is_regular_file() && entry.path().extension() == ".json")
@@ -265,5 +266,5 @@ int main()
     std::cout << "Duration:     " << durationSec << " s\n";
     std::cout << "Failed tests: " << std::dec << failed << "\n";
 
-    return EXIT_SUCCESS;
+    return failed > 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }
