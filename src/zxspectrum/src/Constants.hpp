@@ -38,6 +38,8 @@ namespace epoch::zxspectrum
     constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
     constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
 
+    static_assert((VerticalRetrace + Height) * (Width + HorizontalRetrace) == static_cast<int>(TStatesPerFrame) * 2); // total frame length, 2 pixels per T-state
+
     constexpr auto AudioInThreshold = 0.2f;
 }
 
