@@ -1242,6 +1242,8 @@ namespace epoch::zxspectrum
                     if (m_registers.af.p())
                     {
                         m_registers.wz = (m_registers.pc -= 2) + 1;
+                        m_registers.af.x(m_registers.wz & (Z80Flags::x << 8));
+                        m_registers.af.y(m_registers.wz & (Z80Flags::y << 8));
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1251,6 +1253,8 @@ namespace epoch::zxspectrum
                     if (m_registers.af.p())
                     {
                         m_registers.wz = (m_registers.pc -= 2) + 1;
+                        m_registers.af.x(m_registers.wz & (Z80Flags::x << 8));
+                        m_registers.af.y(m_registers.wz & (Z80Flags::y << 8));
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1278,6 +1282,8 @@ namespace epoch::zxspectrum
                     if (m_registers.af.p() && !m_registers.af.z())
                     {
                         m_registers.wz = (m_registers.pc -= 2) + 1;
+                        m_registers.af.x(m_registers.wz& (Z80Flags::x << 8));
+                        m_registers.af.y(m_registers.wz& (Z80Flags::y << 8));
                         m_remainingCycles += 5;
                     }
                     break;
@@ -1288,6 +1294,8 @@ namespace epoch::zxspectrum
                     if (m_registers.af.p() && !m_registers.af.z())
                     {
                         m_registers.wz = (m_registers.pc -= 2) + 1;
+                        m_registers.af.x(m_registers.wz& (Z80Flags::x << 8));
+                        m_registers.af.y(m_registers.wz& (Z80Flags::y << 8));
                         m_remainingCycles += 5;
                     }
                     break;
