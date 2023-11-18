@@ -25,7 +25,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
     imgui
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    URL https://github.com/ocornut/imgui/archive/v1.89.8-docking.zip
+    URL https://github.com/ocornut/imgui/archive/v1.90-docking.zip
 )
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
