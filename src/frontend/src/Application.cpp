@@ -135,9 +135,16 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Load"))
                 {
-                    if (const auto path = m_platform->openDialog(); !path.empty())
+                    if (const auto path = m_platform->openDialog(m_emulator->info().fileFormats); !path.empty())
                     {
                         m_emulator->load(path);
+                    }
+                }
+                if (ImGui::MenuItem("Save"))
+                {
+                    if (const auto path = m_platform->saveDialog(m_emulator->info().fileFormats); !path.empty())
+                    {
+                        m_emulator->save(path);
                     }
                 }
                 ImGui::Separator();

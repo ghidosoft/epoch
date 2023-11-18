@@ -49,7 +49,11 @@ namespace epoch::zxspectrum
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
 
     ZXSpectrumEmulator::ZXSpectrumEmulator() :
-        Emulator{ {"ZX Spectrum", Width, Height, TStatesPerFrame, FramesPerSecond } },
+        Emulator{ {"ZX Spectrum", Width, Height, TStatesPerFrame, FramesPerSecond, {
+            { "Tapes", "tap,tzx", true, false },
+            { "SNA Snapshots", "sna", true, true },
+            { "Z80 Snapshots", "z80", true, false },
+        } } },
         m_ula{std::make_unique<Ula>(m_rom48k, m_ram)},
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {

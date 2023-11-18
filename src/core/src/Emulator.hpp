@@ -19,11 +19,20 @@
 
 #include <span>
 #include <string>
+#include <vector>
 
 #include "Keyboard.hpp"
 
 namespace epoch
 {
+    struct EmulatorFileFormat
+    {
+        std::string description;
+        std::string extensions;
+        bool load;
+        bool save;
+    };
+
     struct EmulatorInfo
     {
         std::string name;
@@ -31,6 +40,7 @@ namespace epoch
         int height;
         std::size_t frameClocks;
         double framesPerSecond;
+        std::vector<EmulatorFileFormat> fileFormats;
 
         [[nodiscard]] float aspectRatio() const { return static_cast<float>(width) / static_cast<float>(height); }
     };

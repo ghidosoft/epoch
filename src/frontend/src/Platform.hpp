@@ -17,7 +17,10 @@
 #ifndef SRC_FRONTEND_PLATFORM_HPP_
 #define SRC_FRONTEND_PLATFORM_HPP_
 
+#include <span>
 #include <string>
+
+#include <epoch/core.hpp>
 
 namespace epoch::frontend
 {
@@ -34,7 +37,8 @@ namespace epoch::frontend
         Platform& operator=(Platform&& other) noexcept = delete;
 
     public:
-        [[nodiscard]] std::string openDialog() const;
+        [[nodiscard]] std::string openDialog(std::span<const EmulatorFileFormat> = {}) const;
+        [[nodiscard]] std::string saveDialog(std::span<const EmulatorFileFormat> = {}) const;
     };
 }
 

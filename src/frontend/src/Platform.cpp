@@ -35,10 +35,71 @@ namespace epoch::frontend
         NFD::Quit();
     }
 
-    std::string Platform::openDialog() const
+    std::string Platform::openDialog(const std::span<const EmulatorFileFormat> formats) const
     {
+        std::string all;
+        std::vector<nfdu8filteritem_t> filterItems;
+        for (const auto& format : formats)
+        {
+            if (format.load)
+            {
+                filterItems.push_back({
+                    format.description.c_str(),
+                    format.extensions.c_str(),
+                    });
+            }
+        }
+        if (filterItems.size() > 1)
+        {
+            for (const auto& [name, spec] : filterItems)
+            {
+                if (!all.empty()) all += ",";
+                all += spec;
+            }
+            filterItems.insert(filterItems.begin(), {
+                "Supported formats",
+                all.c_str(),
+            });
+        }
+
         NFD::UniquePath path{};
-        const auto result = NFD::OpenDialog(path);
+        const auto result = NFD::OpenDialog(path, filterItems.data(), filterItems.size());
+        if (result == NFD_OKAY)
+        {
+            return path.get();
+        }
+        return {};
+    }
+
+    std::string Platform::saveDialog(const std::span<const EmulatorFileFormat> formats) const
+    {
+        std::string all;
+        std::vector<nfdu8filteritem_t> filterItems;
+        for (const auto& format : formats)
+        {
+            if (format.save)
+            {
+                filterItems.push_back({
+                    format.description.c_str(),
+                    format.extensions.c_str(),
+                });
+            }
+        }
+        if (filterItems.size() > 1)
+        {
+            for (const auto& [name, spec] : filterItems)
+            {
+                if (!all.empty()) all += ",";
+                all += spec;
+            }
+            filterItems.insert(filterItems.begin(), {
+                "Supported formats",
+                all.c_str(),
+                });
+        }
+
+        NFD::UniquePath path{};
+        const auto result = NFD::SaveDialog(path, filterItems.data(), filterItems.size());
         if (result == NFD_OKAY)
         {
             return path.get();
