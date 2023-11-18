@@ -6,7 +6,7 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 
 ## Features
 - Instruction level Z80 emulation: all instructions passes zexdoc and zexall
-- Load/Save snapshots (.sna)
+- Load/Save snapshots (.sna, partial .z80)
 - Tape loading (.tap, .tzx)
 - Sound
 - Drag&drop file loading
