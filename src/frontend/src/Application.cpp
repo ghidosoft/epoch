@@ -148,9 +148,6 @@ namespace epoch::frontend
                     }
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Restore test.sna")) { m_emulator->load("test.sna"); }
-                if (ImGui::MenuItem("Take test.sna")) { m_emulator->save("test.sna"); }
-                ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
                 ImGui::EndMenu();
             }
