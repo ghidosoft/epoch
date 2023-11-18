@@ -92,9 +92,32 @@ namespace epoch::frontend
 
     void Application::render()
     {
-        m_context->viewport(m_window->framebufferWidth(), m_window->framebufferHeight());
+        if (m_keepAspectRatio)
+        {
+            const auto emulatorAspectRatio = m_emulator->info().aspectRatio();
+            const auto windowAspectRatio = static_cast<float>(m_window->framebufferWidth()) / static_cast<float>(m_window->framebufferHeight());
+            auto x = 0, y = 0;
+            auto width = m_window->framebufferWidth();
+            auto height = m_window->framebufferHeight();
+            if (emulatorAspectRatio > windowAspectRatio)
+            {
+                height = static_cast<int>(static_cast<float>(width) / emulatorAspectRatio);
+                y = (m_window->framebufferHeight() - height) / 2;
+            }
+            else
+            {
+                width = static_cast<int>(static_cast<float>(height) * emulatorAspectRatio);
+                x = (m_window->framebufferWidth() - width) / 2;
+            }
+            m_context->viewport(x, y, width, height);
+        }
+        else
+        {
+            m_context->viewport(0, 0, m_window->framebufferWidth(), m_window->framebufferHeight());
+        }
         m_context->renderScreen();
 
+        m_context->viewport(0, 0, m_window->framebufferWidth(), m_window->framebufferHeight());
         m_gui->newFrame(
             m_window->width(), m_window->height(),
             m_window->framebufferWidth(), m_window->framebufferHeight(),
@@ -132,6 +155,8 @@ namespace epoch::frontend
             }
             if (ImGui::BeginMenu("Window"))
             {
+                if (ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio)) {}
+                ImGui::Separator();
                 if (ImGui::MenuItem("1X size")) { m_window->resize(m_emulator->info().width, m_emulator->info().height); }
                 if (ImGui::MenuItem("2X size")) { m_window->resize(m_emulator->info().width * 2, m_emulator->info().height * 2); }
                 if (ImGui::MenuItem("3X size")) { m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3); }

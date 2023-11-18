@@ -31,6 +31,8 @@ namespace epoch
         int height;
         std::size_t frameClocks;
         double framesPerSecond;
+
+        [[nodiscard]] float aspectRatio() const { return static_cast<float>(width) / static_cast<float>(height); }
     };
 
     class Emulator

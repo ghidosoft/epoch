@@ -69,6 +69,7 @@ namespace epoch::frontend
         std::vector<float> m_audioBuffer{};
 
         bool m_running{ true };
+        bool m_keepAspectRatio{ true };
     };
 }
 
