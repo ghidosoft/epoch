@@ -26,7 +26,7 @@ struct GLFWwindow;
 
 namespace epoch::frontend
 {
-    enum class WindowMode { windowed, borderless };
+    enum class WindowMode { windowed, borderless, fullscreen };
 
     struct WindowInfo
     {

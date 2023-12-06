@@ -117,23 +117,36 @@ namespace epoch::frontend
     {
         if (mode != m_mode)
         {
-            m_mode = mode;
+            if (m_mode == WindowMode::windowed)
+            {
+                glfwGetWindowPos(m_window, &m_lastX, &m_lastY);
+                m_lastWidth = m_width;
+                m_lastHeight = m_height;
+            }
             switch (mode)
             {
             case WindowMode::borderless:
                 {
-                    glfwGetWindowPos(m_window, &m_lastX, &m_lastY);
-                    m_lastWidth = m_width;
-                    m_lastHeight = m_height;
+                    const auto monitor = glfwGetPrimaryMonitor();
+                    const auto vidmode = glfwGetVideoMode(monitor);
+                    glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);
+                    glfwSetWindowPos(m_window, 0, 0);
+                    glfwSetWindowSize(m_window, vidmode->width, vidmode->height);
+                }
+                break;
+            case WindowMode::fullscreen:
+                {
                     const auto monitor = glfwGetPrimaryMonitor();
                     const auto vidmode = glfwGetVideoMode(monitor);
                     glfwSetWindowMonitor(m_window, monitor, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
                 }
                 break;
             case WindowMode::windowed:
+                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);
                 glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, m_lastWidth, m_lastHeight, GLFW_DONT_CARE);
                 break;
             }
+            m_mode = mode;
         }
     }
 
