@@ -164,6 +164,8 @@ namespace epoch::frontend
                 if (ImGui::MenuItem("1X size")) { m_window->resize(m_emulator->info().width, m_emulator->info().height); }
                 if (ImGui::MenuItem("2X size")) { m_window->resize(m_emulator->info().width * 2, m_emulator->info().height * 2); }
                 if (ImGui::MenuItem("3X size")) { m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3); }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Fullscreen", nullptr, &m_fullscreen)) { m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed); }
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();

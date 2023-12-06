@@ -26,11 +26,14 @@ struct GLFWwindow;
 
 namespace epoch::frontend
 {
+    enum class WindowMode { windowed, borderless };
+
     struct WindowInfo
     {
         std::string name;
         int width;
         int height;
+        WindowMode mode{ WindowMode::windowed };
     };
 
     class Window final
@@ -57,6 +60,9 @@ namespace epoch::frontend
 
         void close() const;
 
+        void resize(int width, int height) const;
+        void mode(WindowMode mode);
+
         using CharCallback = std::function<void(unsigned int)>;
         using CursorEnterCallback = std::function<void(bool)>;
         using CursorPosCallback = std::function<void(float x, float y)>;
@@ -74,13 +80,14 @@ namespace epoch::frontend
         void setMouseButtonCallback(MouseButtonCallback callback);
         void setMouseWheelCallback(MouseWheelCallback callback);
 
-        void resize(int width, int height) const;
-
     private:
         GLFWwindow* m_window{};
 
         int m_width{}, m_height{};
         int m_framebufferWidth{}, m_framebufferHeight{};
+        WindowMode m_mode{ WindowMode::windowed };
+
+        int m_lastX{}, m_lastY{}, m_lastWidth{}, m_lastHeight{};
 
         CharCallback m_charCallback{};
         CursorEnterCallback m_cursorEnterCallback{};

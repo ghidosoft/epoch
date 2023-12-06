@@ -74,6 +74,8 @@ namespace epoch::frontend
         {
             throw std::runtime_error("Cannot initialize GLAD.");
         }
+
+        mode(info.mode);
     }
 
     Window::~Window()
@@ -104,6 +106,35 @@ namespace epoch::frontend
     void Window::close() const
     {
         glfwSetWindowShouldClose(m_window, true);
+    }
+
+    void Window::resize(const int width, const int height) const
+    {
+        glfwSetWindowSize(m_window, width, height);
+    }
+
+    void Window::mode(const WindowMode mode)
+    {
+        if (mode != m_mode)
+        {
+            m_mode = mode;
+            switch (mode)
+            {
+            case WindowMode::borderless:
+                {
+                    glfwGetWindowPos(m_window, &m_lastX, &m_lastY);
+                    m_lastWidth = m_width;
+                    m_lastHeight = m_height;
+                    const auto monitor = glfwGetPrimaryMonitor();
+                    const auto vidmode = glfwGetVideoMode(monitor);
+                    glfwSetWindowMonitor(m_window, monitor, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
+                }
+                break;
+            case WindowMode::windowed:
+                glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, m_lastWidth, m_lastHeight, GLFW_DONT_CARE);
+                break;
+            }
+        }
     }
 
     void Window::setCharCallback(CharCallback callback)
@@ -144,11 +175,6 @@ namespace epoch::frontend
     void Window::setMouseWheelCallback(MouseWheelCallback callback)
     {
         m_mouseWheelCallback = std::move(callback);
-    }
-
-    void Window::resize(const int width, const int height) const
-    {
-        glfwSetWindowSize(m_window, width, height);
     }
 
     void Window::s_charCallback(GLFWwindow* glfwWindow, const unsigned int c)

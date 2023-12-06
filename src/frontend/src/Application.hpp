@@ -70,6 +70,7 @@ namespace epoch::frontend
 
         bool m_running{ true };
         bool m_keepAspectRatio{ true };
+        bool m_fullscreen{ false };
     };
 }
 
