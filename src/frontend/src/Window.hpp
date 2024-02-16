@@ -31,8 +31,8 @@ namespace epoch::frontend
     struct WindowInfo
     {
         std::string name;
-        int width;
-        int height;
+        unsigned width;
+        unsigned height;
         WindowMode mode{ WindowMode::windowed };
     };
 
@@ -51,16 +51,16 @@ namespace epoch::frontend
     public:
         [[nodiscard]] bool nextFrame() const;
 
-        [[nodiscard]] int width() const { return m_width; }
-        [[nodiscard]] int height() const { return m_height; }
-        [[nodiscard]] int framebufferWidth() const { return m_framebufferWidth; }
-        [[nodiscard]] int framebufferHeight() const { return m_framebufferHeight; }
+        [[nodiscard]] unsigned width() const { return m_width; }
+        [[nodiscard]] unsigned height() const { return m_height; }
+        [[nodiscard]] unsigned framebufferWidth() const { return m_framebufferWidth; }
+        [[nodiscard]] unsigned framebufferHeight() const { return m_framebufferHeight; }
 
         [[nodiscard]] double time() const;
 
         void close() const;
 
-        void resize(int width, int height) const;
+        void resize(unsigned width, unsigned height) const;
         void mode(WindowMode mode);
 
         using CharCallback = std::function<void(unsigned int)>;
@@ -83,11 +83,12 @@ namespace epoch::frontend
     private:
         GLFWwindow* m_window{};
 
-        int m_width{}, m_height{};
-        int m_framebufferWidth{}, m_framebufferHeight{};
+        unsigned m_width{}, m_height{};
+        unsigned m_framebufferWidth{}, m_framebufferHeight{};
         WindowMode m_mode{ WindowMode::windowed };
 
-        int m_lastX{}, m_lastY{}, m_lastWidth{}, m_lastHeight{};
+        int m_lastX{}, m_lastY{};
+        unsigned m_lastWidth{}, m_lastHeight{};
 
         CharCallback m_charCallback{};
         CursorEnterCallback m_cursorEnterCallback{};

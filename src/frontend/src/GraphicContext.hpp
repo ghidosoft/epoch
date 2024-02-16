@@ -39,14 +39,14 @@ namespace epoch::frontend
         GraphicContext& operator=(GraphicContext&& other) noexcept = delete;
 
     public:
-        void init(int screenWidth, int screenHeight);
+        void init(unsigned screenWidth, unsigned screenHeight);
         void updateScreen(std::span<const uint32_t> buffer);
         void renderScreen();
         void viewport(int x, int y, int width, int height);
 
     private:
-        int m_screenWidth{}, m_screenHeight{};
-        int m_screenTextureWidth{}, m_screenTextureHeight{};
+        unsigned m_screenWidth{}, m_screenHeight{};
+        unsigned m_screenTextureWidth{}, m_screenTextureHeight{};
 
         GLuint m_vao{};
         GLuint m_vertexBuffer{}, m_indexBuffer{};

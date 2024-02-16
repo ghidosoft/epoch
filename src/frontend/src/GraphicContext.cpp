@@ -16,6 +16,7 @@
 
 #include "GraphicContext.hpp"
 
+#include <bit>
 #include <cassert>
 #include <cstdint>
 
@@ -93,19 +94,19 @@ namespace epoch::frontend
         m_shader = nullptr;
     }
 
-    void GraphicContext::init(const int screenWidth, const int screenHeight)
+    void GraphicContext::init(const unsigned screenWidth, const unsigned screenHeight)
     {
         assert(screenWidth > 0);
         assert(screenHeight > 0);
         m_screenWidth = screenWidth;
         m_screenHeight = screenHeight;
 
-        // TODO: calculate from screen size
-        m_screenTextureWidth = 512;
-        m_screenTextureHeight = 512;
+        m_screenTextureWidth = std::bit_ceil(m_screenWidth);
+        m_screenTextureHeight = std::bit_ceil(m_screenHeight);
 
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screenTextureWidth, m_screenTextureHeight,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+            static_cast<GLint>(m_screenTextureWidth), static_cast<GLint>(m_screenTextureHeight),
             0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
 

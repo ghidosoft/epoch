@@ -43,14 +43,20 @@ namespace epoch::frontend
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_FALSE);
 
-        m_window = glfwCreateWindow(info.width * 2, info.height * 2, info.name.c_str(), nullptr, nullptr);
+        m_window = glfwCreateWindow(static_cast<int>(info.width) * 2, static_cast<int>(info.height) * 2,
+            info.name.c_str(), nullptr, nullptr);
         if (m_window == nullptr)
         {
             throw std::runtime_error("Cannot create GLFW window.");
         }
 
-        glfwGetWindowSize(m_window, &m_width, &m_height);
-        glfwGetFramebufferSize(m_window, &m_framebufferWidth, &m_framebufferHeight);
+        int w, h;
+        glfwGetWindowSize(m_window, &w, &h);
+        m_width = static_cast<unsigned>(w);
+        m_height = static_cast<unsigned>(h);
+        glfwGetFramebufferSize(m_window, &w, &h);
+        m_framebufferWidth = static_cast<unsigned>(w);
+        m_framebufferHeight = static_cast<unsigned>(h);
 
         glfwSetWindowUserPointer(m_window, this);
 
@@ -108,9 +114,9 @@ namespace epoch::frontend
         glfwSetWindowShouldClose(m_window, true);
     }
 
-    void Window::resize(const int width, const int height) const
+    void Window::resize(const unsigned width, const unsigned height) const
     {
-        glfwSetWindowSize(m_window, width, height);
+        glfwSetWindowSize(m_window, static_cast<int>(width), static_cast<int>(height));
     }
 
     void Window::mode(const WindowMode mode)
@@ -143,7 +149,7 @@ namespace epoch::frontend
                 break;
             case WindowMode::windowed:
                 glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);
-                glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, m_lastWidth, m_lastHeight, GLFW_DONT_CARE);
+                glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, static_cast<int>(m_lastWidth), static_cast<int>(m_lastHeight), GLFW_DONT_CARE);
                 break;
             }
             m_mode = mode;
@@ -238,15 +244,15 @@ namespace epoch::frontend
     void Window::s_framebufferResizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        window->m_framebufferWidth = width;
-        window->m_framebufferHeight = height;
+        window->m_framebufferWidth = static_cast<unsigned>(width);
+        window->m_framebufferHeight = static_cast<unsigned>(height);
     }
 
     void Window::s_resizeCallback(GLFWwindow* glfwWindow, const int width, const int height)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-        window->m_width = width;
-        window->m_height = height;
+        window->m_width = static_cast<unsigned>(width);
+        window->m_height = static_cast<unsigned>(height);
     }
 
     void Window::s_keyCallback(GLFWwindow* glfwWindow, const int key, int scancode, const int action, int mods)

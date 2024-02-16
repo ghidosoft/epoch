@@ -36,8 +36,8 @@ namespace epoch
     struct EmulatorInfo
     {
         std::string name;
-        int width;
-        int height;
+        unsigned width;
+        unsigned height;
         std::size_t frameClocks;
         double framesPerSecond;
         std::vector<EmulatorFileFormat> fileFormats;

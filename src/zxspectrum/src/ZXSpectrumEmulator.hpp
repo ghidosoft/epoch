@@ -73,7 +73,7 @@ namespace epoch::zxspectrum
         MemoryBank m_rom48k{};
         std::array<MemoryBank, 8> m_ram{};
 
-        std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
+        std::array<uint32_t, static_cast<std::size_t>(Width * Height)> m_screenBuffer{};
 
         std::unique_ptr<TapeInterface> m_tape{};
 
