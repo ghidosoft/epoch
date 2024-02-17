@@ -166,9 +166,23 @@ namespace epoch::frontend
                 if (ImGui::MenuItem("3X size")) { m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Fullscreen", nullptr, &m_fullscreen)) { m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed); }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings)) {}
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
+        }
+
+        if (m_showShaderSettings)
+        {
+            ImGui::Begin("Shader settings", &m_showShaderSettings);
+
+            if (ImGui::BeginCombo("Shader", "TODO: current shader name"))
+            {
+                ImGui::EndCombo();
+            }
+
+            ImGui::End();
         }
     }
 }

@@ -20,6 +20,8 @@
 #include <memory>
 #include <vector>
 
+#include "ConfigurableShader.hpp"
+
 namespace epoch
 {
     class Emulator;
@@ -71,6 +73,9 @@ namespace epoch::frontend
         bool m_running{ true };
         bool m_keepAspectRatio{ true };
         bool m_fullscreen{ false };
+        bool m_showShaderSettings{ false };
+
+        std::vector<ConfigurableShader> m_shaders{};
     };
 }
 
