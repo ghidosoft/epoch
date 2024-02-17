@@ -39,7 +39,7 @@ namespace epoch::frontend
         Gui();
         ~Gui();
 
-        void newFrame(int width, int height, int framebufferWidth, int framebufferHeight, double deltaTime) const;
+        void newFrame(unsigned width, unsigned height, unsigned framebufferWidth, unsigned framebufferHeight, double deltaTime) const;
         void render() const;
 
         void cursorEnterEvent(bool entered);
