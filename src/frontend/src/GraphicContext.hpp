@@ -47,6 +47,8 @@ namespace epoch::frontend
     private:
         unsigned m_screenWidth{}, m_screenHeight{};
         unsigned m_screenTextureWidth{}, m_screenTextureHeight{};
+        int m_viewportWidth{}, m_viewportHeight{};
+        int m_frameCount{};
 
         GLuint m_vao{};
         GLuint m_vertexBuffer{}, m_indexBuffer{};

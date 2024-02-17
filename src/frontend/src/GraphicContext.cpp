@@ -140,6 +140,15 @@ namespace epoch::frontend
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        m_shader->bind();
+        float vec2[2];
+        vec2[0] = static_cast<float>(m_screenWidth);
+        vec2[1] = static_cast<float>(m_screenHeight);
+        m_shader->setUniformVec2("InputSize", vec2);
+        vec2[0] = static_cast<float>(m_screenTextureWidth);
+        vec2[1] = static_cast<float>(m_screenTextureHeight);
+        m_shader->setUniformVec2("TextureSize", vec2);
     }
 
     void GraphicContext::updateScreen(const std::span<const uint32_t> buffer)
@@ -147,7 +156,7 @@ namespace epoch::frontend
         assert(buffer.size() == static_cast<std::size_t>(m_screenWidth) * m_screenHeight);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_screenWidth, m_screenHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<GLsizei>(m_screenWidth), static_cast<GLsizei>(m_screenHeight), GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -163,16 +172,27 @@ namespace epoch::frontend
 
         glBindVertexArray(m_vao);
         m_shader->bind();
+        m_shader->setUniformInt("FrameCount", m_frameCount);
         // glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glUseProgram(0);
         glBindVertexArray(0);
+
+        m_frameCount++;
     }
 
     void GraphicContext::viewport(const int x, const int y, const int width, const int height)
     {
+        m_viewportWidth = width;
+        m_viewportHeight = height;
         glViewport(x, y, width, height);
+
+        m_shader->bind();
+        float vec2[2];
+        vec2[0] = static_cast<float>(m_viewportWidth);
+        vec2[1] = static_cast<float>(m_viewportHeight);
+        m_shader->setUniformVec2("OutputSize", vec2);
     }
 }
