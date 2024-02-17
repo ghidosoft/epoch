@@ -96,7 +96,7 @@ namespace epoch::frontend
         {
             const auto emulatorAspectRatio = m_emulator->info().aspectRatio();
             const auto windowAspectRatio = static_cast<float>(m_window->framebufferWidth()) / static_cast<float>(m_window->framebufferHeight());
-            auto x = 0, y = 0;
+            auto x = 0u, y = 0u;
             auto width = m_window->framebufferWidth();
             auto height = m_window->framebufferHeight();
             if (emulatorAspectRatio > windowAspectRatio)
@@ -109,15 +109,15 @@ namespace epoch::frontend
                 width = static_cast<int>(static_cast<float>(height) * emulatorAspectRatio);
                 x = (m_window->framebufferWidth() - width) / 2;
             }
-            m_context->viewport(x, y, width, height);
+            m_context->viewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
         }
         else
         {
-            m_context->viewport(0, 0, m_window->framebufferWidth(), m_window->framebufferHeight());
+            m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()), static_cast<int>(m_window->framebufferHeight()));
         }
         m_context->renderScreen();
 
-        m_context->viewport(0, 0, m_window->framebufferWidth(), m_window->framebufferHeight());
+        m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()), static_cast<int>(m_window->framebufferHeight()));
         m_gui->newFrame(
             m_window->width(), m_window->height(),
             m_window->framebufferWidth(), m_window->framebufferHeight(),
