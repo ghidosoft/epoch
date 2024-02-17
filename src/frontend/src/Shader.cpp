@@ -94,6 +94,12 @@ namespace epoch::frontend
         glUseProgram(m_handle);
     }
 
+    void Shader::setUniformInt(const std::string& name, const GLint data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniform1i(location, data);
+    }
+
     void Shader::setUniformMat4(const std::string& name, const float* data)
     {
         const auto location = getUniformLocation(name);
@@ -104,6 +110,24 @@ namespace epoch::frontend
     {
         const auto location = getUniformLocation(name);
         glUniform1i(location, data);
+    }
+
+    void Shader::setUniformVec2(const std::string& name, const float* data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniform2fv(location, 1, data);
+    }
+
+    void Shader::setUniformVec3(const std::string& name, const float* data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniform3fv(location, 1, data);
+    }
+
+    void Shader::setUniformVec4(const std::string& name, const float* data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniform4fv(location, 1, data);
     }
 
     GLint Shader::getUniformLocation(const std::string& name)
