@@ -61,12 +61,13 @@ namespace epoch::frontend
     public:
         void bind() const;
 
+        void setUniformFloat(const std::string& name, GLfloat data);
         void setUniformInt(const std::string& name, GLint data);
-        void setUniformMat4(const std::string& name, const float* data);
+        void setUniformMat4(const std::string& name, const GLfloat* data);
         void setUniformTexture(const std::string& name, GLint data);
-        void setUniformVec2(const std::string& name, const float* data);
-        void setUniformVec3(const std::string& name, const float* data);
-        void setUniformVec4(const std::string& name, const float* data);
+        void setUniformVec2(const std::string& name, const GLfloat* data);
+        void setUniformVec3(const std::string& name, const GLfloat* data);
+        void setUniformVec4(const std::string& name, const GLfloat* data);
 
     private:
         GLuint m_handle{};

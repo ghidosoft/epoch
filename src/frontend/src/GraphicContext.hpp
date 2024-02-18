@@ -46,6 +46,7 @@ namespace epoch::frontend
         void viewport(int x, int y, int width, int height);
 
         void updateShader(ConfigurableShader& configurableShader);
+        void updateShaderParameters(ConfigurableShader& configurableShader);
 
     private:
         unsigned m_screenWidth{}, m_screenHeight{};

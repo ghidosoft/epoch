@@ -94,13 +94,19 @@ namespace epoch::frontend
         glUseProgram(m_handle);
     }
 
+    void Shader::setUniformFloat(const std::string& name, const GLfloat data)
+    {
+        const auto location = getUniformLocation(name);
+        glUniform1f(location, data);
+    }
+
     void Shader::setUniformInt(const std::string& name, const GLint data)
     {
         const auto location = getUniformLocation(name);
         glUniform1i(location, data);
     }
 
-    void Shader::setUniformMat4(const std::string& name, const float* data)
+    void Shader::setUniformMat4(const std::string& name, const GLfloat* data)
     {
         const auto location = getUniformLocation(name);
         glUniformMatrix4fv(location, 1, GL_FALSE, data);
@@ -112,19 +118,19 @@ namespace epoch::frontend
         glUniform1i(location, data);
     }
 
-    void Shader::setUniformVec2(const std::string& name, const float* data)
+    void Shader::setUniformVec2(const std::string& name, const GLfloat* data)
     {
         const auto location = getUniformLocation(name);
         glUniform2fv(location, 1, data);
     }
 
-    void Shader::setUniformVec3(const std::string& name, const float* data)
+    void Shader::setUniformVec3(const std::string& name, const GLfloat* data)
     {
         const auto location = getUniformLocation(name);
         glUniform3fv(location, 1, data);
     }
 
-    void Shader::setUniformVec4(const std::string& name, const float* data)
+    void Shader::setUniformVec4(const std::string& name, const GLfloat* data)
     {
         const auto location = getUniformLocation(name);
         glUniform4fv(location, 1, data);

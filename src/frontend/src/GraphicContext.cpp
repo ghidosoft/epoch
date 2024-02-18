@@ -162,8 +162,8 @@ namespace epoch::frontend
     {
         m_shader = nullptr;
 
-        std::string vertexSource = "#version 330 core\n#define VERTEX\n\n" + configurableShader.source();
-        std::string fragmentSource = "#version 330 core\n#define FRAGMENT\n\n" + configurableShader.source();
+        std::string vertexSource = "#version 330 core\n#define VERTEX\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
+        std::string fragmentSource = "#version 330 core\n#define FRAGMENT\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
 
         m_shader = std::make_unique<Shader>(vertexSource, fragmentSource);
         m_shader->bind();
@@ -185,5 +185,16 @@ namespace epoch::frontend
             0, 0, 0, 1,
         };
         m_shader->setUniformMat4("MVPMatrix", mat4x4);
+
+        updateShaderParameters(configurableShader);
+    }
+
+    void GraphicContext::updateShaderParameters(ConfigurableShader &configurableShader)
+    {
+        m_shader->bind();
+        for (const auto& parameter : configurableShader.parameters())
+        {
+            m_shader->setUniformFloat(parameter.variableName, parameter.value);
+        }
     }
 }

@@ -200,7 +200,7 @@ namespace epoch::frontend
                 {
                     if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
                     {
-                        // TODO: update shader uniforms
+                        m_context->updateShaderParameters(m_shaders[m_shader]);
                     }
                 }
             }
