@@ -20,8 +20,6 @@ namespace epoch::frontend::shaders
 {
     std::string_view DEFAULT = R"GLSL(
 #if defined(VERTEX)
-#version 330 core
-
 layout (location = 0) in vec4 inPos;
 layout (location = 2) in vec2 inTexCoords;
 
@@ -35,8 +33,6 @@ void main()
 #endif
 
 #if defined(FRAGMENT)
-#version 330 core
-
 uniform sampler2D MainTexture;
 
 in vec2 passTexCoords;

@@ -43,7 +43,12 @@ namespace epoch::frontend
         }
     }
 
-    const std::string& ConfigurableShader::name() const
+    const std::string &ConfigurableShader::source() const
+    {
+        return m_source;
+    }
+
+    const std::string &ConfigurableShader::name() const
     {
         return m_name;
     }

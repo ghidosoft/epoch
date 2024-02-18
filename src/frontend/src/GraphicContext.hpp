@@ -24,6 +24,7 @@
 
 namespace epoch::frontend
 {
+    class ConfigurableShader;
     class Shader;
 
     class GraphicContext final
@@ -43,6 +44,8 @@ namespace epoch::frontend
         void updateScreen(std::span<const uint32_t> buffer);
         void renderScreen();
         void viewport(int x, int y, int width, int height);
+
+        void updateShader(ConfigurableShader& configurableShader);
 
     private:
         unsigned m_screenWidth{}, m_screenHeight{};

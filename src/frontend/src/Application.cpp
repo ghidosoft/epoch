@@ -66,6 +66,7 @@ namespace epoch::frontend
         m_context->init(m_emulator->info().width, m_emulator->info().height);
         m_shaders.emplace_back("<none>", shaders::DEFAULT);
         m_shaders.emplace_back("crt-easymode", shaders::CRT_EASYMODE);
+        m_context->updateShader(m_shaders[0]);
         m_emulator->reset();
         m_time = m_window->time();
         while (m_window->nextFrame())
@@ -188,7 +189,7 @@ namespace epoch::frontend
                         if (ImGui::Selectable(m_shaders[i].name().c_str(), i == m_shader))
                         {
                             m_shader = i;
-                            // TODO: update shader in GraphicContext
+                            m_context->updateShader(m_shaders[m_shader]);
                         }
                         if (i == m_shader) ImGui::SetItemDefaultFocus();
                     }

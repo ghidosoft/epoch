@@ -38,6 +38,7 @@ namespace epoch::frontend
     public:
         ConfigurableShader(std::string name, std::string_view source);
 
+        [[nodiscard]] const std::string& source() const;
         [[nodiscard]] const std::string& name() const;
         [[nodiscard]] std::vector<ConfigurableShaderParameter>& parameters();
 
