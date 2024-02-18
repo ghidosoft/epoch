@@ -30,16 +30,21 @@ namespace epoch::frontend
         float min;
         float max;
         float step;
+        float value;
     };
 
     class ConfigurableShader final
     {
     public:
-        ConfigurableShader(std::string name, std::vector<ConfigurableShaderParameter> parameters);
+        ConfigurableShader(std::string name, std::string_view source);
+
+        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] std::vector<ConfigurableShaderParameter>& parameters();
 
     private:
-        const std::string m_name;
-        const std::vector<ConfigurableShaderParameter> m_parameters;
+        std::string m_source;
+        std::string m_name;
+        std::vector<ConfigurableShaderParameter> m_parameters;
     };
 }
 

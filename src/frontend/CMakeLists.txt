@@ -9,6 +9,7 @@ add_library(epoch_frontend
     "src/Gui.cpp" "src/Gui.hpp"
     "src/Platform.cpp" "src/Platform.hpp"
     "src/Shader.cpp" "src/Shader.hpp"
+    "src/Shaders.cpp" "src/Shaders.hpp"
     "src/Window.cpp" "src/Window.hpp"
 )
 

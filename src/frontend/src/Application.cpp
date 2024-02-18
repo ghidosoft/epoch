@@ -23,6 +23,7 @@
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
 #include "Platform.hpp"
+#include "Shaders.hpp"
 #include "Window.hpp"
 
 namespace epoch::frontend
@@ -63,6 +64,8 @@ namespace epoch::frontend
     int Application::run()
     {
         m_context->init(m_emulator->info().width, m_emulator->info().height);
+        m_shaders.emplace_back("<none>", shaders::DEFAULT);
+        m_shaders.emplace_back("crt-easymode", shaders::CRT_EASYMODE);
         m_emulator->reset();
         m_time = m_window->time();
         while (m_window->nextFrame())
@@ -176,13 +179,30 @@ namespace epoch::frontend
         if (m_showShaderSettings)
         {
             ImGui::SetNextWindowSize({ 200, 250, }, ImGuiCond_Once);
-            ImGui::Begin("Shader settings", &m_showShaderSettings);
-
-            if (ImGui::BeginCombo("Shader", "TODO: current shader name"))
+            if (ImGui::Begin("Shader settings", &m_showShaderSettings))
             {
-                ImGui::EndCombo();
-            }
+                if (ImGui::BeginCombo("Shader", m_shaders[m_shader].name().c_str()))
+                {
+                    for (std::size_t i = 0; i < m_shaders.size(); i++)
+                    {
+                        if (ImGui::Selectable(m_shaders[i].name().c_str(), i == m_shader))
+                        {
+                            m_shader = i;
+                            // TODO: update shader in GraphicContext
+                        }
+                        if (i == m_shader) ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
 
+                for (auto& parameter : m_shaders[m_shader].parameters())
+                {
+                    if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
+                    {
+                        // TODO: update shader uniforms
+                    }
+                }
+            }
             ImGui::End();
         }
     }

@@ -16,9 +16,40 @@
 
 #include "ConfigurableShader.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 namespace epoch::frontend
 {
-    ConfigurableShader::ConfigurableShader(std::string name, std::vector<ConfigurableShaderParameter> parameters) : m_name{ std::move(name) }, m_parameters{ std::move(parameters) }
+    ConfigurableShader::ConfigurableShader(std::string name, const std::string_view source) : m_source{ source }, m_name{ std::move(name) }
     {
+        std::istringstream f{ m_source };
+        std::string line;
+        while (std::getline(f, line))
+        {
+            if (line.starts_with("#pragma parameter "))
+            {
+                std::istringstream ls{ line.substr(sizeof("#pragma parameter ") - 1) };
+                std::string variableName, description;
+                float defaultValue, min, max, step;
+                ls >> variableName;
+                ls >> std::quoted(description);
+                ls >> defaultValue;
+                ls >> min;
+                ls >> max;
+                ls >> step;
+                m_parameters.emplace_back(variableName, description, defaultValue, min, max, step, defaultValue);
+            }
+        }
+    }
+
+    const std::string& ConfigurableShader::name() const
+    {
+        return m_name;
+    }
+
+    std::vector<ConfigurableShaderParameter>& ConfigurableShader::parameters()
+    {
+        return m_parameters;
     }
 }

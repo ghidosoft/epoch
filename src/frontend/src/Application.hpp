@@ -76,6 +76,7 @@ namespace epoch::frontend
         bool m_showShaderSettings{ false };
 
         std::vector<ConfigurableShader> m_shaders{};
+        std::size_t m_shader{};
     };
 }
 
