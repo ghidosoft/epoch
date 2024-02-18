@@ -25,14 +25,14 @@
 static const char* VERTEX_SHADER = R"GLSL(
 #version 330 core
 
-layout (location = 0) in vec2 inPos;
-layout (location = 1) in vec2 inTexCoords;
+layout (location = 0) in vec4 inPos;
+layout (location = 2) in vec2 inTexCoords;
 
 out vec2 passTexCoords;
 
 void main()
 {
-    gl_Position = vec4(inPos.x, inPos.y, 0.0, 1.0);
+    gl_Position = inPos;
     passTexCoords = inTexCoords;
 }
 )GLSL";
@@ -169,7 +169,8 @@ namespace epoch::frontend
 {
     struct Vertex
     {
-        float position[2];
+        float position[4];
+        float color[4];
         float uv[2];
     };
 
@@ -231,10 +232,10 @@ namespace epoch::frontend
         const auto uMax = static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth);
         const auto vMax = static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight);
         const Vertex quadVertices[] = {
-            { {-1, -1}, {uMin, vMax} },
-            { { 1, -1}, {uMax, vMax} },
-            { { 1,  1}, {uMax, vMin} },
-            { {-1,  1}, {uMin, vMin} },
+            { {-1, -1, 0, 1}, {1, 1, 1, 1}, {uMin, vMax} },
+            { { 1, -1, 0, 1}, {1, 1, 1, 1}, {uMax, vMax} },
+            { { 1,  1, 0, 1}, {1, 1, 1, 1}, {uMax, vMin} },
+            { {-1,  1, 0, 1}, {1, 1, 1, 1}, {uMin, vMin} },
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 
@@ -245,10 +246,12 @@ namespace epoch::frontend
         };
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), &quadIndices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(4 * sizeof(float)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
