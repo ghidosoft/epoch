@@ -196,10 +196,23 @@ namespace epoch::frontend
                     ImGui::EndCombo();
                 }
 
-                for (auto& parameter : m_shaders[m_shader].parameters())
+                if (!m_shaders[m_shader].parameters().empty())
                 {
-                    if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
+                    ImGui::Spacing();
+                    ImGui::Spacing();
+                    for (auto& parameter : m_shaders[m_shader].parameters())
                     {
+                        if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
+                        {
+                            m_context->updateShaderParameters(m_shaders[m_shader]);
+                        }
+                    }                
+                    if (ImGui::Button("Reset values"))
+                    {
+                        for (auto& parameter : m_shaders[m_shader].parameters())
+                        {
+                            parameter.value = parameter.defaultValue;
+                        }
                         m_context->updateShaderParameters(m_shaders[m_shader]);
                     }
                 }
