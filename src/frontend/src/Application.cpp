@@ -66,6 +66,7 @@ namespace epoch::frontend
         m_context->init(m_emulator->info().width, m_emulator->info().height);
         m_shaders.emplace_back("<none>", shaders::DEFAULT);
         m_shaders.emplace_back("crt-easymode", shaders::CRT_EASYMODE);
+        m_shaders.emplace_back("crt-geom", shaders::CRT_GEOM);
         m_context->updateShader(m_shaders[0]);
         m_emulator->reset();
         m_time = m_window->time();

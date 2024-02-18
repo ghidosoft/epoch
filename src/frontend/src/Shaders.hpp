@@ -23,6 +23,7 @@ namespace epoch::frontend::shaders
 {
     extern std::string_view DEFAULT;
     extern std::string_view CRT_EASYMODE;
+    extern std::string_view CRT_GEOM;
 }
 
 #endif
