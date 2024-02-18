@@ -175,6 +175,7 @@ namespace epoch::frontend
 
         if (m_showShaderSettings)
         {
+            ImGui::SetNextWindowSize({ 200, 250, }, ImGuiCond_Once);
             ImGui::Begin("Shader settings", &m_showShaderSettings);
 
             if (ImGui::BeginCombo("Shader", "TODO: current shader name"))
