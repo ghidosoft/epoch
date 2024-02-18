@@ -180,7 +180,7 @@ namespace epoch::frontend
 
         if (m_showShaderSettings)
         {
-            ImGui::SetNextWindowSize({ 200, 250, }, ImGuiCond_Once);
+            ImGui::SetNextWindowSize({ 300, 450, }, ImGuiCond_Once);
             if (ImGui::Begin("Shader settings", &m_showShaderSettings))
             {
                 if (ImGui::BeginCombo("Shader", m_shaders[m_shader].name().c_str()))
@@ -201,13 +201,15 @@ namespace epoch::frontend
                 {
                     ImGui::Spacing();
                     ImGui::Spacing();
+                    ImGui::PushItemWidth(ImGui::GetWindowSize().x / 4);
                     for (auto& parameter : m_shaders[m_shader].parameters())
                     {
                         if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
                         {
                             m_context->updateShaderParameters(m_shaders[m_shader]);
                         }
-                    }                
+                    }
+                    ImGui::PopItemWidth();                
                     if (ImGui::Button("Reset values"))
                     {
                         for (auto& parameter : m_shaders[m_shader].parameters())
