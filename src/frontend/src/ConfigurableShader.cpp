@@ -21,6 +21,13 @@
 
 namespace epoch::frontend
 {
+    ConfigurableShaderParameter::ConfigurableShaderParameter(
+        std::string variableName, std::string description,
+        const float defaultValue, const float min, const float max, const float step, const float value
+    ) : variableName(std::move(variableName)), description(std::move(description)), defaultValue(defaultValue), min(min), max(max), step(step), value(value)
+    {
+    }
+
     ConfigurableShader::ConfigurableShader(std::string name, const std::string_view source) : m_source{ source }, m_name{ std::move(name) }
     {
         std::istringstream f{ m_source };
