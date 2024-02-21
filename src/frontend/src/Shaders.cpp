@@ -543,6 +543,8 @@ void main()
 	mod_factor = TexCoord.x * TextureSize.x * OutputSize.x / InputSize.x;
 
 }
+)GLSL"
+R"GLSL(
 
 #elif defined(FRAGMENT)
 
