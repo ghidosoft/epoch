@@ -64,7 +64,7 @@ make
 ```
 
 ## License
-Copyright &copy; 2023 Andrea Ghidini.
+Copyright &copy; 2024 Andrea Ghidini.
 
 Epoch is [free software](https://www.gnu.org/philosophy/free-sw.html): you can redistribute it and/or modify
 it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by
