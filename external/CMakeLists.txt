@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
     glfw
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    URL https://github.com/glfw/glfw/archive/3.3.8.zip
+    URL https://github.com/glfw/glfw/archive/3.4.zip
 )
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
