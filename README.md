@@ -76,5 +76,5 @@ If not, see https://www.gnu.org/licenses/.
 ## Used libraries
 * [Dear ImGui](https://github.com/ocornut/imgui) for the GUI
 * [GLFW](https://www.glfw.org/) for graphics and input
-* [Native File Dialog Extended](https://github.com/btzy/nativefiledialog-extended) for file dialog
+* [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog) for file dialog
 * [PortAudio](http://www.portaudio.com/) for audio

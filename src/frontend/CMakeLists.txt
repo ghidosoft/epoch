@@ -7,7 +7,6 @@ add_library(epoch_frontend
     "src/ConfigurableShader.cpp" "src/ConfigurableShader.hpp"
     "src/GraphicContext.cpp" "src/GraphicContext.hpp"
     "src/Gui.cpp" "src/Gui.hpp"
-    "src/Platform.cpp" "src/Platform.hpp"
     "src/Shader.cpp" "src/Shader.hpp"
     "src/Shaders.cpp" "src/Shaders.hpp"
     "src/Window.cpp" "src/Window.hpp"
@@ -15,6 +14,6 @@ add_library(epoch_frontend
 
 target_include_directories(epoch_frontend INTERFACE include)
 
-target_link_libraries(epoch_frontend PRIVATE glad glfw ${GLFW_LIBRARIES} imgui nfd portaudio_static Epoch::Core)
+target_link_libraries(epoch_frontend PRIVATE glad glfw ${GLFW_LIBRARIES} imgui ImGuiFileDialog portaudio_static Epoch::Core)
 
 add_library(Epoch::Frontend ALIAS epoch_frontend)

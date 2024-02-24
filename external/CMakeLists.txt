@@ -40,12 +40,12 @@ if(NOT imgui_POPULATED)
 endif()
 
 FetchContent_Declare(
-    nfd
+    ImGuiFileDialog
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    URL https://github.com/btzy/nativefiledialog-extended/archive/v1.1.0.zip
+    URL https://github.com/aiekick/ImGuiFileDialog/archive/v0.6.7.zip
 )
-set(NFD_PORTAL ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(nfd)
+FetchContent_MakeAvailable(ImGuiFileDialog)
+target_link_libraries(ImGuiFileDialog PUBLIC imgui)
 
 FetchContent_Declare(
     portaudio

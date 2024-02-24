@@ -16,13 +16,15 @@
 
 #include "Application.hpp"
 
+#include <sstream>
+
 #include <epoch/core.hpp>
 #include <imgui.h>
+#include <ImGuiFileDialog.h>
 
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
-#include "Platform.hpp"
 #include "Shaders.hpp"
 #include "Window.hpp"
 
@@ -36,7 +38,6 @@ namespace epoch::frontend
             .width = emulatorInfo.width,
             .height = emulatorInfo.height,
         });
-        m_platform = std::make_unique<Platform>();
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
@@ -140,17 +141,19 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Load"))
                 {
-                    if (const auto path = m_platform->openDialog(m_emulator->info().fileFormats); !path.empty())
-                    {
-                        m_emulator->load(path);
-                    }
+                    const std::string filters = generateFileDialogFilters(false);
+                    const IGFD::FileDialogConfig config{
+                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal,
+                    };
+                    ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
                 if (ImGui::MenuItem("Save"))
                 {
-                    if (const auto path = m_platform->saveDialog(m_emulator->info().fileFormats); !path.empty())
-                    {
-                        m_emulator->save(path);
-                    }
+                    const std::string filters = generateFileDialogFilters(true);
+                    const IGFD::FileDialogConfig config{
+                        .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal,
+                    };
+                    ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
@@ -176,6 +179,26 @@ namespace epoch::frontend
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->load(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->save(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
         }
 
         if (m_showShaderSettings)
@@ -222,5 +245,32 @@ namespace epoch::frontend
             }
             ImGui::End();
         }
+    }
+
+    std::string Application::generateFileDialogFilters(const bool save) const
+    {
+        std::ostringstream ss;
+        ss << "Supported files{";
+        bool empty{ true };
+        for (const auto& format : m_emulator->info().fileFormats)
+        {
+            if (save ? format.save : format.load)
+            {
+                if (!empty) ss << ",";
+                ss << format.extensions;
+                empty = false;
+            }
+        }
+        ss << "},";
+        for (const auto& format : m_emulator->info().fileFormats)
+        {
+            if (save ? format.save : format.load)
+            {
+                ss << format.description;
+                ss << "{" << format.extensions << "},";
+            }
+        }
+        ss << "All files {.*}";
+        return ss.str();
     }
 }
