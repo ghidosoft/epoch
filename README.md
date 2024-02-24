@@ -29,6 +29,10 @@ First 48K ROM running screenshot:
 
 ![ZX Spectrum 48K](docs/images/zx48k_main.png)
 
+Configurable output shader:
+
+![Output using crt-geom shader](docs/images/2024-02-24_crt-geom-shader.png)
+
 ## Building
 
 This project uses CMake 3.22. All dependencies are loaded using CMake `FetchContent`.
