@@ -1,4 +1,4 @@
-/* This file is part of Epoch, Copyright (C) 2023 Andrea Ghidini.
+/* This file is part of Epoch, Copyright (C) 2024 Andrea Ghidini.
  *
  * Epoch is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,16 @@
 
 #include "Application.hpp"
 
+#include <sstream>
+
 #include <epoch/core.hpp>
 #include <imgui.h>
+#include <ImGuiFileDialog.h>
 
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
-#include "Platform.hpp"
+#include "Shaders.hpp"
 #include "Window.hpp"
 
 namespace epoch::frontend
@@ -35,7 +38,6 @@ namespace epoch::frontend
             .width = emulatorInfo.width,
             .height = emulatorInfo.height,
         });
-        m_platform = std::make_unique<Platform>();
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
@@ -63,6 +65,10 @@ namespace epoch::frontend
     int Application::run()
     {
         m_context->init(m_emulator->info().width, m_emulator->info().height);
+        m_shaders.emplace_back("<none>", shaders::DEFAULT);
+        m_shaders.emplace_back("crt-easymode", shaders::CRT_EASYMODE);
+        m_shaders.emplace_back("crt-geom", shaders::CRT_GEOM);
+        m_context->updateShader(m_shaders[0]);
         m_emulator->reset();
         m_time = m_window->time();
         while (m_window->nextFrame())
@@ -135,17 +141,19 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Load"))
                 {
-                    if (const auto path = m_platform->openDialog(m_emulator->info().fileFormats); !path.empty())
-                    {
-                        m_emulator->load(path);
-                    }
+                    const std::string filters = generateFileDialogFilters(false);
+                    const IGFD::FileDialogConfig config{
+                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal,
+                    };
+                    ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
                 if (ImGui::MenuItem("Save"))
                 {
-                    if (const auto path = m_platform->saveDialog(m_emulator->info().fileFormats); !path.empty())
-                    {
-                        m_emulator->save(path);
-                    }
+                    const std::string filters = generateFileDialogFilters(true);
+                    const IGFD::FileDialogConfig config{
+                        .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal,
+                    };
+                    ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
                 }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { m_window->close(); }
@@ -166,9 +174,103 @@ namespace epoch::frontend
                 if (ImGui::MenuItem("3X size")) { m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Fullscreen", nullptr, &m_fullscreen)) { m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed); }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings)) {}
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
         }
+
+        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->load(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->save(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        if (m_showShaderSettings)
+        {
+            ImGui::SetNextWindowSize({ 300, 450, }, ImGuiCond_Once);
+            if (ImGui::Begin("Shader settings", &m_showShaderSettings))
+            {
+                if (ImGui::BeginCombo("Shader", m_shaders[m_shader].name().c_str()))
+                {
+                    for (std::size_t i = 0; i < m_shaders.size(); i++)
+                    {
+                        if (ImGui::Selectable(m_shaders[i].name().c_str(), i == m_shader))
+                        {
+                            m_shader = i;
+                            m_context->updateShader(m_shaders[m_shader]);
+                        }
+                        if (i == m_shader) ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+
+                if (!m_shaders[m_shader].parameters().empty())
+                {
+                    ImGui::Spacing();
+                    ImGui::Spacing();
+                    ImGui::PushItemWidth(ImGui::GetWindowSize().x / 4);
+                    for (auto& parameter : m_shaders[m_shader].parameters())
+                    {
+                        if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
+                        {
+                            m_context->updateShaderParameters(m_shaders[m_shader]);
+                        }
+                    }
+                    ImGui::PopItemWidth();                
+                    if (ImGui::Button("Reset values"))
+                    {
+                        for (auto& parameter : m_shaders[m_shader].parameters())
+                        {
+                            parameter.value = parameter.defaultValue;
+                        }
+                        m_context->updateShaderParameters(m_shaders[m_shader]);
+                    }
+                }
+            }
+            ImGui::End();
+        }
+    }
+
+    std::string Application::generateFileDialogFilters(const bool save) const
+    {
+        std::ostringstream ss;
+        ss << "Supported files{";
+        bool empty{ true };
+        for (const auto& format : m_emulator->info().fileFormats)
+        {
+            if (save ? format.save : format.load)
+            {
+                if (!empty) ss << ",";
+                ss << format.extensions;
+                empty = false;
+            }
+        }
+        ss << "},";
+        for (const auto& format : m_emulator->info().fileFormats)
+        {
+            if (save ? format.save : format.load)
+            {
+                ss << format.description;
+                ss << "{" << format.extensions << "},";
+            }
+        }
+        ss << "All files {.*}";
+        return ss.str();
     }
 }

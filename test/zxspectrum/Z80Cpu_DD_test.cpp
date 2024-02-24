@@ -1,4 +1,4 @@
-/* This file is part of Epoch, Copyright (C) 2023 Andrea Ghidini.
+/* This file is part of Epoch, Copyright (C) 2024 Andrea Ghidini.
  *
  * Epoch is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

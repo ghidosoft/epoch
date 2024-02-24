@@ -14,12 +14,16 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <epoch/frontend.hpp>
-#include <epoch/zxspectrum.hpp>
+#ifndef SRC_EPOCH_FRONTEND_SHADERS_HPP_
+#define SRC_EPOCH_FRONTEND_SHADERS_HPP_
 
-int main()
+#include <string_view>
+
+namespace epoch::frontend::shaders
 {
-    const std::shared_ptr<epoch::Emulator> emulator{ std::make_shared<epoch::zxspectrum::ZXSpectrumEmulator>() };
-    epoch::frontend::Application application{ emulator };
-    return application.run();
+    extern std::string_view DEFAULT;
+    extern std::string_view CRT_EASYMODE;
+    extern std::string_view CRT_GEOM;
 }
+
+#endif

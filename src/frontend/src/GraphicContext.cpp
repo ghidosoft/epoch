@@ -1,4 +1,4 @@
-/* This file is part of Epoch, Copyright (C) 2023 Andrea Ghidini.
+/* This file is part of Epoch, Copyright (C) 2024 Andrea Ghidini.
  *
  * Epoch is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,41 +22,14 @@
 
 #include "Shader.hpp"
 
-static const char* VERTEX_SHADER = R"GLSL(
-#version 330 core
-
-layout (location = 0) in vec2 inPos;
-layout (location = 1) in vec2 inTexCoords;
-
-out vec2 passTexCoords;
-
-void main()
-{
-    gl_Position = vec4(inPos.x, inPos.y, 0.0, 1.0);
-    passTexCoords = inTexCoords;
-}
-)GLSL";
-
-static const char* FRAGMENT_SHADER = R"GLSL(
-#version 330 core
-
-uniform sampler2D mainTexture;
-
-in vec2 passTexCoords;
-
-out vec4 outFragColor;
-
-void main()
-{
-    outFragColor = texture(mainTexture, passTexCoords);
-}
-)GLSL";
+#include "ConfigurableShader.hpp"
 
 namespace epoch::frontend
 {
     struct Vertex
     {
-        float position[2];
+        float position[4];
+        float color[4];
         float uv[2];
     };
 
@@ -79,10 +52,6 @@ namespace epoch::frontend
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        m_shader = std::make_unique<Shader>(VERTEX_SHADER, FRAGMENT_SHADER);
-        m_shader->bind();
-        m_shader->setUniformTexture("mainTexture", 0);
     }
 
     GraphicContext::~GraphicContext()
@@ -118,10 +87,10 @@ namespace epoch::frontend
         const auto uMax = static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth);
         const auto vMax = static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight);
         const Vertex quadVertices[] = {
-            { {-1, -1}, {uMin, vMax} },
-            { { 1, -1}, {uMax, vMax} },
-            { { 1,  1}, {uMax, vMin} },
-            { {-1,  1}, {uMin, vMin} },
+            { {-1, -1, 0, 1}, {1, 1, 1, 1}, {uMin, vMax} },
+            { { 1, -1, 0, 1}, {1, 1, 1, 1}, {uMax, vMax} },
+            { { 1,  1, 0, 1}, {1, 1, 1, 1}, {uMax, vMin} },
+            { {-1,  1, 0, 1}, {1, 1, 1, 1}, {uMin, vMin} },
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 
@@ -132,23 +101,16 @@ namespace epoch::frontend
         };
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), &quadIndices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>(2 * sizeof(float)));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(4 * sizeof(float)));
         glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        m_shader->bind();
-        float vec2[2];
-        vec2[0] = static_cast<float>(m_screenWidth);
-        vec2[1] = static_cast<float>(m_screenHeight);
-        m_shader->setUniformVec2("InputSize", vec2);
-        vec2[0] = static_cast<float>(m_screenTextureWidth);
-        vec2[1] = static_cast<float>(m_screenTextureHeight);
-        m_shader->setUniformVec2("TextureSize", vec2);
     }
 
     void GraphicContext::updateScreen(const std::span<const uint32_t> buffer)
@@ -194,5 +156,45 @@ namespace epoch::frontend
         vec2[0] = static_cast<float>(m_viewportWidth);
         vec2[1] = static_cast<float>(m_viewportHeight);
         m_shader->setUniformVec2("OutputSize", vec2);
+    }
+
+    void GraphicContext::updateShader(ConfigurableShader &configurableShader)
+    {
+        m_shader = nullptr;
+
+        std::string vertexSource = "#version 330 core\n#define VERTEX\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
+        std::string fragmentSource = "#version 330 core\n#define FRAGMENT\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
+
+        m_shader = std::make_unique<Shader>(vertexSource, fragmentSource);
+        m_shader->bind();
+        m_shader->setUniformTexture("MainTexture", 0);
+        float vec2[2];
+        vec2[0] = static_cast<float>(m_screenWidth);
+        vec2[1] = static_cast<float>(m_screenHeight);
+        m_shader->setUniformVec2("InputSize", vec2);
+        vec2[0] = static_cast<float>(m_screenTextureWidth);
+        vec2[1] = static_cast<float>(m_screenTextureHeight);
+        m_shader->setUniformVec2("TextureSize", vec2);
+        vec2[0] = static_cast<float>(m_viewportWidth);
+        vec2[1] = static_cast<float>(m_viewportHeight);
+        m_shader->setUniformVec2("OutputSize", vec2);
+        float mat4x4[16] = {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        };
+        m_shader->setUniformMat4("MVPMatrix", mat4x4);
+
+        updateShaderParameters(configurableShader);
+    }
+
+    void GraphicContext::updateShaderParameters(ConfigurableShader &configurableShader)
+    {
+        m_shader->bind();
+        for (const auto& parameter : configurableShader.parameters())
+        {
+            m_shader->setUniformFloat(parameter.variableName, parameter.value);
+        }
     }
 }

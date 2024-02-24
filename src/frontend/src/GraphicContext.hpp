@@ -1,4 +1,4 @@
-/* This file is part of Epoch, Copyright (C) 2023 Andrea Ghidini.
+/* This file is part of Epoch, Copyright (C) 2024 Andrea Ghidini.
  *
  * Epoch is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 namespace epoch::frontend
 {
+    class ConfigurableShader;
     class Shader;
 
     class GraphicContext final
@@ -43,6 +44,9 @@ namespace epoch::frontend
         void updateScreen(std::span<const uint32_t> buffer);
         void renderScreen();
         void viewport(int x, int y, int width, int height);
+
+        void updateShader(ConfigurableShader& configurableShader);
+        void updateShaderParameters(ConfigurableShader& configurableShader);
 
     private:
         unsigned m_screenWidth{}, m_screenHeight{};

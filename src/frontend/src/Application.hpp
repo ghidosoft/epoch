@@ -1,4 +1,4 @@
-/* This file is part of Epoch, Copyright (C) 2023 Andrea Ghidini.
+/* This file is part of Epoch, Copyright (C) 2024 Andrea Ghidini.
  *
  * Epoch is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include <memory>
 #include <vector>
 
+#include "ConfigurableShader.hpp"
+
 namespace epoch
 {
     class Emulator;
@@ -30,7 +32,6 @@ namespace epoch::frontend
     class AudioPlayer;
     class GraphicContext;
     class Gui;
-    class Platform;
     class Window;
 
     class Application final
@@ -55,6 +56,8 @@ namespace epoch::frontend
         void render();
         void renderGui();
 
+        std::string generateFileDialogFilters(bool save) const;
+
     private:
         std::shared_ptr<Emulator> m_emulator{};
 
@@ -62,7 +65,6 @@ namespace epoch::frontend
         double m_deltaTime{};
 
         std::unique_ptr<Window> m_window{};
-        std::unique_ptr<Platform> m_platform{}; // must be after Window
         std::unique_ptr<GraphicContext> m_context{};
         std::unique_ptr<Gui> m_gui{};
         std::unique_ptr<AudioPlayer> m_audio{};
@@ -71,6 +73,10 @@ namespace epoch::frontend
         bool m_running{ true };
         bool m_keepAspectRatio{ true };
         bool m_fullscreen{ false };
+        bool m_showShaderSettings{ false };
+
+        std::vector<ConfigurableShader> m_shaders{};
+        std::size_t m_shader{};
     };
 }
 

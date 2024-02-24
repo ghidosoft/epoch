@@ -29,6 +29,10 @@ First 48K ROM running screenshot:
 
 ![ZX Spectrum 48K](docs/images/zx48k_main.png)
 
+Configurable output shader:
+
+![Output using crt-geom shader](docs/images/2024-02-24_crt-geom-shader.png)
+
 ## Building
 
 This project uses CMake 3.22. All dependencies are loaded using CMake `FetchContent`.
@@ -60,7 +64,7 @@ make
 ```
 
 ## License
-Copyright &copy; 2023 Andrea Ghidini.
+Copyright &copy; 2024 Andrea Ghidini.
 
 Epoch is [free software](https://www.gnu.org/philosophy/free-sw.html): you can redistribute it and/or modify
 it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by
@@ -76,5 +80,5 @@ If not, see https://www.gnu.org/licenses/.
 ## Used libraries
 * [Dear ImGui](https://github.com/ocornut/imgui) for the GUI
 * [GLFW](https://www.glfw.org/) for graphics and input
-* [Native File Dialog Extended](https://github.com/btzy/nativefiledialog-extended) for file dialog
+* [ImGuiFileDialog](https://github.com/aiekick/ImGuiFileDialog) for file dialog
 * [PortAudio](http://www.portaudio.com/) for audio
