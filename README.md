@@ -52,7 +52,7 @@ Builds on Windows (Visual Studio 2022), GNU/Linux (Ubuntu 22.04) and MacOS (12.6
 sudo apt install build-essential cmake ninja-build
 
 # Requisites
-sudo apt install libasound-dev libdbus-1-dev xorg-dev
+sudo apt install libasound-dev libdbus-1-dev libwayland-dev libxkbcommon-dev wayland-protocols xorg-dev
 ```
 
 Build commands:
