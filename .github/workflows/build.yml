@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Ubuntu dependencies
       if: matrix.os == 'ubuntu-latest'
@@ -42,21 +42,21 @@ jobs:
 
     - name: Upload Ubuntu Epoch binary
       if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: epoch_ubuntu
         path: build/src/epoch
         retention-days: 2
     - name: Upload Windows Epoch binary
       if: matrix.os == 'windows-latest'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: epoch_windows.exe
         path: build/src/Release/epoch.exe
         retention-days: 2
     - name: Upload MacOS Epoch binary
       if: matrix.os == 'macos-latest'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: epoch_macos
         path: build/src/epoch
@@ -64,7 +64,7 @@ jobs:
 
     - name: Upload Ubuntu ZEX binary
       if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ubuntu_zex_binary
         path: build/src/zxspectrum/tools/epoch_zxspectrum_zexall
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download ZEX binary
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ubuntu_zex_binary
 
