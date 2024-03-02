@@ -25,9 +25,9 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 
 ## Screenshots
 
-First 48K ROM running screenshot:
-
 ![ZX Spectrum 48K](docs/images/zx48k_main.png)
+
+![ZX Spectrum 128K](docs/images/2024-03-02_zx128k.png)
 
 Configurable output shader:
 
