@@ -17,6 +17,7 @@
 #ifndef SRC_EPOCH_FRONTEND_APPLICATION_HPP_
 #define SRC_EPOCH_FRONTEND_APPLICATION_HPP_
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -34,10 +35,21 @@ namespace epoch::frontend
     class Gui;
     class Window;
 
+    struct EmulatorEntry
+    {
+        std::string name;
+        std::function<std::shared_ptr<Emulator>()> factory;
+    };
+    struct ApplicationConfiguration
+    {
+        std::vector<EmulatorEntry> emulators;
+    };
+
     class Application final
     {
     public:
         explicit Application(std::shared_ptr<Emulator> emulator);
+        explicit Application(ApplicationConfiguration configuration);
         ~Application();
 
     public:
@@ -60,6 +72,7 @@ namespace epoch::frontend
 
     private:
         std::shared_ptr<Emulator> m_emulator{};
+        ApplicationConfiguration m_configuration{};
 
         double m_time{};
         double m_deltaTime{};

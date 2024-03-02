@@ -60,6 +60,11 @@ namespace epoch::frontend
             [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
     }
 
+    Application::Application(ApplicationConfiguration configuration) : Application{ configuration.emulators[0].factory() }
+    {
+        m_configuration = std::move(configuration);
+    }
+
     Application::~Application() = default;
 
     int Application::run()
@@ -163,6 +168,17 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Run", nullptr, &m_running)) {}
                 if (ImGui::MenuItem("Reset")) { m_emulator->reset(); }
+                if (!m_configuration.emulators.empty())
+                {
+                    ImGui::Separator();
+                    for (const auto &entry : m_configuration.emulators)
+                    {
+                        if (ImGui::MenuItem(entry.name.c_str()))
+                        {
+                            m_emulator = entry.factory();
+                        }
+                    }
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))

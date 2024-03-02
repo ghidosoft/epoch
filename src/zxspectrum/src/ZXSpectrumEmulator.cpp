@@ -46,19 +46,28 @@ namespace epoch::zxspectrum
     };
     const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
 
-    ZXSpectrumEmulator::ZXSpectrumEmulator() :
-        Emulator{ {"ZX Spectrum", Width, Height, TStatesPerFrame, FramesPerSecond, {
+    ZXSpectrumEmulator::ZXSpectrumEmulator(std::string name, std::unique_ptr<Ula> ula) :
+        Emulator{ {std::move(name), Width, Height, TStatesPerFrame, FramesPerSecond, {
             { "Tapes", ".tap,.tzx", true, false },
             { "SNA Snapshots", ".sna", true, true },
             { "Z80 Snapshots", ".z80", true, false },
         } } },
-        m_ula{std::make_unique<Ula>(UlaType::zx48k, ROM_48K)},
-        // m_ula{ std::make_unique<Ula>(UlaType::zx128k, ROM_128K) },
-        m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
+        m_ula{std::move(ula)},
+        m_cpu{ std::make_unique<Z80Cpu>(*m_ula) }
     {
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
+
+    std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create48K()
+    {
+        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 48K", std::make_unique<Ula>(UlaType::zx48k, ROM_48K));
+    }
+
+    std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128K()
+    {
+        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K", std::make_unique<Ula>(UlaType::zx128k, ROM_128K));
+    }
 
     void ZXSpectrumEmulator::reset()
     {
