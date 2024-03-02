@@ -35,8 +35,8 @@ namespace epoch::frontend
         const auto& emulatorInfo = m_emulator->info();
         m_window = std::make_unique<Window>(WindowInfo{
             .name = "Epoch emulator: " + emulatorInfo.name,
-            .width = emulatorInfo.width,
-            .height = emulatorInfo.height,
+            .width = emulatorInfo.width * 2,
+            .height = emulatorInfo.height * 2,
         });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
