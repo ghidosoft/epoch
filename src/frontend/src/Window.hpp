@@ -30,7 +30,7 @@ namespace epoch::frontend
 
     struct WindowInfo
     {
-        std::string name;
+        std::string title;
         unsigned width;
         unsigned height;
         WindowMode mode{ WindowMode::windowed };
@@ -62,6 +62,8 @@ namespace epoch::frontend
 
         void resize(unsigned width, unsigned height) const;
         void mode(WindowMode mode);
+
+        void setTitle(const std::string& title) const;
 
         using CharCallback = std::function<void(unsigned int)>;
         using CursorEnterCallback = std::function<void(bool)>;

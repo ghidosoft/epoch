@@ -44,7 +44,7 @@ namespace epoch::frontend
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_FALSE);
 
         m_window = glfwCreateWindow(static_cast<int>(info.width), static_cast<int>(info.height),
-            info.name.c_str(), nullptr, nullptr);
+            info.title.c_str(), nullptr, nullptr);
         if (m_window == nullptr)
         {
             throw std::runtime_error("Cannot create GLFW window.");
@@ -154,6 +154,11 @@ namespace epoch::frontend
             }
             m_mode = mode;
         }
+    }
+
+    void Window::setTitle(const std::string& title) const
+    {
+        glfwSetWindowTitle(m_window, title.c_str());
     }
 
     void Window::setCharCallback(CharCallback callback)

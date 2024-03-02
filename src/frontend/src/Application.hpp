@@ -68,6 +68,8 @@ namespace epoch::frontend
         void render();
         void renderGui();
 
+        void setEmulator(std::shared_ptr<Emulator> emulator);
+
         std::string generateFileDialogFilters(bool save) const;
 
     private:

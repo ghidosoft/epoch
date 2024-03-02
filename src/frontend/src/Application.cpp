@@ -34,7 +34,7 @@ namespace epoch::frontend
     {
         const auto& emulatorInfo = m_emulator->info();
         m_window = std::make_unique<Window>(WindowInfo{
-            .name = "Epoch emulator: " + emulatorInfo.name,
+            .title = "Epoch emulator: " + emulatorInfo.name,
             .width = emulatorInfo.width * 2,
             .height = emulatorInfo.height * 2,
         });
@@ -175,7 +175,7 @@ namespace epoch::frontend
                     {
                         if (ImGui::MenuItem(entry.name.c_str()))
                         {
-                            m_emulator = entry.factory();
+                            setEmulator(entry.factory());
                         }
                     }
                 }
@@ -261,6 +261,12 @@ namespace epoch::frontend
             }
             ImGuiFileDialog::Instance()->Close();
         }
+    }
+
+    void Application::setEmulator(std::shared_ptr<Emulator> emulator)
+    {
+        m_emulator = std::move(emulator);
+        m_window->setTitle("Epoch emulator: " + m_emulator->info().name);
     }
 
     std::string Application::generateFileDialogFilters(const bool save) const
