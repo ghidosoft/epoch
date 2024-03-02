@@ -51,7 +51,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v3
       with:
-        name: epoch_windows
+        name: epoch_windows.exe
         path: build/src/Release/epoch.exe
         retention-days: 2
     - name: Upload MacOS Epoch binary
