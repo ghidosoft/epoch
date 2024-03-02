@@ -136,6 +136,7 @@ namespace epoch::zxspectrum
             const auto pulses = loadTzx(fs);
             return std::make_unique<TapeInterface>(pulses);
         }
+        return nullptr;
     }
 
     void save(const std::string& path, const ZXSpectrumEmulator* emulator)
