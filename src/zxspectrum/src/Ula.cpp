@@ -59,6 +59,11 @@ namespace epoch::zxspectrum
         m_ear = m_mic = {};
         m_cpuStalled = {};
 
+        m_ramSelect = 0;
+        m_vramSelect = 5;
+        m_romSelect = 0;
+        m_pagingState = 0;
+
         m_frameCounter = 0;
         m_x = -HorizontalRetrace;
         m_y = -VerticalRetrace;
@@ -68,12 +73,10 @@ namespace epoch::zxspectrum
     {
         if (address <= 0x3fff)
         {
-            // TODO: allow switching ROM for 128K spectrums
-            m_floatingBusValue = m_rom[0][address];
+            m_floatingBusValue = m_rom[m_romSelect][address];
         }
         else if (address <= 0x7fff)
         {
-            // TODO: allow switching ROM for 128K spectrums
             m_floatingBusValue = m_ram[5][address & 0x3fff];
         }
         else if (address <= 0xbfff)
@@ -82,8 +85,7 @@ namespace epoch::zxspectrum
         }
         else
         {
-            // TODO: allow switching bank for 128K spectrums
-            m_floatingBusValue = m_ram[0][address & 0x3fff];
+            m_floatingBusValue = m_ram[m_ramSelect][address & 0x3fff];
         }
         return m_floatingBusValue;
     }
@@ -96,7 +98,6 @@ namespace epoch::zxspectrum
         }
         else if (address <= 0x7fff)
         {
-            // TODO: allow switching ROM for 128K spectrums
             m_ram[5][address & 0x3fff] = m_floatingBusValue = value;
         }
         else if (address <= 0xbfff)
@@ -105,8 +106,7 @@ namespace epoch::zxspectrum
         }
         else
         {
-            // TODO: allow switching bank for 128K spectrums
-            m_ram[0][address & 0x3fff] = m_floatingBusValue = value;
+            m_ram[m_ramSelect][address & 0x3fff] = m_floatingBusValue = value;
         }
     }
 
@@ -131,6 +131,10 @@ namespace epoch::zxspectrum
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
+        else if ((port & 0b1000000000000010) == 0)
+        {
+            return m_pagingState;
+        }
         return 0xff;
     }
 
@@ -147,6 +151,16 @@ namespace epoch::zxspectrum
             m_ear = newEar;
             m_mic = newMic;
             m_border = value & 0x07;
+        }
+        else if ((port & 0b1000000000000010) == 0)
+        {
+            if ((m_pagingState & 0b00100000) == 0)
+            {
+                m_pagingState = value;
+                m_ramSelect = m_pagingState & 0x07;
+                m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                m_romSelect = (m_pagingState >> 4) & 0x01;
+            }
         }
     }
 
@@ -179,7 +193,6 @@ namespace epoch::zxspectrum
 
     uint8_t Ula::vramRead(const uint16_t address) const
     {
-        // TODO: allow switching bank for 128K spectrums
-        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
+        return m_ram[m_vramSelect][address & 0x3fff]; // TODO: should update floating bus value?
     }
 }

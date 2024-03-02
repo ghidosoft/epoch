@@ -64,6 +64,11 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 2> m_rom{};
         std::array<MemoryBank, 8> m_ram{};
 
+        uint8_t m_ramSelect{0};
+        uint8_t m_vramSelect{5};
+        uint8_t m_romSelect{0};
+        uint8_t m_pagingState{};
+
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};
         std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
