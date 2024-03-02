@@ -73,9 +73,9 @@ namespace epoch::zxspectrum
         low = GET_BYTE();
         ula->ioWrite(0xfe, low);
         // Load memory
-        is.read(reinterpret_cast<char*>(emulator->ram()[5].data()), ZXSpectrumEmulator::MemoryBankSize);
-        is.read(reinterpret_cast<char*>(emulator->ram()[2].data()), ZXSpectrumEmulator::MemoryBankSize);
-        is.read(reinterpret_cast<char*>(emulator->ram()[0].data()), ZXSpectrumEmulator::MemoryBankSize);
+        is.read(reinterpret_cast<char*>(emulator->ram()[5].data()), MemoryBankSize);
+        is.read(reinterpret_cast<char*>(emulator->ram()[2].data()), MemoryBankSize);
+        is.read(reinterpret_cast<char*>(emulator->ram()[0].data()), MemoryBankSize);
         // Pop PC from the stack
         registers.pc = static_cast<uint16_t>(ula->read(registers.sp) | (ula->read(registers.sp + 1) << 8));
         registers.sp += 2;
@@ -228,8 +228,8 @@ namespace epoch::zxspectrum
         PUT_BYTE(static_cast<char>(sp >> 8));
         PUT_BYTE(registers.interruptMode);
         PUT_BYTE(emulator->ula()->border());
-        os.write(reinterpret_cast<const char*>(emulator->ram()[5].data()), ZXSpectrumEmulator::MemoryBankSize);
-        os.write(reinterpret_cast<const char*>(emulator->ram()[2].data()), ZXSpectrumEmulator::MemoryBankSize);
-        os.write(reinterpret_cast<const char*>(emulator->ram()[0].data()), ZXSpectrumEmulator::MemoryBankSize);
+        os.write(reinterpret_cast<const char*>(emulator->ram()[5].data()), MemoryBankSize);
+        os.write(reinterpret_cast<const char*>(emulator->ram()[2].data()), MemoryBankSize);
+        os.write(reinterpret_cast<const char*>(emulator->ram()[0].data()), MemoryBankSize);
     }
 }

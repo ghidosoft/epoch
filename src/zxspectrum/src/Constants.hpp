@@ -17,12 +17,13 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
 
+#include <array>
 #include <cstddef>
 
 namespace epoch::zxspectrum
 {
     constexpr std::size_t TStatesPerFrame = 69888;
-    constexpr double FramesPerSecond = 50.0;
+    constexpr double FramesPerSecond = 50.08;
 
     constexpr int ScreenWidth = 256;
     constexpr int ScreenHeight = 192;
@@ -41,6 +42,10 @@ namespace epoch::zxspectrum
     static_assert((VerticalRetrace + Height) * (Width + HorizontalRetrace) == static_cast<int>(TStatesPerFrame) * 2); // total frame length, 2 pixels per T-state
 
     constexpr auto AudioInThreshold = 0.2f;
+
+    constexpr uint16_t MemoryBankSize = 0x4000; // 16K
+
+    using MemoryBank = std::array<uint8_t, MemoryBankSize>;
 }
 
 #endif

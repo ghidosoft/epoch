@@ -35,8 +35,8 @@ namespace epoch::frontend
         const auto& emulatorInfo = m_emulator->info();
         m_window = std::make_unique<Window>(WindowInfo{
             .name = "Epoch emulator: " + emulatorInfo.name,
-            .width = emulatorInfo.width,
-            .height = emulatorInfo.height,
+            .width = emulatorInfo.width * 2,
+            .height = emulatorInfo.height * 2,
         });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>();
@@ -58,6 +58,11 @@ namespace epoch::frontend
             [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
         m_window->setMouseWheelCallback(
             [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
+    }
+
+    Application::Application(ApplicationConfiguration configuration) : Application{ configuration.emulators[0].factory() }
+    {
+        m_configuration = std::move(configuration);
     }
 
     Application::~Application() = default;
@@ -163,6 +168,17 @@ namespace epoch::frontend
             {
                 if (ImGui::MenuItem("Run", nullptr, &m_running)) {}
                 if (ImGui::MenuItem("Reset")) { m_emulator->reset(); }
+                if (!m_configuration.emulators.empty())
+                {
+                    ImGui::Separator();
+                    for (const auto &entry : m_configuration.emulators)
+                    {
+                        if (ImGui::MenuItem(entry.name.c_str()))
+                        {
+                            m_emulator = entry.factory();
+                        }
+                    }
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))

@@ -43,7 +43,7 @@ namespace epoch::frontend
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_FALSE);
 
-        m_window = glfwCreateWindow(static_cast<int>(info.width) * 2, static_cast<int>(info.height) * 2,
+        m_window = glfwCreateWindow(static_cast<int>(info.width), static_cast<int>(info.height),
             info.name.c_str(), nullptr, nullptr);
         if (m_window == nullptr)
         {

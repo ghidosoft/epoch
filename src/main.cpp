@@ -19,7 +19,18 @@
 
 int main()
 {
-    const std::shared_ptr<epoch::Emulator> emulator{ std::make_shared<epoch::zxspectrum::ZXSpectrumEmulator>() };
-    epoch::frontend::Application application{ emulator };
+    const epoch::frontend::ApplicationConfiguration configuration{
+        .emulators = {
+            {
+                .name = "ZX Spectrum 48K",
+                .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create48K(); },
+            },
+            {
+                .name = "ZX Spectrum 128K",
+                .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create128K(); },
+            },
+        },
+    };
+    epoch::frontend::Application application{ configuration };
     return application.run();
 }

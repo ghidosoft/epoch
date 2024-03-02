@@ -2,7 +2,7 @@
 
 ![BuildBadge](https://github.com/ghidosoft/epoch/actions/workflows/build.yml/badge.svg)
 
-This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C++.
+This is a cross-platform ZX Spectrum 48K/128K/+2 emulator written, for the fun of it, from scratch in C++.
 
 ## Features
 - Instruction level Z80 emulation: all instructions passes zexdoc and zexall
@@ -11,9 +11,10 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 - Sound
 - Drag&drop file loading
 - Kempston joystick emulation (arrows and right-control for fire)
+- ZX 48K/128K/+2 spectrum
 
 ## Roadmap
-- 128K spectrum
+- +2A/+3 spectrum
 - AY sound chip
 - .z80 snapshots
 - Fast loading
@@ -25,9 +26,9 @@ This is a ZX Spectrum 48K emulator written, for the fun of it, from scratch in C
 
 ## Screenshots
 
-First 48K ROM running screenshot:
-
 ![ZX Spectrum 48K](docs/images/zx48k_main.png)
+
+![ZX Spectrum 128K](docs/images/2024-03-02_zx128k.png)
 
 Configurable output shader:
 
