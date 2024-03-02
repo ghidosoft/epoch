@@ -17,6 +17,7 @@
 #include "Ula.hpp"
 
 #include <cassert>
+#include <cstring>
 
 namespace epoch::zxspectrum
 {
