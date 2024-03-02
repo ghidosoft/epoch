@@ -20,7 +20,7 @@
 
 namespace epoch::zxspectrum
 {
-    Ula::Ula(const std::span<const uint8_t> rom) : m_keyboardState{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
+    Ula::Ula(const UlaType type, const std::span<const uint8_t> rom) : m_type{ type }, m_keyboardState { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
     {
         assert(rom.size() <= sizeof(m_rom));
         std::memcpy(m_rom.data(), rom.data(), rom.size());
@@ -131,9 +131,16 @@ namespace epoch::zxspectrum
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
-        else if ((port & 0b1000000000000010) == 0)
+        switch (m_type)
         {
-            return m_pagingState;
+        case UlaType::zx48k:
+            break;
+        case UlaType::zx128k:
+            if ((port & 0b1000000000000010) == 0)
+            {
+                return m_pagingState;
+            }
+            break;
         }
         return 0xff;
     }
@@ -152,15 +159,22 @@ namespace epoch::zxspectrum
             m_mic = newMic;
             m_border = value & 0x07;
         }
-        else if ((port & 0b1000000000000010) == 0)
+        switch (m_type)
         {
-            if ((m_pagingState & 0b00100000) == 0)
+        case UlaType::zx48k:
+            break;
+        case UlaType::zx128k:
+            if ((port & 0b1000000000000010) == 0)
             {
-                m_pagingState = value;
-                m_ramSelect = m_pagingState & 0x07;
-                m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
-                m_romSelect = (m_pagingState >> 4) & 0x01;
+                if ((m_pagingState & 0b00100000) == 0)
+                {
+                    m_pagingState = value;
+                    m_ramSelect = m_pagingState & 0x07;
+                    m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                    m_romSelect = (m_pagingState >> 4) & 0x01;
+                }
             }
+            break;
         }
     }
 

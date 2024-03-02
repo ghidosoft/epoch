@@ -43,7 +43,7 @@ namespace epoch::zxspectrum
 
     constexpr auto AudioInThreshold = 0.2f;
 
-    constexpr uint16_t MemoryBankSize = 0x4000;
+    constexpr uint16_t MemoryBankSize = 0x4000; // 16K
 
     using MemoryBank = std::array<uint8_t, MemoryBankSize>;
 }

@@ -52,7 +52,8 @@ namespace epoch::zxspectrum
             { "SNA Snapshots", ".sna", true, true },
             { "Z80 Snapshots", ".z80", true, false },
         } } },
-        m_ula{std::make_unique<Ula>(ROM_48K)},
+        m_ula{std::make_unique<Ula>(UlaType::zx48k, ROM_48K)},
+        // m_ula{ std::make_unique<Ula>(UlaType::zx128k, ROM_128K) },
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
     }

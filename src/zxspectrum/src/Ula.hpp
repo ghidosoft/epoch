@@ -26,10 +26,12 @@
 
 namespace epoch::zxspectrum
 {
+    enum class UlaType { zx48k, zx128k };
+
     class Ula final : public Z80Interface
     {
     public:
-        explicit Ula(std::span<const uint8_t> rom);
+        Ula(UlaType type, std::span<const uint8_t> rom);
 
     public:
         void clock();
@@ -61,6 +63,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] uint8_t vramRead(uint16_t address) const;
 
     private:
+        UlaType m_type;
+
         std::array<MemoryBank, 2> m_rom{};
         std::array<MemoryBank, 8> m_ram{};
 
