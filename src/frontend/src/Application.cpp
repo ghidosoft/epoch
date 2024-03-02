@@ -181,26 +181,6 @@ namespace epoch::frontend
             ImGui::EndMainMenuBar();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
-        {
-            if (ImGuiFileDialog::Instance()->IsOk())
-            {
-                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                m_emulator->load(filePathName);
-            }
-            ImGuiFileDialog::Instance()->Close();
-        }
-
-        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
-        {
-            if (ImGuiFileDialog::Instance()->IsOk())
-            {
-                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                m_emulator->save(filePathName);
-            }
-            ImGuiFileDialog::Instance()->Close();
-        }
-
         if (m_showShaderSettings)
         {
             ImGui::SetNextWindowSize({ 300, 450, }, ImGuiCond_Once);
@@ -244,6 +224,26 @@ namespace epoch::frontend
                 }
             }
             ImGui::End();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->load(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                m_emulator->save(filePathName);
+            }
+            ImGuiFileDialog::Instance()->Close();
         }
     }
 
