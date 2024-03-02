@@ -20,9 +20,10 @@
 
 namespace epoch::zxspectrum
 {
-    Ula::Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram) : m_rom48k{ rom48k }, m_ram{ ram },
-        m_keyboardState{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
+    Ula::Ula(const std::span<const uint8_t> rom) : m_keyboardState{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
     {
+        assert(rom.size() <= sizeof(m_rom));
+        std::memcpy(m_rom.data(), rom.data(), rom.size());
     }
 
     void Ula::clock()
@@ -67,10 +68,12 @@ namespace epoch::zxspectrum
     {
         if (address <= 0x3fff)
         {
-            m_floatingBusValue = m_rom48k[address];
+            // TODO: allow switching ROM for 128K spectrums
+            m_floatingBusValue = m_rom[0][address];
         }
         else if (address <= 0x7fff)
         {
+            // TODO: allow switching ROM for 128K spectrums
             m_floatingBusValue = m_ram[5][address & 0x3fff];
         }
         else if (address <= 0xbfff)
@@ -93,6 +96,7 @@ namespace epoch::zxspectrum
         }
         else if (address <= 0x7fff)
         {
+            // TODO: allow switching ROM for 128K spectrums
             m_ram[5][address & 0x3fff] = m_floatingBusValue = value;
         }
         else if (address <= 0xbfff)
@@ -171,5 +175,11 @@ namespace epoch::zxspectrum
         {
             m_kempstonState &= ~(1 << button);
         }
+    }
+
+    uint8_t Ula::vramRead(const uint16_t address) const
+    {
+        // TODO: allow switching bank for 128K spectrums
+        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
     }
 }

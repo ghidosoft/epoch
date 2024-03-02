@@ -29,13 +29,14 @@ namespace epoch::zxspectrum
     class Ula final : public Z80Interface
     {
     public:
-        using MemoryBank = std::array<uint8_t, 0x4000>;
-
-        Ula(MemoryBank& rom48k, std::array<MemoryBank, 8>& ram);
+        explicit Ula(std::span<const uint8_t> rom);
 
     public:
         void clock();
         void reset();
+
+        [[nodiscard]] std::array<MemoryBank, 8>& ram() { return m_ram; }
+        [[nodiscard]] const std::array<MemoryBank, 8>& ram() const { return m_ram; }
 
         uint8_t read(uint16_t address) override;
         void write(uint16_t address, uint8_t value) override;
@@ -57,9 +58,11 @@ namespace epoch::zxspectrum
         void setKempstonState(int button, bool state);
         void setAudioIn(const bool value) { m_audioIn = value; }
 
+        [[nodiscard]] uint8_t vramRead(uint16_t address) const;
+
     private:
-        MemoryBank& m_rom48k;
-        std::array<MemoryBank, 8>& m_ram;
+        std::array<MemoryBank, 2> m_rom{};
+        std::array<MemoryBank, 8> m_ram{};
 
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};

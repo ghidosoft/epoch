@@ -22,8 +22,6 @@
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
 
-#include <cstring>
-
 namespace epoch::zxspectrum
 {
     static constexpr uint8_t darkColor = 0xd9;
@@ -54,10 +52,9 @@ namespace epoch::zxspectrum
             { "SNA Snapshots", ".sna", true, true },
             { "Z80 Snapshots", ".z80", true, false },
         } } },
-        m_ula{std::make_unique<Ula>(m_rom48k, m_ram)},
+        m_ula{std::make_unique<Ula>(ROM_48K)},
         m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
-        std::memcpy(m_rom48k.data(), ROM_48K, sizeof(ROM_48K));
     }
 
     ZXSpectrumEmulator::~ZXSpectrumEmulator() = default;
@@ -232,6 +229,16 @@ namespace epoch::zxspectrum
         }
     }
 
+    std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram()
+    {
+        return m_ula->ram();
+    }
+
+    const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const
+    {
+        return m_ula->ram();
+    }
+
     void ZXSpectrumEmulator::doClock()
     {
         if (!m_ula->isCpuStalled())
@@ -263,12 +270,6 @@ namespace epoch::zxspectrum
         m_clockCounter++;
     }
 
-    uint8_t ZXSpectrumEmulator::vramRead(const uint16_t address) const
-    {
-        // TODO: allow switching bank for 128K spectrums
-        return m_ram[5][address & 0x3fff]; // TODO: should update floating bus value?
-    }
-
     void ZXSpectrumEmulator::updateScreenBuffer()
     {
         std::size_t source = 0;
@@ -294,10 +295,10 @@ namespace epoch::zxspectrum
                     pixelAddress |= (yPixel & 0b00000111) << 8;
                     pixelAddress |= (yPixel & 0b00111000) << 2;
                     pixelAddress |= (yPixel & 0b11000000) << 5;
-                    const auto pixelData = vramRead(pixelAddress);
+                    const auto pixelData = m_ula->vramRead(pixelAddress);
                     const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
 
-                    const auto attribute = vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
+                    const auto attribute = m_ula->vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
 
                     auto paper = (attribute >> 3) & 0x07;
                     auto ink = attribute & 0x07;
