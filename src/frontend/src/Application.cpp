@@ -25,14 +25,16 @@
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
+#include "Settings.hpp"
 #include "Shaders.hpp"
 #include "Window.hpp"
 
 namespace epoch::frontend
 {
-    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }
+    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }, m_settings{ std::make_unique<Settings>() }
     {
         assert(!m_configuration.emulators.empty());
+        m_settings->load();
         const auto& entry = m_configuration.emulators[0];
         m_emulator = entry.factory();
         m_currentEntry = &entry;
@@ -71,6 +73,10 @@ namespace epoch::frontend
             m_time = currentTime;
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
+        }
+        if (m_settings->dirty())
+        {
+            m_settings->save();
         }
         return 0;
     }

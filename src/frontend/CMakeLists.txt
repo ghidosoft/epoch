@@ -7,6 +7,7 @@ add_library(epoch_frontend
     "src/ConfigurableShader.cpp" "src/ConfigurableShader.hpp"
     "src/GraphicContext.cpp" "src/GraphicContext.hpp"
     "src/Gui.cpp" "src/Gui.hpp"
+    "src/Settings.cpp" "src/Settings.hpp"
     "src/Shader.cpp" "src/Shader.hpp"
     "src/Shaders.cpp" "src/Shaders.hpp"
     "src/Window.cpp" "src/Window.hpp"
