@@ -31,7 +31,7 @@
 
 namespace epoch::frontend
 {
-    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }, m_settings{ std::make_unique<Settings>() }
+    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }, m_settings{ std::make_unique<SettingsManager>() }
     {
         assert(!m_configuration.emulators.empty());
         m_settings->load();

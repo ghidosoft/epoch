@@ -21,10 +21,10 @@
 
 namespace epoch::frontend
 {
-    class Settings final
+    class SettingsManager final
     {
     public:
-        Settings();
+        SettingsManager();
 
     public:
         void load();

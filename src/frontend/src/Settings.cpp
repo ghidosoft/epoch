@@ -22,12 +22,12 @@
 
 namespace epoch::frontend
 {
-    Settings::Settings()
+    SettingsManager::SettingsManager()
     {
         m_path = std::filesystem::current_path() / "epoch.yaml";
     }
 
-    void Settings::load()
+    void SettingsManager::load()
     {
         reset();
         std::ifstream fin{m_path};
@@ -45,17 +45,20 @@ namespace epoch::frontend
         }
     }
 
-    void Settings::save()
+    void SettingsManager::save()
     {
-        YAML::Emitter out;
+        YAML::Node node;
 
         std::ofstream fout{m_path};
-        fout << out.c_str();
+        if (fout.good())
+        {
+            fout << node;
 
-        m_dirty = false;
+            m_dirty = false;
+        }
     }
 
-    void Settings::reset()
+    void SettingsManager::reset()
     {
         m_dirty = true;
     }

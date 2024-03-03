@@ -33,7 +33,7 @@ namespace epoch::frontend
     class AudioPlayer;
     class GraphicContext;
     class Gui;
-    class Settings;
+    class SettingsManager;
     class Window;
 
     struct EmulatorEntry
@@ -76,7 +76,7 @@ namespace epoch::frontend
         [[nodiscard]] std::string generateFileDialogFilters(bool save) const;
 
     private:
-        std::unique_ptr<Settings> m_settings{};
+        std::unique_ptr<SettingsManager> m_settings{};
         const ApplicationConfiguration m_configuration{};
         std::shared_ptr<Emulator> m_emulator{};
         const EmulatorEntry* m_currentEntry{};
