@@ -14,6 +14,6 @@ add_library(epoch_frontend
 
 target_include_directories(epoch_frontend INTERFACE include)
 
-target_link_libraries(epoch_frontend PRIVATE glad glfw ${GLFW_LIBRARIES} imgui ImGuiFileDialog portaudio_static Epoch::Core)
+target_link_libraries(epoch_frontend PRIVATE glad glfw ${GLFW_LIBRARIES} imgui ImGuiFileDialog portaudio_static yaml-cpp::yaml-cpp Epoch::Core)
 
 add_library(Epoch::Frontend ALIAS epoch_frontend)
