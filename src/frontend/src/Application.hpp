@@ -72,7 +72,7 @@ namespace epoch::frontend
 
         void setEmulatorEntry(const EmulatorEntry& entry);
 
-        std::string generateFileDialogFilters(bool save) const;
+        [[nodiscard]] std::string generateFileDialogFilters(bool save) const;
 
     private:
         const ApplicationConfiguration m_configuration{};
