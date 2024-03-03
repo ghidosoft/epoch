@@ -37,6 +37,7 @@ namespace epoch::frontend
 
     struct EmulatorEntry
     {
+        std::string key;
         std::string name;
         std::function<std::shared_ptr<Emulator>()> factory;
     };
@@ -48,7 +49,6 @@ namespace epoch::frontend
     class Application final
     {
     public:
-        explicit Application(std::shared_ptr<Emulator> emulator);
         explicit Application(ApplicationConfiguration configuration);
         ~Application();
 
@@ -65,16 +65,19 @@ namespace epoch::frontend
         static constexpr auto AudioChannels = 1;
 
     private:
+        void init();
+
         void render();
         void renderGui();
 
-        void setEmulator(std::shared_ptr<Emulator> emulator);
+        void setEmulatorEntry(const EmulatorEntry& entry);
 
         std::string generateFileDialogFilters(bool save) const;
 
     private:
+        const ApplicationConfiguration m_configuration{};
         std::shared_ptr<Emulator> m_emulator{};
-        ApplicationConfiguration m_configuration{};
+        const EmulatorEntry* m_currentEntry{};
 
         double m_time{};
         double m_deltaTime{};

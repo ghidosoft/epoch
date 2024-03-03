@@ -30,39 +30,13 @@
 
 namespace epoch::frontend
 {
-    Application::Application(std::shared_ptr<Emulator> emulator) : m_emulator{ std::move(emulator) }
+    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }
     {
-        const auto& emulatorInfo = m_emulator->info();
-        m_window = std::make_unique<Window>(WindowInfo{
-            .title = "Epoch emulator: " + emulatorInfo.name,
-            .width = emulatorInfo.width * 2,
-            .height = emulatorInfo.height * 2,
-        });
-        m_context = std::make_unique<GraphicContext>();
-        m_gui = std::make_unique<Gui>();
-        m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
-
-        m_window->setCharCallback(
-            [&](const unsigned int c) { m_gui->charEvent(c); });
-        m_window->setCursorEnterCallback(
-            [&](const bool entered) { m_gui->cursorEnterEvent(entered); });
-        m_window->setCursorPosCallback(
-            [&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
-        m_window->setFileDropCallback(
-            [&](const char* path) { m_emulator->load(path); });
-        m_window->setFocusCallback(
-            [&](const bool focused) { m_gui->focusEvent(focused); });
-        m_window->setKeyboardCallback(
-            [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
-        m_window->setMouseButtonCallback(
-            [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
-        m_window->setMouseWheelCallback(
-            [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
-    }
-
-    Application::Application(ApplicationConfiguration configuration) : Application{ configuration.emulators[0].factory() }
-    {
-        m_configuration = std::move(configuration);
+        assert(!m_configuration.emulators.empty());
+        const auto& entry = m_configuration.emulators[0];
+        m_emulator = entry.factory();
+        m_currentEntry = &entry;
+        init();
     }
 
     Application::~Application() = default;
@@ -99,6 +73,37 @@ namespace epoch::frontend
             render();
         }
         return 0;
+    }
+
+    void Application::init()
+    {
+        assert(!m_window);
+        const auto& emulatorInfo = m_emulator->info();
+        m_window = std::make_unique<Window>(WindowInfo{
+            .title = "Epoch emulator: " + emulatorInfo.name,
+            .width = emulatorInfo.width * 2,
+            .height = emulatorInfo.height * 2,
+            });
+        m_context = std::make_unique<GraphicContext>();
+        m_gui = std::make_unique<Gui>();
+        m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
+
+        m_window->setCharCallback(
+            [&](const unsigned int c) { m_gui->charEvent(c); });
+        m_window->setCursorEnterCallback(
+            [&](const bool entered) { m_gui->cursorEnterEvent(entered); });
+        m_window->setCursorPosCallback(
+            [&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
+        m_window->setFileDropCallback(
+            [&](const char* path) { m_emulator->load(path); });
+        m_window->setFocusCallback(
+            [&](const bool focused) { m_gui->focusEvent(focused); });
+        m_window->setKeyboardCallback(
+            [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
+        m_window->setMouseButtonCallback(
+            [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
+        m_window->setMouseWheelCallback(
+            [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
     }
 
     void Application::render()
@@ -173,10 +178,7 @@ namespace epoch::frontend
                     ImGui::Separator();
                     for (const auto &entry : m_configuration.emulators)
                     {
-                        if (ImGui::MenuItem(entry.name.c_str()))
-                        {
-                            setEmulator(entry.factory());
-                        }
+                        if (ImGui::MenuItem(entry.name.c_str(), nullptr, m_currentEntry == &entry)) { setEmulatorEntry(entry); }
                     }
                 }
                 ImGui::EndMenu();
@@ -263,9 +265,10 @@ namespace epoch::frontend
         }
     }
 
-    void Application::setEmulator(std::shared_ptr<Emulator> emulator)
+    void Application::setEmulatorEntry(const EmulatorEntry& entry)
     {
-        m_emulator = std::move(emulator);
+        m_emulator = entry.factory();
+        m_currentEntry = &entry;
         m_window->setTitle("Epoch emulator: " + m_emulator->info().name);
     }
 

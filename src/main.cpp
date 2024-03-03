@@ -22,10 +22,12 @@ int main()
     const epoch::frontend::ApplicationConfiguration configuration{
         .emulators = {
             {
+                .key = "ZXSpectrum48K",
                 .name = "ZX Spectrum 48K",
                 .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create48K(); },
             },
             {
+                .key = "ZXSpectrum128K",
                 .name = "ZX Spectrum 128K",
                 .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create128K(); },
             },
