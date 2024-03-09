@@ -49,6 +49,7 @@ namespace epoch::frontend
         {
             const auto& entry = m_configuration.emulators[0];
             m_currentEntry = &entry;
+            m_settings->current().emulator.key = m_currentEntry->key;
         }
         m_emulator = m_currentEntry->factory();
 
