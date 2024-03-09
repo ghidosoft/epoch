@@ -25,7 +25,7 @@ namespace epoch::frontend
     {
         std::string key;
 
-        bool operator==(const SettingsEmulator&) const;
+        bool operator==(const SettingsEmulator&) const = default;
     };
 
     struct SettingsUI final
@@ -35,7 +35,7 @@ namespace epoch::frontend
         std::string lastSavePath;
         std::string shader;
 
-        bool operator==(const SettingsUI&) const;
+        bool operator==(const SettingsUI&) const = default;
     };
 
     struct Settings final
@@ -43,7 +43,7 @@ namespace epoch::frontend
         SettingsEmulator emulator;
         SettingsUI ui;
 
-        bool operator==(const Settings&) const;
+        bool operator==(const Settings&) const = default;
     };
 }
 
