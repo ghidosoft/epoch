@@ -33,6 +33,7 @@ namespace epoch::frontend
     class AudioPlayer;
     class GraphicContext;
     class Gui;
+    class SettingsManager;
     class Window;
 
     struct EmulatorEntry
@@ -71,10 +72,12 @@ namespace epoch::frontend
         void renderGui();
 
         void setEmulatorEntry(const EmulatorEntry& entry);
+        void setShader(std::size_t index);
 
-        std::string generateFileDialogFilters(bool save) const;
+        [[nodiscard]] std::string generateFileDialogFilters(bool save) const;
 
     private:
+        std::unique_ptr<SettingsManager> m_settings{};
         const ApplicationConfiguration m_configuration{};
         std::shared_ptr<Emulator> m_emulator{};
         const EmulatorEntry* m_currentEntry{};

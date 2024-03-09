@@ -28,7 +28,7 @@ namespace epoch::frontend
     {
     }
 
-    ConfigurableShader::ConfigurableShader(std::string name, const std::string_view source) : m_source{ source }, m_name{ std::move(name) }
+    ConfigurableShader::ConfigurableShader(std::string key, std::string name, const std::string_view source) : m_key{ std::move(key) }, m_name{ std::move(name) }, m_source { source }
     {
         std::istringstream f{ m_source };
         std::string line;
@@ -50,14 +50,19 @@ namespace epoch::frontend
         }
     }
 
+    const std::string& ConfigurableShader::key() const
+    {
+        return m_key;
+    }
+
+    const std::string& ConfigurableShader::name() const
+    {
+        return m_name;
+    }
+
     const std::string &ConfigurableShader::source() const
     {
         return m_source;
-    }
-
-    const std::string &ConfigurableShader::name() const
-    {
-        return m_name;
     }
 
     std::vector<ConfigurableShaderParameter>& ConfigurableShader::parameters()

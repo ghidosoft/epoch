@@ -56,6 +56,13 @@ set(PA_BUILD_SHARED OFF CACHE BOOL "Build PortAudio shared library" FORCE)
 FetchContent_MakeAvailable(portaudio)
 
 FetchContent_Declare(
+    yaml-cpp
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    URL https://github.com/jbeder/yaml-cpp/archive/0.8.0.zip
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
+FetchContent_Declare(
     nlohmann_json
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz

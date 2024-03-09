@@ -25,17 +25,35 @@
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
+#include "SettingsManager.hpp"
 #include "Shaders.hpp"
 #include "Window.hpp"
 
 namespace epoch::frontend
 {
-    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }
+    Application::Application(ApplicationConfiguration configuration) : m_settings{ std::make_unique<SettingsManager>() }, m_configuration{ std::move(configuration) }
     {
         assert(!m_configuration.emulators.empty());
-        const auto& entry = m_configuration.emulators[0];
-        m_emulator = entry.factory();
-        m_currentEntry = &entry;
+        m_settings->load();
+        for (auto &entry : m_configuration.emulators)
+        {
+            if (entry.key == m_settings->current().emulator.key)
+            {
+                m_currentEntry = &entry;
+                break;
+            }
+        }
+        if (!m_currentEntry)
+        {
+            const auto& entry = m_configuration.emulators[0];
+            m_currentEntry = &entry;
+        }
+        m_emulator = m_currentEntry->factory();
+
+        m_shaders.emplace_back("default", "<none>", shaders::DEFAULT);
+        m_shaders.emplace_back("crt-easymode", "crt-easymode", shaders::CRT_EASYMODE);
+        m_shaders.emplace_back("crt-geom", "crt-geom", shaders::CRT_GEOM);
+
         init();
     }
 
@@ -43,12 +61,6 @@ namespace epoch::frontend
 
     int Application::run()
     {
-        m_context->init(m_emulator->info().width, m_emulator->info().height);
-        m_shaders.emplace_back("<none>", shaders::DEFAULT);
-        m_shaders.emplace_back("crt-easymode", shaders::CRT_EASYMODE);
-        m_shaders.emplace_back("crt-geom", shaders::CRT_GEOM);
-        m_context->updateShader(m_shaders[0]);
-        m_emulator->reset();
         m_time = m_window->time();
         while (m_window->nextFrame())
         {
@@ -72,6 +84,11 @@ namespace epoch::frontend
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
+        m_settings->current().ui.imgui = m_gui->generateSettings();
+        if (m_settings->dirty())
+        {
+            m_settings->save();
+        }
         return 0;
     }
 
@@ -85,7 +102,7 @@ namespace epoch::frontend
             .height = emulatorInfo.height * 2,
             });
         m_context = std::make_unique<GraphicContext>();
-        m_gui = std::make_unique<Gui>();
+        m_gui = std::make_unique<Gui>(m_settings->current().ui.imgui.c_str());
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCharCallback(
@@ -104,6 +121,21 @@ namespace epoch::frontend
             [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
         m_window->setMouseWheelCallback(
             [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
+
+        m_context->init(m_emulator->info().width, m_emulator->info().height);
+
+        std::size_t shader = 0;
+        for (std::size_t i = 0; i < m_shaders.size(); ++i)
+        {
+            if (m_shaders[i].key() == m_settings->current().ui.shader)
+            {
+                shader = i;
+                break;
+            }
+        }
+        setShader(shader);
+
+        m_emulator->reset();
     }
 
     void Application::render()
@@ -153,7 +185,8 @@ namespace epoch::frontend
                 {
                     const std::string filters = generateFileDialogFilters(false);
                     const IGFD::FileDialogConfig config{
-                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal,
+                        .path = m_settings->current().ui.lastLoadPath,
+                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_DisableCreateDirectoryButton,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
@@ -161,6 +194,7 @@ namespace epoch::frontend
                 {
                     const std::string filters = generateFileDialogFilters(true);
                     const IGFD::FileDialogConfig config{
+                        .path = m_settings->current().ui.lastSavePath,
                         .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
@@ -210,8 +244,7 @@ namespace epoch::frontend
                     {
                         if (ImGui::Selectable(m_shaders[i].name().c_str(), i == m_shader))
                         {
-                            m_shader = i;
-                            m_context->updateShader(m_shaders[m_shader]);
+                            setShader(i);
                         }
                         if (i == m_shader) ImGui::SetItemDefaultFocus();
                     }
@@ -244,8 +277,12 @@ namespace epoch::frontend
             ImGui::End();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
+        const ImVec2 screenSize{ static_cast<float>(m_window->width()), static_cast<float>(m_window->height()) };
+        ImGui::SetNextWindowPos({ 0, 0 });
+
+        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
+            m_settings->current().ui.lastLoadPath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -254,8 +291,9 @@ namespace epoch::frontend
             ImGuiFileDialog::Instance()->Close();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
+        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
+            m_settings->current().ui.lastSavePath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -269,7 +307,15 @@ namespace epoch::frontend
     {
         m_emulator = entry.factory();
         m_currentEntry = &entry;
+        m_settings->current().emulator.key = m_currentEntry->key;
         m_window->setTitle("Epoch emulator: " + m_emulator->info().name);
+    }
+
+    void Application::setShader(const std::size_t index)
+    {
+        m_shader = index;
+        m_context->updateShader(m_shaders[m_shader]);
+        m_settings->current().ui.shader = m_shaders[m_shader].key();
     }
 
     std::string Application::generateFileDialogFilters(const bool save) const

@@ -38,15 +38,17 @@ namespace epoch::frontend
     class ConfigurableShader final
     {
     public:
-        ConfigurableShader(std::string name, std::string_view source);
+        ConfigurableShader(std::string key, std::string name, std::string_view source);
 
-        [[nodiscard]] const std::string& source() const;
+        [[nodiscard]] const std::string& key() const;
         [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] const std::string& source() const;
         [[nodiscard]] std::vector<ConfigurableShaderParameter>& parameters();
 
     private:
-        std::string m_source;
+        std::string m_key;
         std::string m_name;
+        std::string m_source;
         std::vector<ConfigurableShaderParameter> m_parameters;
     };
 }
