@@ -16,50 +16,9 @@
 
 #include "Settings.hpp"
 
-#include <fstream>
-
-#include <yaml-cpp/yaml.h>
-
 namespace epoch::frontend
 {
-    SettingsManager::SettingsManager()
-    {
-        m_path = std::filesystem::current_path() / "epoch.yaml";
-    }
+    bool SettingsUI::operator==(const SettingsUI&) const = default;
 
-    void SettingsManager::load()
-    {
-        reset();
-        std::ifstream fin{m_path};
-        if (fin.good())
-        {
-            try
-            {
-                const auto yaml = YAML::Load(fin);
-                m_dirty = false;
-            }
-            catch (...)
-            {
-                reset();
-            }
-        }
-    }
-
-    void SettingsManager::save()
-    {
-        YAML::Node node;
-
-        std::ofstream fout{m_path};
-        if (fout.good())
-        {
-            fout << node;
-
-            m_dirty = false;
-        }
-    }
-
-    void SettingsManager::reset()
-    {
-        m_dirty = true;
-    }
+    bool Settings::operator==(const Settings&) const = default;
 }

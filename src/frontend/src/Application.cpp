@@ -25,13 +25,13 @@
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
-#include "Settings.hpp"
+#include "SettingsManager.hpp"
 #include "Shaders.hpp"
 #include "Window.hpp"
 
 namespace epoch::frontend
 {
-    Application::Application(ApplicationConfiguration configuration) : m_configuration{ std::move(configuration) }, m_settings{ std::make_unique<SettingsManager>() }
+    Application::Application(ApplicationConfiguration configuration) : m_settings{ std::make_unique<SettingsManager>() }, m_configuration{ std::move(configuration) }
     {
         assert(!m_configuration.emulators.empty());
         m_settings->load();
@@ -74,6 +74,7 @@ namespace epoch::frontend
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
         }
+        m_settings->current().ui.imgui = m_gui->generateSettings();
         if (m_settings->dirty())
         {
             m_settings->save();
@@ -91,7 +92,7 @@ namespace epoch::frontend
             .height = emulatorInfo.height * 2,
             });
         m_context = std::make_unique<GraphicContext>();
-        m_gui = std::make_unique<Gui>();
+        m_gui = std::make_unique<Gui>(m_settings->current().ui.imgui.c_str());
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCharCallback(

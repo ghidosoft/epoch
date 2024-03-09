@@ -36,9 +36,16 @@ namespace epoch::frontend
     class Gui final
     {
     public:
-        Gui();
+        explicit Gui(const char* settings);
         ~Gui();
 
+    public:
+        Gui(const Gui& other) = delete;
+        Gui(Gui&& other) noexcept = delete;
+        Gui& operator=(const Gui& other) = delete;
+        Gui& operator=(Gui&& other) noexcept = delete;
+
+    public:
         void newFrame(unsigned width, unsigned height, unsigned framebufferWidth, unsigned framebufferHeight, double deltaTime) const;
         void render() const;
 
@@ -51,6 +58,8 @@ namespace epoch::frontend
         void mouseWheelEvent(float x, float y) const;
 
         [[nodiscard]] bool wantKeyboardEvents() const;
+
+        [[nodiscard]] const char* generateSettings() const;
 
     private:
         std::unique_ptr<Shader> m_shader{};

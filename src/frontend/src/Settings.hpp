@@ -17,25 +17,22 @@
 #ifndef SRC_EPOCH_FRONTEND_SETTINGS_HPP_
 #define SRC_EPOCH_FRONTEND_SETTINGS_HPP_
 
-#include <filesystem>
+#include <string>
 
 namespace epoch::frontend
 {
-    class SettingsManager final
+    struct SettingsUI final
     {
-    public:
-        SettingsManager();
+        std::string imgui;
 
-    public:
-        void load();
-        void save();
-        void reset();
+        bool operator==(const SettingsUI&) const;
+    };
 
-        [[nodiscard]] bool dirty() const { return m_dirty; }
+    struct Settings final
+    {
+        SettingsUI ui;
 
-    private:
-        std::filesystem::path m_path;
-        bool m_dirty{};
+        bool operator==(const Settings&) const;
     };
 }
 

@@ -170,7 +170,7 @@ namespace epoch::frontend
         }
     }
 
-    Gui::Gui()
+    Gui::Gui(const char* settings)
     {
         m_shader = std::make_unique<Shader>(IMGUI_VERTEX_SHADER, IMGUI_FRAGMENT_SHADER);
         m_shader->bind();
@@ -196,9 +196,14 @@ namespace epoch::frontend
         glEnableVertexAttribArray(2);
 
         m_context = ImGui::CreateContext();
+        auto& io = ImGui::GetIO();
+        io.IniFilename = nullptr;
         ImGui::StyleColorsDark();
 
-        const auto& io = ImGui::GetIO();
+        if (settings != nullptr)
+        {
+            ImGui::LoadIniSettingsFromMemory(settings);
+        }
 
         unsigned char* pixels;
         int width, height;
@@ -370,5 +375,10 @@ namespace epoch::frontend
     bool Gui::wantKeyboardEvents() const
     {
         return ImGui::GetIO().WantCaptureKeyboard;
+    }
+
+    const char* Gui::generateSettings() const
+    {
+        return ImGui::SaveIniSettingsToMemory();
     }
 }
