@@ -48,6 +48,7 @@ struct YAML::convert<epoch::frontend::SettingsUI>
     {
         Node node;
         node["imgui"] = rhs.imgui;
+        node["shader"] = rhs.shader;
         return node;
     }
 
@@ -58,6 +59,7 @@ struct YAML::convert<epoch::frontend::SettingsUI>
             return false;
         }
         rhs.imgui = node["imgui"].as<std::string>("");
+        rhs.shader = node["shader"].as<std::string>("");
         return true;
     }
 };

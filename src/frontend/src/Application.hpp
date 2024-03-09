@@ -72,6 +72,7 @@ namespace epoch::frontend
         void renderGui();
 
         void setEmulatorEntry(const EmulatorEntry& entry);
+        void setShader(std::size_t index);
 
         [[nodiscard]] std::string generateFileDialogFilters(bool save) const;
 
