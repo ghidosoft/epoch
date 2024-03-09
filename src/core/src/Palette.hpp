@@ -35,6 +35,6 @@ namespace epoch
     private:
         std::vector<Color> m_palette{};
     };
-}
+}  // namespace epoch
 
 #endif

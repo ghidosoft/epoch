@@ -544,7 +544,7 @@ void main()
 
 }
 )GLSL"
-R"GLSL(
+                                R"GLSL(
 
 #elif defined(FRAGMENT)
 
@@ -848,4 +848,4 @@ if (INV == 1.0){ mul_res = inv_gamma(mul_res,pwr);}
 } 
 #endif
     )GLSL";
-}
+}  // namespace epoch::frontend::shaders

@@ -24,7 +24,8 @@ namespace epoch::frontend
 {
     struct ConfigurableShaderParameter
     {
-        ConfigurableShaderParameter(std::string variableName, std::string description, float defaultValue, float min, float max, float step, float value);
+        ConfigurableShaderParameter(std::string variableName, std::string description, float defaultValue, float min,
+                                    float max, float step, float value);
 
         std::string variableName;
         std::string description;
@@ -51,6 +52,6 @@ namespace epoch::frontend
         std::string m_source;
         std::vector<ConfigurableShaderParameter> m_parameters;
     };
-}
+}  // namespace epoch::frontend
 
 #endif

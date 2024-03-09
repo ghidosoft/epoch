@@ -78,6 +78,6 @@ namespace epoch::frontend
 
         void link(const ShaderModule& shaderModule1, const ShaderModule& shaderModule2) const;
     };
-}
+}  // namespace epoch::frontend
 
 #endif

@@ -24,12 +24,8 @@ namespace epoch::zxspectrum
     class TapeInterface
     {
     public:
-        explicit TapeInterface(const std::initializer_list<std::size_t> pulses) : m_pulses{ pulses }
-        {
-        }
-        explicit TapeInterface(std::vector<std::size_t> other) : m_pulses{ std::move(other) }
-        {
-        }
+        explicit TapeInterface(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
+        explicit TapeInterface(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
 
         [[nodiscard]] bool clock()
         {
@@ -50,6 +46,6 @@ namespace epoch::zxspectrum
         std::size_t m_position{};
         std::vector<std::size_t> m_pulses{};
     };
-}
+}  // namespace epoch::zxspectrum
 
 #endif

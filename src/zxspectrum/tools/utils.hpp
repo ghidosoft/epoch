@@ -30,7 +30,9 @@ public:
     struct IoOperation
     {
         IoOperation() = default;
-        IoOperation(const uint16_t port, const uint8_t value, const bool write) : port(port), value(value), write(write) {}
+        IoOperation(const uint16_t port, const uint8_t value, const bool write) : port(port), value(value), write(write)
+        {
+        }
         uint16_t port;
         uint8_t value;
         bool write;
@@ -43,21 +45,17 @@ public:
         std::memcpy(m_ram.data(), ram.data(), ram.size());
     }
 
-    uint8_t read(const uint16_t address) override
-    {
-        return m_ram[address];
-    }
-    void write(const uint16_t address, const uint8_t value) override
-    {
-        m_ram[address] = value;
-    }
+    uint8_t read(const uint16_t address) override { return m_ram[address]; }
+    void write(const uint16_t address, const uint8_t value) override { m_ram[address] = value; }
 
     uint8_t ioRead(const uint16_t port) override
     {
         if (m_nextIoOperation >= m_ioOperations.size()) throw std::runtime_error("Unexpected IO operation");
         const auto& op = m_ioOperations[m_nextIoOperation++];
         if (op.write) throw std::runtime_error("Invalid IO operation (should be read)");
-        if (op.port != port) throw std::runtime_error("Invalid IO read operation port, expected=" + std::to_string(op.port) + " actual=" + std::to_string(port));
+        if (op.port != port)
+            throw std::runtime_error("Invalid IO read operation port, expected=" + std::to_string(op.port) +
+                                     " actual=" + std::to_string(port));
         return op.value;
     }
     void ioWrite(const uint16_t port, const uint8_t value) override
@@ -65,8 +63,12 @@ public:
         if (m_nextIoOperation >= m_ioOperations.size()) throw std::runtime_error("Unexpected IO operation");
         const auto& op = m_ioOperations[m_nextIoOperation++];
         if (!op.write) throw std::runtime_error("Invalid IO operation (should be write)");
-        if (op.port != port) throw std::runtime_error("Invalid IO write operation port, expected=" + std::to_string(op.port) + " actual=" + std::to_string(port));
-        if (op.value != value) throw std::runtime_error("Invalid IO write operation value, expected=" + std::to_string(op.value) + " actual=" + std::to_string(value));
+        if (op.port != port)
+            throw std::runtime_error("Invalid IO write operation port, expected=" + std::to_string(op.port) +
+                                     " actual=" + std::to_string(port));
+        if (op.value != value)
+            throw std::runtime_error("Invalid IO write operation value, expected=" + std::to_string(op.value) +
+                                     " actual=" + std::to_string(value));
     }
 
     std::span<uint8_t> ram() { return m_ram; }

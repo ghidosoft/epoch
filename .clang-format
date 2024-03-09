@@ -1,0 +1,23 @@
+BasedOnStyle: Google
+IndentWidth: 4
+Language: Cpp
+ColumnLimit: 120
+Standard: c++20
+BreakBeforeBraces: Allman
+NamespaceIndentation: All
+AccessModifierOffset: -4
+IndentAccessModifiers: false
+SortIncludes: true
+SpaceAfterTemplateKeyword: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: "^<glad.*"
+    Priority: 2
+  - Regex: '[<"].*(/|\\).*'
+    Priority: 3
+  - Regex: "^<.*\\.h.*"
+    Priority: 3
+  - Regex: "^<.*"
+    Priority: 1
+  - Regex: ".*"
+    Priority: 100

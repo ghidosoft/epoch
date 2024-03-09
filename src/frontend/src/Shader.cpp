@@ -37,10 +37,7 @@ namespace epoch::frontend
         }
     }
 
-    GLuint ShaderModule::handle() const
-    {
-        return m_handle;
-    }
+    GLuint ShaderModule::handle() const { return m_handle; }
 
     void ShaderModule::compile(const std::string_view source) const
     {
@@ -76,8 +73,8 @@ namespace epoch::frontend
     {
         m_handle = glCreateProgram();
         assert(m_handle);
-        const ShaderModule vertexModule{ GL_VERTEX_SHADER, vertex };
-        const ShaderModule fragmentModule{ GL_FRAGMENT_SHADER, fragment };
+        const ShaderModule vertexModule{GL_VERTEX_SHADER, vertex};
+        const ShaderModule fragmentModule{GL_FRAGMENT_SHADER, fragment};
         link(vertexModule, fragmentModule);
     }
 
@@ -89,10 +86,7 @@ namespace epoch::frontend
         }
     }
 
-    void Shader::bind() const
-    {
-        glUseProgram(m_handle);
-    }
+    void Shader::bind() const { glUseProgram(m_handle); }
 
     void Shader::setUniformFloat(const std::string& name, const GLfloat data)
     {
@@ -145,7 +139,8 @@ namespace epoch::frontend
             m_uniformLocations.insert(i, std::make_pair(name, value));
             return value;
         }
-        else {
+        else
+        {
             return i->second;
         }
     }
@@ -178,4 +173,4 @@ namespace epoch::frontend
             throw std::runtime_error(ss.str());
         }
     }
-}
+}  // namespace epoch::frontend

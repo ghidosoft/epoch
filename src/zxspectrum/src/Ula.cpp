@@ -21,7 +21,8 @@
 
 namespace epoch::zxspectrum
 {
-    Ula::Ula(const UlaType type, const std::span<const uint8_t> rom) : m_type{ type }, m_keyboardState { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff }
+    Ula::Ula(const UlaType type, const std::span<const uint8_t> rom)
+        : m_type{type}, m_keyboardState{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
     {
         assert(rom.size() <= sizeof(m_rom));
         std::memcpy(m_rom.data(), rom.data(), rom.size());
@@ -134,14 +135,14 @@ namespace epoch::zxspectrum
         }
         switch (m_type)
         {
-        case UlaType::zx48k:
-            break;
-        case UlaType::zx128k:
-            if ((port & 0b1000000000000010) == 0)
-            {
-                return m_pagingState;
-            }
-            break;
+            case UlaType::zx48k:
+                break;
+            case UlaType::zx128k:
+                if ((port & 0b1000000000000010) == 0)
+                {
+                    return m_pagingState;
+                }
+                break;
         }
         return 0xff;
     }
@@ -162,20 +163,20 @@ namespace epoch::zxspectrum
         }
         switch (m_type)
         {
-        case UlaType::zx48k:
-            break;
-        case UlaType::zx128k:
-            if ((port & 0b1000000000000010) == 0)
-            {
-                if ((m_pagingState & 0b00100000) == 0)
+            case UlaType::zx48k:
+                break;
+            case UlaType::zx128k:
+                if ((port & 0b1000000000000010) == 0)
                 {
-                    m_pagingState = value;
-                    m_ramSelect = m_pagingState & 0x07;
-                    m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
-                    m_romSelect = (m_pagingState >> 4) & 0x01;
+                    if ((m_pagingState & 0b00100000) == 0)
+                    {
+                        m_pagingState = value;
+                        m_ramSelect = m_pagingState & 0x07;
+                        m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                        m_romSelect = (m_pagingState >> 4) & 0x01;
+                    }
                 }
-            }
-            break;
+                break;
         }
     }
 
@@ -208,6 +209,6 @@ namespace epoch::zxspectrum
 
     uint8_t Ula::vramRead(const uint16_t address) const
     {
-        return m_ram[m_vramSelect][address & 0x3fff]; // TODO: should update floating bus value?
+        return m_ram[m_vramSelect][address & 0x3fff];  // TODO: should update floating bus value?
     }
-}
+}  // namespace epoch::zxspectrum

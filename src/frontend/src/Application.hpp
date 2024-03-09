@@ -91,14 +91,14 @@ namespace epoch::frontend
         std::unique_ptr<AudioPlayer> m_audio{};
         std::vector<float> m_audioBuffer{};
 
-        bool m_running{ true };
-        bool m_keepAspectRatio{ true };
-        bool m_fullscreen{ false };
-        bool m_showShaderSettings{ false };
+        bool m_running{true};
+        bool m_keepAspectRatio{true};
+        bool m_fullscreen{false};
+        bool m_showShaderSettings{false};
 
         std::vector<ConfigurableShader> m_shaders{};
         std::size_t m_shader{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

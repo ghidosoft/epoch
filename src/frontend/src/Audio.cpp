@@ -23,16 +23,19 @@
 
 #include <portaudio.h>
 
-#define PA_CHECK(a) do { \
-		const auto PA_CHECK_paResult = a; \
-        if (PA_CHECK_paResult != paNoError) { \
-			std::stringstream ss{}; \
+#define PA_CHECK(a)                                                          \
+    do                                                                       \
+    {                                                                        \
+        const auto PA_CHECK_paResult = a;                                    \
+        if (PA_CHECK_paResult != paNoError)                                  \
+        {                                                                    \
+            std::stringstream ss{};                                          \
             ss << "PortAudio error: " << Pa_GetErrorText(PA_CHECK_paResult); \
-            const auto s = ss.str(); \
-            std::cerr << s << std::endl; \
-			throw std::runtime_error(s); \
-        } \
-    } while (0) \
+            const auto s = ss.str();                                         \
+            std::cerr << s << std::endl;                                     \
+            throw std::runtime_error(s);                                     \
+        }                                                                    \
+    } while (0)
 
 namespace epoch::frontend
 {
@@ -42,16 +45,15 @@ namespace epoch::frontend
         const auto info = Pa_GetDeviceInfo(device);
         assert(info);
         const PaStreamParameters outputParameters{
-                .device = device,
-                .channelCount = channels,
-                .sampleFormat = paFloat32,
-                .suggestedLatency = info->defaultLowOutputLatency,
+            .device = device,
+            .channelCount = channels,
+            .sampleFormat = paFloat32,
+            .suggestedLatency = info->defaultLowOutputLatency,
         };
         const auto hostApi = Pa_GetHostApiInfo(info->hostApi);
         std::cout << "Audio output: " << info->name << " (" << hostApi->name << ")" << std::endl;
-        PA_CHECK(Pa_OpenStream(&m_handle, nullptr, &outputParameters, sampleRate,
-            paFramesPerBufferUnspecified, paClipOff,
-            &s_callback, this));
+        PA_CHECK(Pa_OpenStream(&m_handle, nullptr, &outputParameters, sampleRate, paFramesPerBufferUnspecified,
+                               paClipOff, &s_callback, this));
     }
 
     AudioStream::~AudioStream()
@@ -62,15 +64,9 @@ namespace epoch::frontend
         }
     }
 
-    void AudioStream::start() const
-    {
-        PA_CHECK(Pa_StartStream(m_handle));
-    }
+    void AudioStream::start() const { PA_CHECK(Pa_StartStream(m_handle)); }
 
-    void AudioStream::stop() const
-    {
-        PA_CHECK(Pa_StopStream(m_handle));
-    }
+    void AudioStream::stop() const { PA_CHECK(Pa_StopStream(m_handle)); }
 
     int AudioStream::callback(float* outputBuffer, const unsigned long framesPerBuffer,
                               const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags)
@@ -80,21 +76,16 @@ namespace epoch::frontend
     }
 
     int AudioStream::s_callback(const void* inputBuffer, void* outputBuffer, const unsigned long framesPerBuffer,
-        const PaStreamCallbackTimeInfo* timeInfo, const PaStreamCallbackFlags statusFlags,
-        void* userData)
+                                const PaStreamCallbackTimeInfo* timeInfo, const PaStreamCallbackFlags statusFlags,
+                                void* userData)
     {
-        return static_cast<AudioStream*>(userData)->callback(static_cast<float*>(outputBuffer), framesPerBuffer, timeInfo, statusFlags);
+        return static_cast<AudioStream*>(userData)->callback(static_cast<float*>(outputBuffer), framesPerBuffer,
+                                                             timeInfo, statusFlags);
     }
 
-    AudioContext::AudioContext()
-    {
-        PA_CHECK(Pa_Initialize());
-    }
+    AudioContext::AudioContext() { PA_CHECK(Pa_Initialize()); }
 
-    AudioContext::~AudioContext()
-    {
-        Pa_Terminate();
-    }
+    AudioContext::~AudioContext() { Pa_Terminate(); }
 
     AudioPlayer::AudioPlayer(int sampleRate, int channels)
     {
@@ -103,4 +94,4 @@ namespace epoch::frontend
     }
 
     AudioPlayer::~AudioPlayer() = default;
-}
+}  // namespace epoch::frontend

@@ -20,9 +20,8 @@
 #include <cassert>
 #include <cstdint>
 
-#include "Shader.hpp"
-
 #include "ConfigurableShader.hpp"
+#include "Shader.hpp"
 
 namespace epoch::frontend
 {
@@ -74,9 +73,8 @@ namespace epoch::frontend
         m_screenTextureHeight = std::bit_ceil(m_screenHeight);
 
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-            static_cast<GLint>(m_screenTextureWidth), static_cast<GLint>(m_screenTextureHeight),
-            0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLint>(m_screenTextureWidth),
+                     static_cast<GLint>(m_screenTextureHeight), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         glBindVertexArray(m_vao);
@@ -87,25 +85,26 @@ namespace epoch::frontend
         const auto uMax = static_cast<float>(screenWidth) / static_cast<float>(m_screenTextureWidth);
         const auto vMax = static_cast<float>(screenHeight) / static_cast<float>(m_screenTextureHeight);
         const Vertex quadVertices[] = {
-            { {-1, -1, 0, 1}, {1, 1, 1, 1}, {uMin, vMax} },
-            { { 1, -1, 0, 1}, {1, 1, 1, 1}, {uMax, vMax} },
-            { { 1,  1, 0, 1}, {1, 1, 1, 1}, {uMax, vMin} },
-            { {-1,  1, 0, 1}, {1, 1, 1, 1}, {uMin, vMin} },
+            {{-1, -1, 0, 1}, {1, 1, 1, 1}, {uMin, vMax}},
+            {{1, -1, 0, 1}, {1, 1, 1, 1}, {uMax, vMax}},
+            {{1, 1, 0, 1}, {1, 1, 1, 1}, {uMax, vMin}},
+            {{-1, 1, 0, 1}, {1, 1, 1, 1}, {uMin, vMin}},
         };
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
         const uint8_t quadIndices[] = {
-            0, 1, 3,
-            1, 2, 3,
+            0, 1, 3, 1, 2, 3,
         };
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), &quadIndices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(4 * sizeof(float)));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 10 * sizeof(float),
+                              reinterpret_cast<void *>(4 * sizeof(float)));
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 10 * sizeof(float),
+                              reinterpret_cast<void *>(8 * sizeof(float)));
         glEnableVertexAttribArray(2);
 
         glBindVertexArray(0);
@@ -118,7 +117,8 @@ namespace epoch::frontend
         assert(buffer.size() == static_cast<std::size_t>(m_screenWidth) * m_screenHeight);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_screenTexture);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<GLsizei>(m_screenWidth), static_cast<GLsizei>(m_screenHeight), GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, static_cast<GLsizei>(m_screenWidth),
+                        static_cast<GLsizei>(m_screenHeight), GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -162,8 +162,10 @@ namespace epoch::frontend
     {
         m_shader = nullptr;
 
-        std::string vertexSource = "#version 330 core\n#define VERTEX\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
-        std::string fragmentSource = "#version 330 core\n#define FRAGMENT\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
+        std::string vertexSource =
+            "#version 330 core\n#define VERTEX\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
+        std::string fragmentSource =
+            "#version 330 core\n#define FRAGMENT\n#define PARAMETER_UNIFORM\n\n" + configurableShader.source();
 
         m_shader = std::make_unique<Shader>(vertexSource, fragmentSource);
         m_shader->bind();
@@ -179,10 +181,7 @@ namespace epoch::frontend
         vec2[1] = static_cast<float>(m_viewportHeight);
         m_shader->setUniformVec2("OutputSize", vec2);
         float mat4x4[16] = {
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1,
+            1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
         };
         m_shader->setUniformMat4("MVPMatrix", mat4x4);
 
@@ -192,9 +191,9 @@ namespace epoch::frontend
     void GraphicContext::updateShaderParameters(ConfigurableShader &configurableShader)
     {
         m_shader->bind();
-        for (const auto& parameter : configurableShader.parameters())
+        for (const auto &parameter : configurableShader.parameters())
         {
             m_shader->setUniformFloat(parameter.variableName, parameter.value);
         }
     }
-}
+}  // namespace epoch::frontend

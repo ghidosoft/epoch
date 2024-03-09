@@ -70,16 +70,14 @@ struct YAML::convert<epoch::frontend::SettingsUI>
 
 namespace epoch::frontend
 {
-    SettingsManager::SettingsManager() : m_path{ std::filesystem::current_path() / "epoch.yaml" }
-    {
-    }
+    SettingsManager::SettingsManager() : m_path{std::filesystem::current_path() / "epoch.yaml"} {}
 
     SettingsManager::~SettingsManager() = default;
 
     void SettingsManager::load()
     {
         reset();
-        std::ifstream fin{ m_path };
+        std::ifstream fin{m_path};
         if (fin.good())
         {
             try
@@ -98,7 +96,7 @@ namespace epoch::frontend
 
     void SettingsManager::save()
     {
-        std::ofstream fout{ m_path };
+        std::ofstream fout{m_path};
         if (fout.good())
         {
             YAML::Node node;
@@ -111,13 +109,7 @@ namespace epoch::frontend
         }
     }
 
-    void SettingsManager::reset()
-    {
-        m_currentSettings = {};
-    }
+    void SettingsManager::reset() { m_currentSettings = {}; }
 
-    bool SettingsManager::dirty() const
-    {
-        return m_currentSettings != m_storedSettings;
-    }
-}
+    bool SettingsManager::dirty() const { return m_currentSettings != m_storedSettings; }
+}  // namespace epoch::frontend

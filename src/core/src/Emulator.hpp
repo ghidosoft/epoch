@@ -88,6 +88,6 @@ namespace epoch
         double m_clockDuration;
         double m_elapsed{};
     };
-}
+}  // namespace epoch
 
 #endif

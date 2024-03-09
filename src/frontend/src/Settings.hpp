@@ -45,6 +45,6 @@ namespace epoch::frontend
 
         bool operator==(const Settings&) const = default;
     };
-}
+}  // namespace epoch::frontend
 
 #endif

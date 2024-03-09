@@ -45,10 +45,13 @@ namespace epoch::zxspectrum
         struct WordRegister
         {
             WordRegister() = default;
-            WordRegister(const uint16_t v) : low{ static_cast<uint8_t>(v & 0xff) }, high{ static_cast<uint8_t>(v >> 8) } {}
+            WordRegister(const uint16_t v) : low{static_cast<uint8_t>(v & 0xff)}, high{static_cast<uint8_t>(v >> 8)} {}
             uint8_t low{};
             uint8_t high{};
-            [[nodiscard]] uint16_t value() const { return static_cast<uint16_t>(low) | static_cast<uint16_t>(high << 8); }
+            [[nodiscard]] uint16_t value() const
+            {
+                return static_cast<uint16_t>(low) | static_cast<uint16_t>(high << 8);
+            }
 
             operator uint16_t() const { return value(); }
         };
@@ -80,37 +83,37 @@ namespace epoch::zxspectrum
         // PC Program counter
         uint16_t pc{};
         // SP Stack pointer
-        uint16_t sp{ 0xffff };
+        uint16_t sp{0xffff};
         // IX Index X
-        WordRegister ix{ 0xffff };
+        WordRegister ix{0xffff};
         // IY Index Y
-        WordRegister iy{ 0xffff };
+        WordRegister iy{0xffff};
         // IR Interrupt/Refresh register
         WordRegister ir{};
         // AF Accumulator and flags
-        WordFlagsRegister af{ 0xffff };
+        WordFlagsRegister af{0xffff};
         // BC General purpose
-        WordRegister bc{ 0xffff };
+        WordRegister bc{0xffff};
         // DE General purpose
-        WordRegister de{ 0xffff };
+        WordRegister de{0xffff};
         // HL General purpose
-        WordRegister hl{ 0xffff };
+        WordRegister hl{0xffff};
         // AF shadow
-        WordFlagsRegister af2{ 0xffff };
+        WordFlagsRegister af2{0xffff};
         // BC shadow
-        WordRegister bc2{ 0xffff };
+        WordRegister bc2{0xffff};
         // DE shadow
-        WordRegister de2{ 0xffff };
+        WordRegister de2{0xffff};
         // HL shadow
-        WordRegister hl2{ 0xffff };
+        WordRegister hl2{0xffff};
 
         // WZ (or MEMPTR) internal register
-        uint16_t wz{ 0x0000 };
+        uint16_t wz{0x0000};
 
-        uint8_t interruptMode{ 0 };
-        bool iff1{ false };
-        bool iff2{ false };
-        bool interruptJustEnabled{ false };
+        uint8_t interruptMode{0};
+        bool iff1{false};
+        bool iff2{false};
+        bool interruptJustEnabled{false};
     };
 
     enum class Z80OpcodePrefix
@@ -140,7 +143,7 @@ namespace epoch::zxspectrum
     private:
         Z80Registers m_registers{};
         uint8_t m_opcode{};
-        Z80OpcodePrefix m_currentPrefix{ Z80OpcodePrefix::none };
+        Z80OpcodePrefix m_currentPrefix{Z80OpcodePrefix::none};
         bool m_interruptRequested{};
         int m_remainingCycles{};
         std::size_t m_clockCounter{};
@@ -198,6 +201,6 @@ namespace epoch::zxspectrum
         uint8_t prefixCbRead(int8_t d, int z);
         void prefixCbWrite(int8_t d, int z, uint8_t value);
     };
-}
+}  // namespace epoch::zxspectrum
 
 #endif

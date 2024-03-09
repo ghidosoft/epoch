@@ -56,7 +56,7 @@ namespace epoch::frontend
                 if (outputSize >= m_available)
                 {
                     m_available = 0;
-                    m_readHead = m_writeHead.load(); // TODO Is this the right thing to do?
+                    m_readHead = m_writeHead.load();  // TODO Is this the right thing to do?
                 }
                 else
                 {
@@ -97,10 +97,7 @@ namespace epoch::frontend
             write(inputData.data(), static_cast<unsigned long>(inputData.size()));
         }
 
-        void write(const T sample)
-        {
-            write(&sample, 1);
-        }
+        void write(const T sample) { write(&sample, 1); }
 
         [[nodiscard]] unsigned long available() const { return m_available; }
 
@@ -114,6 +111,6 @@ namespace epoch::frontend
 
         std::mutex m_mutex{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

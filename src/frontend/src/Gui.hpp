@@ -27,7 +27,7 @@ namespace epoch
 {
     enum class Key;
     enum class KeyAction;
-}
+}  // namespace epoch
 
 namespace epoch::frontend
 {
@@ -46,7 +46,8 @@ namespace epoch::frontend
         Gui& operator=(Gui&& other) noexcept = delete;
 
     public:
-        void newFrame(unsigned width, unsigned height, unsigned framebufferWidth, unsigned framebufferHeight, double deltaTime) const;
+        void newFrame(unsigned width, unsigned height, unsigned framebufferWidth, unsigned framebufferHeight,
+                      double deltaTime) const;
         void render() const;
 
         void cursorEnterEvent(bool entered);
@@ -71,6 +72,6 @@ namespace epoch::frontend
 
         float m_lastMouseX{}, m_lastMouseY{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

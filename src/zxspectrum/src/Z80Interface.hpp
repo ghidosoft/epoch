@@ -30,6 +30,6 @@ namespace epoch::zxspectrum
         virtual uint8_t ioRead(uint16_t port) = 0;
         virtual void ioWrite(uint16_t port, uint8_t value) = 0;
     };
-}
+}  // namespace epoch::zxspectrum
 
 #endif

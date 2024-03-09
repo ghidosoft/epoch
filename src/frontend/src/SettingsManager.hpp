@@ -51,6 +51,6 @@ namespace epoch::frontend
         Settings m_currentSettings{};
         Settings m_storedSettings{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

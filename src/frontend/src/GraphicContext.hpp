@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <span>
+
 #include <glad/glad.h>
 
 namespace epoch::frontend
@@ -59,6 +60,6 @@ namespace epoch::frontend
         GLuint m_screenTexture{};
         std::unique_ptr<Shader> m_shader{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

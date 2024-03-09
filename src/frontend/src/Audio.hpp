@@ -58,17 +58,13 @@ namespace epoch::frontend
 
         CircularBuffer<float, BufferSize> m_buffer{};
 
-        int callback(float* outputBuffer,
-            unsigned long framesPerBuffer,
-            const PaStreamCallbackTimeInfo* timeInfo,
-            PaStreamCallbackFlags statusFlags);
+        int callback(float* outputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackTimeInfo* timeInfo,
+                     PaStreamCallbackFlags statusFlags);
 
     private:
-        static int s_callback(const void* inputBuffer, void* outputBuffer,
-            unsigned long framesPerBuffer,
-            const PaStreamCallbackTimeInfo* timeInfo,
-            PaStreamCallbackFlags statusFlags,
-            void* userData);
+        static int s_callback(const void* inputBuffer, void* outputBuffer, unsigned long framesPerBuffer,
+                              const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags,
+                              void* userData);
     };
 
     class AudioContext final
@@ -98,12 +94,15 @@ namespace epoch::frontend
 
     public:
         void push(const std::span<float> sample) const { m_stream->push(sample); }
-        [[nodiscard]] unsigned long neededSamples() const { return std::max(0L, 4096L - static_cast<long>(m_stream->ahead())); }
+        [[nodiscard]] unsigned long neededSamples() const
+        {
+            return std::max(0L, 4096L - static_cast<long>(m_stream->ahead()));
+        }
 
     private:
         AudioContext m_audioContext{};
         std::unique_ptr<AudioStream> m_stream{};
     };
-}
+}  // namespace epoch::frontend
 
 #endif

@@ -22,11 +22,17 @@
 
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE() do { low = GET_BYTE(); high = GET_BYTE(); } while (false)
+#define GET_WORD_LE()      \
+    do                     \
+    {                      \
+        low = GET_BYTE();  \
+        high = GET_BYTE(); \
+    } while (false)
 
 namespace epoch::zxspectrum
 {
-    void generatePilot(std::vector<std::size_t>& pulses, const std::size_t pulseLength, const std::size_t pulseCount, const std::size_t sync1, const std::size_t sync2)
+    void generatePilot(std::vector<std::size_t>& pulses, const std::size_t pulseLength, const std::size_t pulseCount,
+                       const std::size_t sync1, const std::size_t sync2)
     {
         for (auto i = 0u; i < pulseCount; i++)
         {
@@ -36,7 +42,8 @@ namespace epoch::zxspectrum
         pulses.push_back(sync2);
     }
 
-    void generateDataBlock(std::vector<std::size_t>& pulses, const std::span<uint8_t> data, const std::size_t zero, const std::size_t one, const int bitsLastByte = 8)
+    void generateDataBlock(std::vector<std::size_t>& pulses, const std::span<uint8_t> data, const std::size_t zero,
+                           const std::size_t one, const int bitsLastByte = 8)
     {
         assert(bitsLastByte > 0 && bitsLastByte <= 8);
         if (data.empty()) return;
@@ -118,28 +125,28 @@ namespace epoch::zxspectrum
         generatePause(pulses, pause);
     }
 
-    void loadTzxBlock(const uint8_t blockId, std::istream&is, std::vector<std::size_t>& pulses)
+    void loadTzxBlock(const uint8_t blockId, std::istream& is, std::vector<std::size_t>& pulses)
     {
         switch (blockId)
         {
-        case 0x10:
-            return loadTzxBlock10StandardSpeed(is, pulses);
-        case 0x11:
-            return loadTzxBlock11TurboSpeed(is, pulses);
-        case 0x30:
-            // Text description
-            is.seekg(GET_BYTE(), std::ios::cur);
-            return;
-        case 0x32:
-            // Archive info
-            {
-                uint8_t high, low;
-                GET_WORD_LE();
-                is.seekg(MAKE_WORD(high, low), std::ios::cur);
-            }
-            return;
-        default:
-            throw std::runtime_error("Unsupported TZX block type");
+            case 0x10:
+                return loadTzxBlock10StandardSpeed(is, pulses);
+            case 0x11:
+                return loadTzxBlock11TurboSpeed(is, pulses);
+            case 0x30:
+                // Text description
+                is.seekg(GET_BYTE(), std::ios::cur);
+                return;
+            case 0x32:
+                // Archive info
+                {
+                    uint8_t high, low;
+                    GET_WORD_LE();
+                    is.seekg(MAKE_WORD(high, low), std::ios::cur);
+                }
+                return;
+            default:
+                throw std::runtime_error("Unsupported TZX block type");
         }
     }
 
@@ -165,4 +172,4 @@ namespace epoch::zxspectrum
             loadTzxBlock(blockId, is, pulses);
         } while (!is.eof());
     }
-}
+}  // namespace epoch::zxspectrum
