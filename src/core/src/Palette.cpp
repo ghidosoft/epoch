@@ -24,13 +24,7 @@ namespace epoch
         m_palette.assign(colors.begin(), colors.end());
     }
 
-    Color Palette::map(const std::size_t index) const
-    {
-        return m_palette[index];
-    }
+    Color Palette::map(const std::size_t index) const { return m_palette[index]; }
 
-    std::size_t Palette::size() const
-    {
-        return m_palette.size();
-    }
-}
+    std::size_t Palette::size() const { return m_palette.size(); }
+}  // namespace epoch

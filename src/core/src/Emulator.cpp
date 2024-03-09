@@ -20,7 +20,7 @@
 
 namespace epoch
 {
-    Emulator::Emulator(EmulatorInfo info) : m_info{ std::move(info) }
+    Emulator::Emulator(EmulatorInfo info) : m_info{std::move(info)}
     {
         assert(m_info.frameClocks > 0);
         assert(m_info.width > 0);
@@ -47,7 +47,7 @@ namespace epoch
 
     float Emulator::generateNextAudioSample()
     {
-        constexpr auto sampleDuration = 1.0 / 48000.0; // TODO: hardcoded sample rate
+        constexpr auto sampleDuration = 1.0 / 48000.0;  // TODO: hardcoded sample rate
         while (m_elapsed < sampleDuration)
         {
             clock();
@@ -56,8 +56,5 @@ namespace epoch
         return audioOut();
     }
 
-    const EmulatorInfo &Emulator::info() const
-    {
-        return m_info;
-    }
-}
+    const EmulatorInfo &Emulator::info() const { return m_info; }
+}  // namespace epoch

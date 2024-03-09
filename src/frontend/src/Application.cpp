@@ -16,12 +16,6 @@
 
 #include "Application.hpp"
 
-#include <sstream>
-
-#include <epoch/core.hpp>
-#include <imgui.h>
-#include <ImGuiFileDialog.h>
-
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
@@ -29,13 +23,21 @@
 #include "Shaders.hpp"
 #include "Window.hpp"
 
+#include <epoch/core.hpp>
+
+#include <imgui.h>
+#include <ImGuiFileDialog.h>
+
+#include <sstream>
+
 namespace epoch::frontend
 {
-    Application::Application(ApplicationConfiguration configuration) : m_settings{ std::make_unique<SettingsManager>() }, m_configuration{ std::move(configuration) }
+    Application::Application(ApplicationConfiguration configuration)
+        : m_settings{std::make_unique<SettingsManager>()}, m_configuration{std::move(configuration)}
     {
         assert(!m_configuration.emulators.empty());
         m_settings->load();
-        for (auto &entry : m_configuration.emulators)
+        for (auto& entry : m_configuration.emulators)
         {
             if (entry.key == m_settings->current().emulator.key)
             {
@@ -47,6 +49,7 @@ namespace epoch::frontend
         {
             const auto& entry = m_configuration.emulators[0];
             m_currentEntry = &entry;
+            m_settings->current().emulator.key = m_currentEntry->key;
         }
         m_emulator = m_currentEntry->factory();
 
@@ -100,27 +103,25 @@ namespace epoch::frontend
             .title = "Epoch emulator: " + emulatorInfo.name,
             .width = emulatorInfo.width * 2,
             .height = emulatorInfo.height * 2,
-            });
+        });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>(m_settings->current().ui.imgui.c_str());
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
-        m_window->setCharCallback(
-            [&](const unsigned int c) { m_gui->charEvent(c); });
-        m_window->setCursorEnterCallback(
-            [&](const bool entered) { m_gui->cursorEnterEvent(entered); });
-        m_window->setCursorPosCallback(
-            [&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
-        m_window->setFileDropCallback(
-            [&](const char* path) { m_emulator->load(path); });
-        m_window->setFocusCallback(
-            [&](const bool focused) { m_gui->focusEvent(focused); });
+        m_window->setCharCallback([&](const unsigned int c) { m_gui->charEvent(c); });
+        m_window->setCursorEnterCallback([&](const bool entered) { m_gui->cursorEnterEvent(entered); });
+        m_window->setCursorPosCallback([&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
+        m_window->setFileDropCallback([&](const char* path) { m_emulator->load(path); });
+        m_window->setFocusCallback([&](const bool focused) { m_gui->focusEvent(focused); });
         m_window->setKeyboardCallback(
-            [&](const Key key, const KeyAction action) { if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action); m_gui->keyEvent(key, action);  });
-        m_window->setMouseButtonCallback(
-            [&](const int button, const int action) { m_gui->mouseButtonEvent(button, action == 1); });
-        m_window->setMouseWheelCallback(
-            [&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
+            [&](const Key key, const KeyAction action)
+            {
+                if (!m_gui->wantKeyboardEvents()) m_emulator->keyEvent(key, action);
+                m_gui->keyEvent(key, action);
+            });
+        m_window->setMouseButtonCallback([&](const int button, const int action)
+                                         { m_gui->mouseButtonEvent(button, action == 1); });
+        m_window->setMouseWheelCallback([&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
 
         m_context->init(m_emulator->info().width, m_emulator->info().height);
 
@@ -143,7 +144,8 @@ namespace epoch::frontend
         if (m_keepAspectRatio)
         {
             const auto emulatorAspectRatio = m_emulator->info().aspectRatio();
-            const auto windowAspectRatio = static_cast<float>(m_window->framebufferWidth()) / static_cast<float>(m_window->framebufferHeight());
+            const auto windowAspectRatio =
+                static_cast<float>(m_window->framebufferWidth()) / static_cast<float>(m_window->framebufferHeight());
             auto x = 0u, y = 0u;
             auto width = m_window->framebufferWidth();
             auto height = m_window->framebufferHeight();
@@ -157,20 +159,20 @@ namespace epoch::frontend
                 width = static_cast<int>(static_cast<float>(height) * emulatorAspectRatio);
                 x = (m_window->framebufferWidth() - width) / 2;
             }
-            m_context->viewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
+            m_context->viewport(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width),
+                                static_cast<int>(height));
         }
         else
         {
-            m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()), static_cast<int>(m_window->framebufferHeight()));
+            m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()),
+                                static_cast<int>(m_window->framebufferHeight()));
         }
         m_context->renderScreen();
 
-        m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()), static_cast<int>(m_window->framebufferHeight()));
-        m_gui->newFrame(
-            m_window->width(), m_window->height(),
-            m_window->framebufferWidth(), m_window->framebufferHeight(),
-            m_deltaTime
-        );
+        m_context->viewport(0, 0, static_cast<int>(m_window->framebufferWidth()),
+                            static_cast<int>(m_window->framebufferHeight()));
+        m_gui->newFrame(m_window->width(), m_window->height(), m_window->framebufferWidth(),
+                        m_window->framebufferHeight(), m_deltaTime);
         renderGui();
         m_gui->render();
     }
@@ -186,7 +188,8 @@ namespace epoch::frontend
                     const std::string filters = generateFileDialogFilters(false);
                     const IGFD::FileDialogConfig config{
                         .path = m_settings->current().ui.lastLoadPath,
-                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_DisableCreateDirectoryButton,
+                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal |
+                                 ImGuiFileDialogFlags_DisableCreateDirectoryButton,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
@@ -200,34 +203,61 @@ namespace epoch::frontend
                     ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Exit")) { m_window->close(); }
+                if (ImGui::MenuItem("Exit"))
+                {
+                    m_window->close();
+                }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Emulator"))
             {
-                if (ImGui::MenuItem("Run", nullptr, &m_running)) {}
-                if (ImGui::MenuItem("Reset")) { m_emulator->reset(); }
+                if (ImGui::MenuItem("Run", nullptr, &m_running))
+                {
+                }
+                if (ImGui::MenuItem("Reset"))
+                {
+                    m_emulator->reset();
+                }
                 if (!m_configuration.emulators.empty())
                 {
                     ImGui::Separator();
-                    for (const auto &entry : m_configuration.emulators)
+                    for (const auto& entry : m_configuration.emulators)
                     {
-                        if (ImGui::MenuItem(entry.name.c_str(), nullptr, m_currentEntry == &entry)) { setEmulatorEntry(entry); }
+                        if (ImGui::MenuItem(entry.name.c_str(), nullptr, m_currentEntry == &entry))
+                        {
+                            setEmulatorEntry(entry);
+                        }
                     }
                 }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))
             {
-                if (ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio)) {}
+                if (ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio))
+                {
+                }
                 ImGui::Separator();
-                if (ImGui::MenuItem("1X size")) { m_window->resize(m_emulator->info().width, m_emulator->info().height); }
-                if (ImGui::MenuItem("2X size")) { m_window->resize(m_emulator->info().width * 2, m_emulator->info().height * 2); }
-                if (ImGui::MenuItem("3X size")) { m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3); }
+                if (ImGui::MenuItem("1X size"))
+                {
+                    m_window->resize(m_emulator->info().width, m_emulator->info().height);
+                }
+                if (ImGui::MenuItem("2X size"))
+                {
+                    m_window->resize(m_emulator->info().width * 2, m_emulator->info().height * 2);
+                }
+                if (ImGui::MenuItem("3X size"))
+                {
+                    m_window->resize(m_emulator->info().width * 3, m_emulator->info().height * 3);
+                }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Fullscreen", nullptr, &m_fullscreen)) { m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed); }
+                if (ImGui::MenuItem("Fullscreen", nullptr, &m_fullscreen))
+                {
+                    m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed);
+                }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings)) {}
+                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings))
+                {
+                }
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -235,7 +265,12 @@ namespace epoch::frontend
 
         if (m_showShaderSettings)
         {
-            ImGui::SetNextWindowSize({ 300, 450, }, ImGuiCond_Once);
+            ImGui::SetNextWindowSize(
+                {
+                    300,
+                    450,
+                },
+                ImGuiCond_Once);
             if (ImGui::Begin("Shader settings", &m_showShaderSettings))
             {
                 if (ImGui::BeginCombo("Shader", m_shaders[m_shader].name().c_str()))
@@ -258,12 +293,13 @@ namespace epoch::frontend
                     ImGui::PushItemWidth(ImGui::GetWindowSize().x / 4);
                     for (auto& parameter : m_shaders[m_shader].parameters())
                     {
-                        if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min, parameter.max))
+                        if (ImGui::SliderFloat(parameter.description.c_str(), &parameter.value, parameter.min,
+                                               parameter.max))
                         {
                             m_context->updateShaderParameters(m_shaders[m_shader]);
                         }
                     }
-                    ImGui::PopItemWidth();                
+                    ImGui::PopItemWidth();
                     if (ImGui::Button("Reset values"))
                     {
                         for (auto& parameter : m_shaders[m_shader].parameters())
@@ -277,10 +313,12 @@ namespace epoch::frontend
             ImGui::End();
         }
 
-        const ImVec2 screenSize{ static_cast<float>(m_window->width()), static_cast<float>(m_window->height()) };
-        ImGui::SetNextWindowPos({ 0, 0 });
+        const ImVec2 screenSize{static_cast<float>(m_window->width()), static_cast<float>(m_window->height())};
+        ImGui::SetNextWindowPos({0, 0});
 
-        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
+        if (ImGuiFileDialog::Instance()->Display(
+                "LoadDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize,
+                screenSize, screenSize))
         {
             m_settings->current().ui.lastLoadPath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -291,7 +329,9 @@ namespace epoch::frontend
             ImGuiFileDialog::Instance()->Close();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
+        if (ImGuiFileDialog::Instance()->Display(
+                "SaveDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize,
+                screenSize, screenSize))
         {
             m_settings->current().ui.lastSavePath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -322,7 +362,7 @@ namespace epoch::frontend
     {
         std::ostringstream ss;
         ss << "Supported files{";
-        bool empty{ true };
+        bool empty{true};
         for (const auto& format : m_emulator->info().fileFormats)
         {
             if (save ? format.save : format.load)
@@ -344,4 +384,4 @@ namespace epoch::frontend
         ss << "All files {.*}";
         return ss.str();
     }
-}
+}  // namespace epoch::frontend

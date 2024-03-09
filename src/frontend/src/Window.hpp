@@ -17,23 +17,28 @@
 #ifndef SRC_FRONTEND_WINDOW_HPP_
 #define SRC_FRONTEND_WINDOW_HPP_
 
+#include <epoch/core.hpp>
+
 #include <functional>
 #include <string>
-
-#include <epoch/core.hpp>
 
 struct GLFWwindow;
 
 namespace epoch::frontend
 {
-    enum class WindowMode { windowed, borderless, fullscreen };
+    enum class WindowMode
+    {
+        windowed,
+        borderless,
+        fullscreen
+    };
 
     struct WindowInfo
     {
         std::string title;
         unsigned width;
         unsigned height;
-        WindowMode mode{ WindowMode::windowed };
+        WindowMode mode{WindowMode::windowed};
     };
 
     class Window final
@@ -87,7 +92,7 @@ namespace epoch::frontend
 
         unsigned m_width{}, m_height{};
         unsigned m_framebufferWidth{}, m_framebufferHeight{};
-        WindowMode m_mode{ WindowMode::windowed };
+        WindowMode m_mode{WindowMode::windowed};
 
         int m_lastX{}, m_lastY{};
         unsigned m_lastWidth{}, m_lastHeight{};
@@ -113,6 +118,6 @@ namespace epoch::frontend
         static void s_mouseButtonCallback(GLFWwindow* glfwWindow, int button, int action, int mods);
         static void s_scrollCallback(GLFWwindow* glfwWindow, double x, double y);
     };
-}
+}  // namespace epoch::frontend
 
 #endif

@@ -27,6 +27,6 @@ namespace epoch::zxspectrum
     void loadZ80(const std::filesystem::path& path, ZXSpectrumEmulator* emulator);
 
     void saveSna(const std::filesystem::path& path, const ZXSpectrumEmulator* emulator);
-}
+}  // namespace epoch::zxspectrum
 
 #endif

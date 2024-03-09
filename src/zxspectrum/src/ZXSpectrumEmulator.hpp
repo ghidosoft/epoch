@@ -17,12 +17,12 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
 
-#include <array>
-#include <memory>
+#include "Constants.hpp"
 
 #include <epoch/core.hpp>
 
-#include "Constants.hpp"
+#include <array>
+#include <memory>
 
 namespace epoch::zxspectrum
 {
@@ -56,7 +56,7 @@ namespace epoch::zxspectrum
         void save(const std::string& path) override;
 
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override { return m_screenBuffer; }
-        
+
         void keyEvent(Key key, KeyAction action) override;
 
         [[nodiscard]] Z80Cpu* cpu() const { return m_cpu.get(); }
@@ -72,12 +72,12 @@ namespace epoch::zxspectrum
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
 
-        std::array<uint32_t, static_cast<std::size_t>(Width * Height)> m_screenBuffer{};
+        std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
 
         std::unique_ptr<TapeInterface> m_tape{};
 
         void updateScreenBuffer();
     };
-}
+}  // namespace epoch::zxspectrum
 
 #endif

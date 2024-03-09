@@ -18,7 +18,7 @@
 #define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
 
 #include <array>
-#include <cstddef>
+#include <cstdint>
 
 namespace epoch::zxspectrum
 {
@@ -32,20 +32,21 @@ namespace epoch::zxspectrum
     constexpr int BorderTop = 48;
     constexpr int BorderBottom = 56;
 
-    constexpr int VerticalRetrace = 16; // 16 lines
-    constexpr int HorizontalRetrace = 48 * 2; // Pixels (48 T-states)
+    constexpr int VerticalRetrace = 16;        // 16 lines
+    constexpr int HorizontalRetrace = 48 * 2;  // Pixels (48 T-states)
     constexpr int InterruptActiveTStates = 32;
 
     constexpr auto Width = ScreenWidth + BorderLeft + BorderRight;
     constexpr auto Height = ScreenHeight + BorderTop + BorderBottom;
 
-    static_assert((VerticalRetrace + Height) * (Width + HorizontalRetrace) == static_cast<int>(TStatesPerFrame) * 2); // total frame length, 2 pixels per T-state
+    static_assert((VerticalRetrace + Height) * (Width + HorizontalRetrace) ==
+                  static_cast<int>(TStatesPerFrame) * 2);  // total frame length, 2 pixels per T-state
 
     constexpr auto AudioInThreshold = 0.2f;
 
-    constexpr uint16_t MemoryBankSize = 0x4000; // 16K
+    constexpr uint16_t MemoryBankSize = 0x4000;  // 16K
 
     using MemoryBank = std::array<uint8_t, MemoryBankSize>;
-}
+}  // namespace epoch::zxspectrum
 
 #endif

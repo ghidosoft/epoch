@@ -16,6 +16,12 @@
 
 #include "Io.hpp"
 
+#include "IoSnapshot.hpp"
+#include "IoTzx.hpp"
+#include "TapeInterface.hpp"
+#include "Ula.hpp"
+#include "ZXSpectrumEmulator.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -23,15 +29,14 @@
 #include <fstream>
 #include <vector>
 
-#include "IoSnapshot.hpp"
-#include "IoTzx.hpp"
-#include "TapeInterface.hpp"
-#include "Ula.hpp"
-#include "ZXSpectrumEmulator.hpp"
-
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE() do { low = GET_BYTE(); high = GET_BYTE(); } while (false)
+#define GET_WORD_LE()      \
+    do                     \
+    {                      \
+        low = GET_BYTE();  \
+        high = GET_BYTE(); \
+    } while (false)
 
 namespace epoch::zxspectrum
 {
@@ -47,8 +52,8 @@ namespace epoch::zxspectrum
         {
             if (!first)
             {
-                result.push_back(1750000); // TODO
-                result.push_back(1750000); // TODO
+                result.push_back(1750000);  // TODO
+                result.push_back(1750000);  // TODO
             }
 
             uint8_t high, low;
@@ -111,7 +116,7 @@ namespace epoch::zxspectrum
     std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
-        const std::filesystem::path fs{ path };
+        const std::filesystem::path fs{path};
         auto ext = fs.extension().string();
         std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
         if (ext == ".sna")
@@ -142,7 +147,7 @@ namespace epoch::zxspectrum
     void save(const std::string& path, const ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
-        const std::filesystem::path fs{ path };
+        const std::filesystem::path fs{path};
         auto ext = fs.extension().string();
         std::transform(ext.begin(), ext.end(), ext.begin(), [](const char c) { return std::tolower(c); });
         if (ext == ".sna")
@@ -150,4 +155,4 @@ namespace epoch::zxspectrum
             saveSna(fs, emulator);
         }
     }
-}
+}  // namespace epoch::zxspectrum

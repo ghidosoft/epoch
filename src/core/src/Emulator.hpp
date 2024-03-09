@@ -17,11 +17,11 @@
 #ifndef SRC_EPOCH_CORE_EMULATOR_HPP_
 #define SRC_EPOCH_CORE_EMULATOR_HPP_
 
+#include "Keyboard.hpp"
+
 #include <span>
 #include <string>
 #include <vector>
-
-#include "Keyboard.hpp"
 
 namespace epoch
 {
@@ -88,6 +88,6 @@ namespace epoch
         double m_clockDuration;
         double m_elapsed{};
     };
-}
+}  // namespace epoch
 
 #endif

@@ -17,16 +17,20 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
 
+#include "Constants.hpp"
+#include "Z80Interface.hpp"
+
 #include <array>
 #include <cstdint>
 #include <span>
 
-#include "Constants.hpp"
-#include "Z80Interface.hpp"
-
 namespace epoch::zxspectrum
 {
-    enum class UlaType { zx48k, zx128k };
+    enum class UlaType
+    {
+        zx48k,
+        zx128k
+    };
 
     class Ula final : public Z80Interface
     {
@@ -44,16 +48,22 @@ namespace epoch::zxspectrum
         void write(uint16_t address, uint8_t value) override;
         uint8_t ioRead(uint16_t port) override;
         void ioWrite(uint16_t port, uint8_t value) override;
-        
+
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 
         [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
-        [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; } // 16 frames
+        [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; }  // 16 frames
 
-        [[nodiscard]] bool interruptRequested() const { return m_y == -VerticalRetrace && m_x >= BorderLeft && m_x < BorderLeft + InterruptActiveTStates * 2; }
+        [[nodiscard]] bool interruptRequested() const
+        {
+            return m_y == -VerticalRetrace && m_x >= BorderLeft && m_x < BorderLeft + InterruptActiveTStates * 2;
+        }
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const { return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f)/* * 2.f - 1.f*/; }
+        [[nodiscard]] float audioOutput() const
+        {
+            return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f) /* * 2.f - 1.f*/;
+        }
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
@@ -75,15 +85,15 @@ namespace epoch::zxspectrum
 
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};
-        std::array<uint8_t, 8> m_keyboardState{}; // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
+        std::array<uint8_t, 8> m_keyboardState{};  // Rows 0=Caps, A, Q, 1, 6, Y, H, 7=B
         bool m_ear{}, m_mic{}, m_audioIn{};
         uint8_t m_kempstonState{};
         int m_cpuStalled{};
 
         uint64_t m_frameCounter{};
         std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_borderBuffer{};
-        int m_x{ -HorizontalRetrace }, m_y{ -VerticalRetrace };
+        int m_x{-HorizontalRetrace}, m_y{-VerticalRetrace};
     };
-}
+}  // namespace epoch::zxspectrum
 
 #endif

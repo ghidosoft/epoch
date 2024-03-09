@@ -16,19 +16,24 @@
 
 #include "IoSnapshot.hpp"
 
+#include "Ula.hpp"
+#include "Z80Cpu.hpp"
+#include "ZXSpectrumEmulator.hpp"
+
 #include <cassert>
 #include <cstring>
 #include <fstream>
 #include <vector>
 
-#include "Ula.hpp"
-#include "ZXSpectrumEmulator.hpp"
-#include "Z80Cpu.hpp"
-
 #define PUT_BYTE(x) os.put(static_cast<uint8_t>(x))
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE() do { low = GET_BYTE(); high = GET_BYTE(); } while (false)
+#define GET_WORD_LE()      \
+    do                     \
+    {                      \
+        low = GET_BYTE();  \
+        high = GET_BYTE(); \
+    } while (false)
 
 namespace epoch::zxspectrum
 {
@@ -103,7 +108,7 @@ namespace epoch::zxspectrum
         registers.ir.low = GET_BYTE() & 0x7f;
 
         low = GET_BYTE();
-        if (low == 0xff) low = 0x01; // Because of compatibility, if byte 12 is 255, it has to be regarded as being 1.
+        if (low == 0xff) low = 0x01;  // Because of compatibility, if byte 12 is 255, it has to be regarded as being 1.
         registers.ir = (registers.ir | ((low & 0x01) << 7));
         const bool basicSamRomv1 = low & (1 << 4);
         const bool compressedv1 = low & (1 << 5);
@@ -119,7 +124,7 @@ namespace epoch::zxspectrum
         GET_WORD_LE();
         registers.hl2 = MAKE_WORD(high, low);
         registers.af2.high = GET_BYTE();
-        registers.af2.low =GET_BYTE();
+        registers.af2.low = GET_BYTE();
         GET_WORD_LE();
         registers.iy = MAKE_WORD(high, low);
         GET_WORD_LE();
@@ -131,7 +136,7 @@ namespace epoch::zxspectrum
         low = GET_BYTE();
         registers.interruptMode = low & 0b11;
 
-        assert(registers.pc == 0); // unsupported z80 version 1
+        assert(registers.pc == 0);  // unsupported z80 version 1
         if (registers.pc == 0)
         {
             auto pos = is.tellg();
@@ -141,7 +146,7 @@ namespace epoch::zxspectrum
             GET_WORD_LE();
             registers.pc = MAKE_WORD(high, low);
             const auto hardwareMode = GET_BYTE();
-            assert(hardwareMode == 0 || hardwareMode == 1); // Only ZX Spectrum 48K supported
+            assert(hardwareMode == 0 || hardwareMode == 1);  // Only ZX Spectrum 48K supported
 
             pos += additionalHeaderLength + 2;
             is.seekg(pos, std::ios::beg);
@@ -151,7 +156,7 @@ namespace epoch::zxspectrum
                 GET_WORD_LE();
                 if (is.eof()) break;
                 const auto blockLength = MAKE_WORD(high, low);
-                assert(blockLength != 0xffff); // uncompressed not yet supported
+                assert(blockLength != 0xffff);  // uncompressed not yet supported
                 const auto pageNumber = GET_BYTE();
                 uint8_t* page{};
                 if (pageNumber == 0x04)
@@ -232,4 +237,4 @@ namespace epoch::zxspectrum
         os.write(reinterpret_cast<const char*>(emulator->ram()[2].data()), MemoryBankSize);
         os.write(reinterpret_cast<const char*>(emulator->ram()[0].data()), MemoryBankSize);
     }
-}
+}  // namespace epoch::zxspectrum

@@ -44,16 +44,21 @@ namespace epoch::zxspectrum
         {brightColor, brightColor, 0x00},
         {brightColor, brightColor, brightColor},
     };
-    const Palette ZXSpectrumEmulator::DefaultPalette{ defaultColors };
+    const Palette ZXSpectrumEmulator::DefaultPalette{defaultColors};
 
-    ZXSpectrumEmulator::ZXSpectrumEmulator(std::string name, std::unique_ptr<Ula> ula) :
-        Emulator{ {std::move(name), Width, Height, TStatesPerFrame, FramesPerSecond, {
-            { "Tapes", ".tap,.tzx", true, false },
-            { "SNA Snapshots", ".sna", true, true },
-            { "Z80 Snapshots", ".z80", true, false },
-        } } },
-        m_ula{std::move(ula)},
-        m_cpu{ std::make_unique<Z80Cpu>(*m_ula) }
+    ZXSpectrumEmulator::ZXSpectrumEmulator(std::string name, std::unique_ptr<Ula> ula)
+        : Emulator{{std::move(name),
+                    Width,
+                    Height,
+                    TStatesPerFrame,
+                    FramesPerSecond,
+                    {
+                        {"Tapes", ".tap,.tzx", true, false},
+                        {"SNA Snapshots", ".sna", true, true},
+                        {"Z80 Snapshots", ".z80", true, false},
+                    }}},
+          m_ula{std::move(ula)},
+          m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
     }
 
@@ -66,7 +71,8 @@ namespace epoch::zxspectrum
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128K()
     {
-        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K", std::make_unique<Ula>(UlaType::zx128k, ROM_128K));
+        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K",
+                                                    std::make_unique<Ula>(UlaType::zx128k, ROM_128K));
     }
 
     void ZXSpectrumEmulator::reset()
@@ -77,177 +83,165 @@ namespace epoch::zxspectrum
         m_clockCounter = 0;
     }
 
-    void ZXSpectrumEmulator::load(const std::string& path)
-    {
-        m_tape = epoch::zxspectrum::load(path, this);
-    }
+    void ZXSpectrumEmulator::load(const std::string& path) { m_tape = epoch::zxspectrum::load(path, this); }
 
-    void ZXSpectrumEmulator::save(const std::string& path)
-    {
-        epoch::zxspectrum::save(path, this);
-    }
+    void ZXSpectrumEmulator::save(const std::string& path) { epoch::zxspectrum::save(path, this); }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
     {
         const auto state = action != KeyAction::release;
         switch (key)
         {
-        case Key::LeftShift:
-        case Key::RightShift:
-            m_ula->setKeyState(0, 0, state);
-            break;
-        case Key::Z:
-            m_ula->setKeyState(0, 1, state);
-            break;
-        case Key::X:
-            m_ula->setKeyState(0, 2, state);
-            break;
-        case Key::C:
-            m_ula->setKeyState(0, 3, state);
-            break;
-        case Key::V:
-            m_ula->setKeyState(0, 4, state);
-            break;
+            case Key::LeftShift:
+            case Key::RightShift:
+                m_ula->setKeyState(0, 0, state);
+                break;
+            case Key::Z:
+                m_ula->setKeyState(0, 1, state);
+                break;
+            case Key::X:
+                m_ula->setKeyState(0, 2, state);
+                break;
+            case Key::C:
+                m_ula->setKeyState(0, 3, state);
+                break;
+            case Key::V:
+                m_ula->setKeyState(0, 4, state);
+                break;
 
-        case Key::A:
-            m_ula->setKeyState(1, 0, state);
-            break;
-        case Key::S:
-            m_ula->setKeyState(1, 1, state);
-            break;
-        case Key::D:
-            m_ula->setKeyState(1, 2, state);
-            break;
-        case Key::F:
-            m_ula->setKeyState(1, 3, state);
-            break;
-        case Key::G:
-            m_ula->setKeyState(1, 4, state);
-            break;
+            case Key::A:
+                m_ula->setKeyState(1, 0, state);
+                break;
+            case Key::S:
+                m_ula->setKeyState(1, 1, state);
+                break;
+            case Key::D:
+                m_ula->setKeyState(1, 2, state);
+                break;
+            case Key::F:
+                m_ula->setKeyState(1, 3, state);
+                break;
+            case Key::G:
+                m_ula->setKeyState(1, 4, state);
+                break;
 
-        case Key::Q:
-            m_ula->setKeyState(2, 0, state);
-            break;
-        case Key::W:
-            m_ula->setKeyState(2, 1, state);
-            break;
-        case Key::E:
-            m_ula->setKeyState(2, 2, state);
-            break;
-        case Key::R:
-            m_ula->setKeyState(2, 3, state);
-            break;
-        case Key::T:
-            m_ula->setKeyState(2, 4, state);
-            break;
+            case Key::Q:
+                m_ula->setKeyState(2, 0, state);
+                break;
+            case Key::W:
+                m_ula->setKeyState(2, 1, state);
+                break;
+            case Key::E:
+                m_ula->setKeyState(2, 2, state);
+                break;
+            case Key::R:
+                m_ula->setKeyState(2, 3, state);
+                break;
+            case Key::T:
+                m_ula->setKeyState(2, 4, state);
+                break;
 
-        case Key::D1:
-            m_ula->setKeyState(3, 0, state);
-            break;
-        case Key::D2:
-            m_ula->setKeyState(3, 1, state);
-            break;
-        case Key::D3:
-            m_ula->setKeyState(3, 2, state);
-            break;
-        case Key::D4:
-            m_ula->setKeyState(3, 3, state);
-            break;
-        case Key::D5:
-            m_ula->setKeyState(3, 4, state);
-            break;
+            case Key::D1:
+                m_ula->setKeyState(3, 0, state);
+                break;
+            case Key::D2:
+                m_ula->setKeyState(3, 1, state);
+                break;
+            case Key::D3:
+                m_ula->setKeyState(3, 2, state);
+                break;
+            case Key::D4:
+                m_ula->setKeyState(3, 3, state);
+                break;
+            case Key::D5:
+                m_ula->setKeyState(3, 4, state);
+                break;
 
-        case Key::D6:
-            m_ula->setKeyState(4, 4, state);
-            break;
-        case Key::D7:
-            m_ula->setKeyState(4, 3, state);
-            break;
-        case Key::D8:
-            m_ula->setKeyState(4, 2, state);
-            break;
-        case Key::D9:
-            m_ula->setKeyState(4, 1, state);
-            break;
-        case Key::D0:
-            m_ula->setKeyState(4, 0, state);
-            break;
+            case Key::D6:
+                m_ula->setKeyState(4, 4, state);
+                break;
+            case Key::D7:
+                m_ula->setKeyState(4, 3, state);
+                break;
+            case Key::D8:
+                m_ula->setKeyState(4, 2, state);
+                break;
+            case Key::D9:
+                m_ula->setKeyState(4, 1, state);
+                break;
+            case Key::D0:
+                m_ula->setKeyState(4, 0, state);
+                break;
 
-        case Key::Y:
-            m_ula->setKeyState(5, 4, state);
-            break;
-        case Key::U:
-            m_ula->setKeyState(5, 3, state);
-            break;
-        case Key::I:
-            m_ula->setKeyState(5, 2, state);
-            break;
-        case Key::O:
-            m_ula->setKeyState(5, 1, state);
-            break;
-        case Key::P:
-            m_ula->setKeyState(5, 0, state);
-            break;
+            case Key::Y:
+                m_ula->setKeyState(5, 4, state);
+                break;
+            case Key::U:
+                m_ula->setKeyState(5, 3, state);
+                break;
+            case Key::I:
+                m_ula->setKeyState(5, 2, state);
+                break;
+            case Key::O:
+                m_ula->setKeyState(5, 1, state);
+                break;
+            case Key::P:
+                m_ula->setKeyState(5, 0, state);
+                break;
 
-        case Key::H:
-            m_ula->setKeyState(6, 4, state);
-            break;
-        case Key::J:
-            m_ula->setKeyState(6, 3, state);
-            break;
-        case Key::K:
-            m_ula->setKeyState(6, 2, state);
-            break;
-        case Key::L:
-            m_ula->setKeyState(6, 1, state);
-            break;
-        case Key::Enter:
-            m_ula->setKeyState(6, 0, state);
-            break;
+            case Key::H:
+                m_ula->setKeyState(6, 4, state);
+                break;
+            case Key::J:
+                m_ula->setKeyState(6, 3, state);
+                break;
+            case Key::K:
+                m_ula->setKeyState(6, 2, state);
+                break;
+            case Key::L:
+                m_ula->setKeyState(6, 1, state);
+                break;
+            case Key::Enter:
+                m_ula->setKeyState(6, 0, state);
+                break;
 
-        case Key::B:
-            m_ula->setKeyState(7, 4, state);
-            break;
-        case Key::N:
-            m_ula->setKeyState(7, 3, state);
-            break;
-        case Key::M:
-            m_ula->setKeyState(7, 2, state);
-            break;
-        case Key::LeftControl:
-            m_ula->setKeyState(7, 1, state);
-            break;
-        case Key::Space:
-            m_ula->setKeyState(7, 0, state);
-            break;
+            case Key::B:
+                m_ula->setKeyState(7, 4, state);
+                break;
+            case Key::N:
+                m_ula->setKeyState(7, 3, state);
+                break;
+            case Key::M:
+                m_ula->setKeyState(7, 2, state);
+                break;
+            case Key::LeftControl:
+                m_ula->setKeyState(7, 1, state);
+                break;
+            case Key::Space:
+                m_ula->setKeyState(7, 0, state);
+                break;
 
-        case Key::Right:
-            m_ula->setKempstonState(0, state);
-            break;
-        case Key::Left:
-            m_ula->setKempstonState(1, state);
-            break;
-        case Key::Down:
-            m_ula->setKempstonState(2, state);
-            break;
-        case Key::Up:
-            m_ula->setKempstonState(3, state);
-            break;
-        case Key::RightControl:
-            m_ula->setKempstonState(4, state);
-            break;
+            case Key::Right:
+                m_ula->setKempstonState(0, state);
+                break;
+            case Key::Left:
+                m_ula->setKempstonState(1, state);
+                break;
+            case Key::Down:
+                m_ula->setKempstonState(2, state);
+                break;
+            case Key::Up:
+                m_ula->setKempstonState(3, state);
+                break;
+            case Key::RightControl:
+                m_ula->setKempstonState(4, state);
+                break;
         }
     }
 
-    std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram()
-    {
-        return m_ula->ram();
-    }
+    std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() { return m_ula->ram(); }
 
-    const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const
-    {
-        return m_ula->ram();
-    }
+    const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const { return m_ula->ram(); }
 
     void ZXSpectrumEmulator::doClock()
     {
@@ -327,4 +321,4 @@ namespace epoch::zxspectrum
             }
         }
     }
-}
+}  // namespace epoch::zxspectrum

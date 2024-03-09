@@ -21,22 +21,29 @@
 
 namespace epoch::frontend
 {
-    ConfigurableShaderParameter::ConfigurableShaderParameter(
-        std::string variableName, std::string description,
-        const float defaultValue, const float min, const float max, const float step, const float value
-    ) : variableName(std::move(variableName)), description(std::move(description)), defaultValue(defaultValue), min(min), max(max), step(step), value(value)
+    ConfigurableShaderParameter::ConfigurableShaderParameter(std::string variableName, std::string description,
+                                                             const float defaultValue, const float min, const float max,
+                                                             const float step, const float value)
+        : variableName(std::move(variableName)),
+          description(std::move(description)),
+          defaultValue(defaultValue),
+          min(min),
+          max(max),
+          step(step),
+          value(value)
     {
     }
 
-    ConfigurableShader::ConfigurableShader(std::string key, std::string name, const std::string_view source) : m_key{ std::move(key) }, m_name{ std::move(name) }, m_source { source }
+    ConfigurableShader::ConfigurableShader(std::string key, std::string name, const std::string_view source)
+        : m_key{std::move(key)}, m_name{std::move(name)}, m_source{source}
     {
-        std::istringstream f{ m_source };
+        std::istringstream f{m_source};
         std::string line;
         while (std::getline(f, line))
         {
             if (line.starts_with("#pragma parameter "))
             {
-                std::istringstream ls{ line.substr(sizeof("#pragma parameter ") - 1) };
+                std::istringstream ls{line.substr(sizeof("#pragma parameter ") - 1)};
                 std::string variableName, description;
                 float defaultValue, min, max, step;
                 ls >> variableName;
@@ -50,23 +57,11 @@ namespace epoch::frontend
         }
     }
 
-    const std::string& ConfigurableShader::key() const
-    {
-        return m_key;
-    }
+    const std::string& ConfigurableShader::key() const { return m_key; }
 
-    const std::string& ConfigurableShader::name() const
-    {
-        return m_name;
-    }
+    const std::string& ConfigurableShader::name() const { return m_name; }
 
-    const std::string &ConfigurableShader::source() const
-    {
-        return m_source;
-    }
+    const std::string& ConfigurableShader::source() const { return m_source; }
 
-    std::vector<ConfigurableShaderParameter>& ConfigurableShader::parameters()
-    {
-        return m_parameters;
-    }
-}
+    std::vector<ConfigurableShaderParameter>& ConfigurableShader::parameters() { return m_parameters; }
+}  // namespace epoch::frontend

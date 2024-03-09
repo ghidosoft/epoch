@@ -14,16 +14,16 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "utils.hpp"
+
+#include <nlohmann/json.hpp>
+
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <set>
-
-#include <nlohmann/json.hpp>
-
-#include "utils.hpp"
 
 std::set<std::filesystem::path> findJsons(const std::filesystem::path& path)
 {
@@ -131,12 +131,15 @@ void from_json(const nlohmann::json& j, TestInfo& r)
     }
 }
 
-#define CHECK_VALUE(key, width, actual, expected) \
-    if ((actual) != (expected)) \
-    { \
-        std::cout << "Test " << testInfo.name << " KO\t" << key << "\texpected: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(expected) << "\tactual: 0x" << std::hex<<std::setw((width)*2)<<std::setfill('0') << (int)(actual) << "\n"; \
-        success = false; \
-    } else
+#define CHECK_VALUE(key, width, actual, expected)                                                                 \
+    if ((actual) != (expected))                                                                                   \
+    {                                                                                                             \
+        std::cout << "Test " << testInfo.name << " KO\t" << key << "\texpected: 0x" << std::hex                   \
+                  << std::setw((width) * 2) << std::setfill('0') << (int)(expected) << "\tactual: 0x" << std::hex \
+                  << std::setw((width) * 2) << std::setfill('0') << (int)(actual) << "\n";                        \
+        success = false;                                                                                          \
+    }                                                                                                             \
+    else
 
 bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const TestInfo& testInfo)
 {
@@ -210,13 +213,15 @@ bool executeTest(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, con
 
     for (const auto& [address, value] : testInfo.final.ram)
     {
-        CHECK_VALUE("RAM[0x"<<std::hex<<std::setw(4)<<std::setfill('0')<<address<<"]", 1, interface.ram()[address], value);
+        CHECK_VALUE("RAM[0x" << std::hex << std::setw(4) << std::setfill('0') << address << "]", 1,
+                    interface.ram()[address], value);
     }
 
     return success;
 }
 
-int executeTestSuite(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu, const std::filesystem::path& testSuitePath)
+int executeTestSuite(RamZ80Interface& interface, epoch::zxspectrum::Z80Cpu& cpu,
+                     const std::filesystem::path& testSuitePath)
 {
     std::ifstream fs(testSuitePath);
     const auto j = nlohmann::json::parse(fs);
@@ -239,13 +244,14 @@ int main()
     if (files.empty())
     {
         std::cerr << "No input files found in " << path << "\n";
-        std::cout << "Please download Z80 json tests from https://github.com/raddad772/jsmoo/tree/main/misc/tests/GeneratedTests/z80\n";
+        std::cout << "Please download Z80 json tests from "
+                     "https://github.com/raddad772/jsmoo/tree/main/misc/tests/GeneratedTests/z80\n";
         return EXIT_FAILURE;
     }
     std::cout << "Found " << files.size() << " files in " << path << std::endl;
 
     RamZ80Interface interface;
-    epoch::zxspectrum::Z80Cpu cpu{ interface };
+    epoch::zxspectrum::Z80Cpu cpu{interface};
 
     const auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -254,7 +260,8 @@ int main()
     for (const auto& testSuitePath : files)
     {
         remaining--;
-        // if (testSuitePath.filename().generic_string().starts_with("de"))
+        // if (testSuitePath.filename().generic_string().starts_with("ed"))
+        // if (testSuitePath.filename().generic_string().starts_with("dd cb __ cb"))
         failed += executeTestSuite(interface, cpu, testSuitePath);
     }
 

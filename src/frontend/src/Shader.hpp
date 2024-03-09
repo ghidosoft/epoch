@@ -17,11 +17,11 @@
 #ifndef SRC_FRONTEND_SHADER_HPP_
 #define SRC_FRONTEND_SHADER_HPP_
 
+#include <glad/glad.h>
+
 #include <map>
 #include <string>
 #include <string_view>
-
-#include <glad/glad.h>
 
 namespace epoch::frontend
 {
@@ -78,6 +78,6 @@ namespace epoch::frontend
 
         void link(const ShaderModule& shaderModule1, const ShaderModule& shaderModule2) const;
     };
-}
+}  // namespace epoch::frontend
 
 #endif

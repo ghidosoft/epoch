@@ -16,12 +16,12 @@
 
 #include "Window.hpp"
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <utility>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 static void s_glfwErrorCallback(const int code, const char* description)
 {
@@ -43,8 +43,8 @@ namespace epoch::frontend
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GL_FALSE);
 
-        m_window = glfwCreateWindow(static_cast<int>(info.width), static_cast<int>(info.height),
-            info.title.c_str(), nullptr, nullptr);
+        m_window = glfwCreateWindow(static_cast<int>(info.width), static_cast<int>(info.height), info.title.c_str(),
+                                    nullptr, nullptr);
         if (m_window == nullptr)
         {
             throw std::runtime_error("Cannot create GLFW window.");
@@ -104,15 +104,9 @@ namespace epoch::frontend
         return result;
     }
 
-    double Window::time() const
-    {
-        return glfwGetTime();
-    }
+    double Window::time() const { return glfwGetTime(); }
 
-    void Window::close() const
-    {
-        glfwSetWindowShouldClose(m_window, true);
-    }
+    void Window::close() const { glfwSetWindowShouldClose(m_window, true); }
 
     void Window::resize(const unsigned width, const unsigned height) const
     {
@@ -131,7 +125,7 @@ namespace epoch::frontend
             }
             switch (mode)
             {
-            case WindowMode::borderless:
+                case WindowMode::borderless:
                 {
                     const auto monitor = glfwGetPrimaryMonitor();
                     const auto vidmode = glfwGetVideoMode(monitor);
@@ -140,66 +134,41 @@ namespace epoch::frontend
                     glfwSetWindowSize(m_window, vidmode->width, vidmode->height);
                 }
                 break;
-            case WindowMode::fullscreen:
+                case WindowMode::fullscreen:
                 {
                     const auto monitor = glfwGetPrimaryMonitor();
                     const auto vidmode = glfwGetVideoMode(monitor);
-                    glfwSetWindowMonitor(m_window, monitor, 0, 0, vidmode->width, vidmode->height, vidmode->refreshRate);
+                    glfwSetWindowMonitor(m_window, monitor, 0, 0, vidmode->width, vidmode->height,
+                                         vidmode->refreshRate);
                 }
                 break;
-            case WindowMode::windowed:
-                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);
-                glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, static_cast<int>(m_lastWidth), static_cast<int>(m_lastHeight), GLFW_DONT_CARE);
-                break;
+                case WindowMode::windowed:
+                    glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);
+                    glfwSetWindowMonitor(m_window, nullptr, m_lastX, m_lastY, static_cast<int>(m_lastWidth),
+                                         static_cast<int>(m_lastHeight), GLFW_DONT_CARE);
+                    break;
             }
             m_mode = mode;
         }
     }
 
-    void Window::setTitle(const std::string& title) const
-    {
-        glfwSetWindowTitle(m_window, title.c_str());
-    }
+    void Window::setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
 
-    void Window::setCharCallback(CharCallback callback)
-    {
-        m_charCallback = std::move(callback);
-    }
+    void Window::setCharCallback(CharCallback callback) { m_charCallback = std::move(callback); }
 
-    void Window::setCursorEnterCallback(CursorEnterCallback callback)
-    {
-        m_cursorEnterCallback = std::move(callback);
-    }
+    void Window::setCursorEnterCallback(CursorEnterCallback callback) { m_cursorEnterCallback = std::move(callback); }
 
-    void Window::setCursorPosCallback(CursorPosCallback callback)
-    {
-        m_cursorPosCallback = std::move(callback);
-    }
+    void Window::setCursorPosCallback(CursorPosCallback callback) { m_cursorPosCallback = std::move(callback); }
 
-    void Window::setFileDropCallback(FileDropCallback callback)
-    {
-        m_fileDropCallback = std::move(callback);
-    }
+    void Window::setFileDropCallback(FileDropCallback callback) { m_fileDropCallback = std::move(callback); }
 
-    void Window::setFocusCallback(FocusCallback callback)
-    {
-        m_focusCallback = std::move(callback);
-    }
+    void Window::setFocusCallback(FocusCallback callback) { m_focusCallback = std::move(callback); }
 
-    void Window::setKeyboardCallback(KeyboardCallback callback)
-    {
-        m_keyboardCallback = std::move(callback);
-    }
+    void Window::setKeyboardCallback(KeyboardCallback callback) { m_keyboardCallback = std::move(callback); }
 
-    void Window::setMouseButtonCallback(MouseButtonCallback callback)
-    {
-        m_mouseButtonCallback = std::move(callback);
-    }
+    void Window::setMouseButtonCallback(MouseButtonCallback callback) { m_mouseButtonCallback = std::move(callback); }
 
-    void Window::setMouseWheelCallback(MouseWheelCallback callback)
-    {
-        m_mouseWheelCallback = std::move(callback);
-    }
+    void Window::setMouseWheelCallback(MouseWheelCallback callback) { m_mouseWheelCallback = std::move(callback); }
 
     void Window::s_charCallback(GLFWwindow* glfwWindow, const unsigned int c)
     {
@@ -228,7 +197,7 @@ namespace epoch::frontend
         }
     }
 
-    void Window::s_dropCallback(GLFWwindow *glfwWindow, int count, const char** paths)
+    void Window::s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
         if (window->m_fileDropCallback && count >= 1)
@@ -294,4 +263,4 @@ namespace epoch::frontend
             window->m_mouseWheelCallback(static_cast<float>(x), static_cast<float>(y));
         }
     }
-}
+}  // namespace epoch::frontend

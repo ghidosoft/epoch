@@ -27,6 +27,6 @@ namespace epoch::zxspectrum
 
     std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator);
     void save(const std::string& path, const ZXSpectrumEmulator* emulator);
-}
+}  // namespace epoch::zxspectrum
 
 #endif
