@@ -185,6 +185,7 @@ namespace epoch::frontend
                 {
                     const std::string filters = generateFileDialogFilters(false);
                     const IGFD::FileDialogConfig config{
+                        .path = m_settings->current().ui.lastLoadPath,
                         .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
@@ -193,6 +194,7 @@ namespace epoch::frontend
                 {
                     const std::string filters = generateFileDialogFilters(true);
                     const IGFD::FileDialogConfig config{
+                        .path = m_settings->current().ui.lastSavePath,
                         .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
@@ -280,6 +282,7 @@ namespace epoch::frontend
 
         if (ImGuiFileDialog::Instance()->Display("LoadDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
+            m_settings->current().ui.lastLoadPath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -290,6 +293,7 @@ namespace epoch::frontend
 
         if (ImGuiFileDialog::Instance()->Display("SaveDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
+            m_settings->current().ui.lastSavePath = ImGuiFileDialog::Instance()->GetCurrentPath();
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 const std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();

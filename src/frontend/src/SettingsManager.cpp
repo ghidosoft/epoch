@@ -48,6 +48,8 @@ struct YAML::convert<epoch::frontend::SettingsUI>
     {
         Node node;
         node["imgui"] = rhs.imgui;
+        node["lastLoadPath"] = rhs.lastLoadPath;
+        node["lastSavePath"] = rhs.lastSavePath;
         node["shader"] = rhs.shader;
         return node;
     }
@@ -59,6 +61,8 @@ struct YAML::convert<epoch::frontend::SettingsUI>
             return false;
         }
         rhs.imgui = node["imgui"].as<std::string>("");
+        rhs.lastLoadPath = node["lastLoadPath"].as<std::string>(".");
+        rhs.lastSavePath = node["lastSavePath"].as<std::string>(".");
         rhs.shader = node["shader"].as<std::string>("");
         return true;
     }

@@ -31,6 +31,8 @@ namespace epoch::frontend
     struct SettingsUI final
     {
         std::string imgui;
+        std::string lastLoadPath;
+        std::string lastSavePath;
         std::string shader;
 
         bool operator==(const SettingsUI&) const;
