@@ -189,7 +189,8 @@ namespace epoch::frontend
                     const IGFD::FileDialogConfig config{
                         .path = m_settings->current().ui.lastLoadPath,
                         .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal |
-                                 ImGuiFileDialogFlags_DisableCreateDirectoryButton,
+                                 ImGuiFileDialogFlags_DisableCreateDirectoryButton |
+                                 ImGuiFileDialogFlags_CaseInsensitiveExtention,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
@@ -198,7 +199,8 @@ namespace epoch::frontend
                     const std::string filters = generateFileDialogFilters(true);
                     const IGFD::FileDialogConfig config{
                         .path = m_settings->current().ui.lastSavePath,
-                        .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal,
+                        .flags = ImGuiFileDialogFlags_ConfirmOverwrite | ImGuiFileDialogFlags_Modal |
+                                 ImGuiFileDialogFlags_CaseInsensitiveExtention,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("SaveDialogKey", "Save", filters.c_str(), config);
                 }
