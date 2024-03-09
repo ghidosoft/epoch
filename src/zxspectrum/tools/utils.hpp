@@ -20,6 +20,7 @@
 #include "../src/Z80Cpu.hpp"
 
 #include <cassert>
+#include <cstring>
 #include <span>
 #include <stdexcept>
 #include <string>

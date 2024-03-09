@@ -18,7 +18,7 @@
 #define SRC_EPOCH_ZXSPECTRUM_CONSTANTS_HPP_
 
 #include <array>
-#include <cstddef>
+#include <cstdint>
 
 namespace epoch::zxspectrum
 {
