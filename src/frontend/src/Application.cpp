@@ -186,7 +186,7 @@ namespace epoch::frontend
                     const std::string filters = generateFileDialogFilters(false);
                     const IGFD::FileDialogConfig config{
                         .path = m_settings->current().ui.lastLoadPath,
-                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal,
+                        .flags = ImGuiFileDialogFlags_ReadOnlyFileNameField | ImGuiFileDialogFlags_Modal | ImGuiFileDialogFlags_DisableCreateDirectoryButton,
                     };
                     ImGuiFileDialog::Instance()->OpenDialog("LoadDialogKey", "Load", filters.c_str(), config);
                 }
