@@ -275,7 +275,10 @@ namespace epoch::frontend
             ImGui::End();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey"))
+        const ImVec2 screenSize{ static_cast<float>(m_window->width()), static_cast<float>(m_window->height()) };
+        ImGui::SetNextWindowPos({ 0, 0 });
+
+        if (ImGuiFileDialog::Instance()->Display("LoadDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
             {
@@ -285,7 +288,7 @@ namespace epoch::frontend
             ImGuiFileDialog::Instance()->Close();
         }
 
-        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey"))
+        if (ImGuiFileDialog::Instance()->Display("SaveDialogKey", ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize, screenSize, screenSize))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
             {
