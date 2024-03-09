@@ -17,10 +17,10 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_Z80CPU_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_Z80CPU_HPP_
 
+#include "Z80Interface.hpp"
+
 #include <array>
 #include <cstdint>
-
-#include "Z80Interface.hpp"
 
 namespace epoch::zxspectrum
 {

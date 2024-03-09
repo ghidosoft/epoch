@@ -16,11 +16,11 @@
 
 #include "Z80Cpu.hpp"
 
+#include "Z80Tables.hpp"
+
 #include <bit>
 #include <cassert>
 #include <sstream>
-
-#include "Z80Tables.hpp"
 
 namespace epoch::zxspectrum
 {

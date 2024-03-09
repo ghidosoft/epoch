@@ -14,16 +14,16 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "utils.hpp"
+
+#include <nlohmann/json.hpp>
+
 #include <chrono>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <set>
-
-#include <nlohmann/json.hpp>
-
-#include "utils.hpp"
 
 std::set<std::filesystem::path> findJsons(const std::filesystem::path& path)
 {

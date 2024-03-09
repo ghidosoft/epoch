@@ -16,9 +16,9 @@
 
 #include "SettingsManager.hpp"
 
-#include <fstream>
-
 #include <yaml-cpp/yaml.h>
+
+#include <fstream>
 
 template<>
 struct YAML::convert<epoch::frontend::SettingsEmulator>

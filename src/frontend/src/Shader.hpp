@@ -17,11 +17,11 @@
 #ifndef SRC_FRONTEND_SHADER_HPP_
 #define SRC_FRONTEND_SHADER_HPP_
 
+#include <glad/glad.h>
+
 #include <map>
 #include <string>
 #include <string_view>
-
-#include <glad/glad.h>
 
 namespace epoch::frontend
 {

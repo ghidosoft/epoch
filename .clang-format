@@ -12,12 +12,17 @@ SpaceAfterTemplateKeyword: false
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: "^<glad.*"
-    Priority: 2
+    Priority: 10
+  - Regex: "^<imgui.*"
+    Priority: 10
+    CaseSensitive: true
+  - Regex: "^<epoch.*"
+    Priority: 5
   - Regex: '[<"].*(/|\\).*'
-    Priority: 3
+    Priority: 15
   - Regex: "^<.*\\.h.*"
-    Priority: 3
+    Priority: 15
   - Regex: "^<.*"
-    Priority: 1
+    Priority: 20
   - Regex: ".*"
-    Priority: 100
+    Priority: 1

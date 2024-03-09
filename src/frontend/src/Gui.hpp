@@ -17,9 +17,9 @@
 #ifndef SRC_FRONTEND_GUI_HPP_
 #define SRC_FRONTEND_GUI_HPP_
 
-#include <memory>
-
 #include <glad/glad.h>
+
+#include <memory>
 
 struct ImGuiContext;
 

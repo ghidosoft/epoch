@@ -17,9 +17,9 @@
 #ifndef SRC_EPOCH_FRONTEND_SETTINGSMANAGER_HPP_
 #define SRC_EPOCH_FRONTEND_SETTINGSMANAGER_HPP_
 
-#include <filesystem>
-
 #include "Settings.hpp"
+
+#include <filesystem>
 
 namespace epoch::frontend
 {

@@ -17,12 +17,12 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_ZXSPECTRUMEMULATOR_HPP_
 
-#include <array>
-#include <memory>
+#include "Constants.hpp"
 
 #include <epoch/core.hpp>
 
-#include "Constants.hpp"
+#include <array>
+#include <memory>
 
 namespace epoch::zxspectrum
 {

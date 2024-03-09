@@ -16,18 +16,18 @@
 
 #include "Io.hpp"
 
+#include "IoSnapshot.hpp"
+#include "IoTzx.hpp"
+#include "TapeInterface.hpp"
+#include "Ula.hpp"
+#include "ZXSpectrumEmulator.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <filesystem>
 #include <fstream>
 #include <vector>
-
-#include "IoSnapshot.hpp"
-#include "IoTzx.hpp"
-#include "TapeInterface.hpp"
-#include "Ula.hpp"
-#include "ZXSpectrumEmulator.hpp"
 
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
 #define GET_BYTE() static_cast<uint8_t>(is.get())

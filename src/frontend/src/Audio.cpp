@@ -16,12 +16,12 @@
 
 #include "Audio.hpp"
 
+#include <portaudio.h>
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-#include <portaudio.h>
 
 #define PA_CHECK(a)                                                          \
     do                                                                       \

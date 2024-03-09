@@ -17,10 +17,10 @@
 #ifndef SRC_FRONTEND_WINDOW_HPP_
 #define SRC_FRONTEND_WINDOW_HPP_
 
+#include <epoch/core.hpp>
+
 #include <functional>
 #include <string>
-
-#include <epoch/core.hpp>
 
 struct GLFWwindow;
 

@@ -14,14 +14,14 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "utils.hpp"
+
 #include <array>
 #include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-
-#include "utils.hpp"
 
 // Source: https://mdfs.net/Software/Z80/Exerciser/
 

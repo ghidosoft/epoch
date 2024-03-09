@@ -16,13 +16,13 @@
 
 #include "Window.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <utility>
-
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
+
+#include <iostream>
+#include <stdexcept>
+#include <utility>
 
 static void s_glfwErrorCallback(const int code, const char* description)
 {

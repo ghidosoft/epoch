@@ -17,12 +17,13 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_TOOLS_UTILS_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_TOOLS_UTILS_HPP_
 
+#include "../src/Z80Cpu.hpp"
+
 #include <cassert>
 #include <span>
 #include <stdexcept>
+#include <string>
 #include <vector>
-
-#include "../src/Z80Cpu.hpp"
 
 class RamZ80Interface : public epoch::zxspectrum::Z80Interface
 {

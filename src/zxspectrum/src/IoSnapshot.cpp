@@ -16,14 +16,14 @@
 
 #include "IoSnapshot.hpp"
 
+#include "Ula.hpp"
+#include "Z80Cpu.hpp"
+#include "ZXSpectrumEmulator.hpp"
+
 #include <cassert>
 #include <cstring>
 #include <fstream>
 #include <vector>
-
-#include "Ula.hpp"
-#include "Z80Cpu.hpp"
-#include "ZXSpectrumEmulator.hpp"
 
 #define PUT_BYTE(x) os.put(static_cast<uint8_t>(x))
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))

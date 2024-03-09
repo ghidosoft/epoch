@@ -17,9 +17,9 @@
 #ifndef SRC_FRONTEND_AUDIO_HPP_
 #define SRC_FRONTEND_AUDIO_HPP_
 
-#include <memory>
-
 #include "CircularBuffer.hpp"
+
+#include <memory>
 
 #ifndef PaStream
 typedef void PaStream;

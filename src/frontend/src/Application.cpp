@@ -16,18 +16,20 @@
 
 #include "Application.hpp"
 
-#include <sstream>
-
-#include <ImGuiFileDialog.h>
-#include <epoch/core.hpp>
-#include <imgui.h>
-
 #include "Audio.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
 #include "SettingsManager.hpp"
 #include "Shaders.hpp"
 #include "Window.hpp"
+
+#include <epoch/core.hpp>
+
+#include <imgui.h>
+
+#include <ImGuiFileDialog.h>
+
+#include <sstream>
 
 namespace epoch::frontend
 {

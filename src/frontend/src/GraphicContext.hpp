@@ -17,11 +17,11 @@
 #ifndef SRC_FRONTEND_GRAPHICCONTEXT_HPP_
 #define SRC_FRONTEND_GRAPHICCONTEXT_HPP_
 
+#include <glad/glad.h>
+
 #include <cstdint>
 #include <memory>
 #include <span>
-
-#include <glad/glad.h>
 
 namespace epoch::frontend
 {

@@ -17,11 +17,11 @@
 #ifndef SRC_EPOCH_FRONTEND_APPLICATION_HPP_
 #define SRC_EPOCH_FRONTEND_APPLICATION_HPP_
 
+#include "ConfigurableShader.hpp"
+
 #include <functional>
 #include <memory>
 #include <vector>
-
-#include "ConfigurableShader.hpp"
 
 namespace epoch
 {

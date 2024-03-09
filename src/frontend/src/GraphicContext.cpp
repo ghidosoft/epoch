@@ -16,12 +16,12 @@
 
 #include "GraphicContext.hpp"
 
+#include "ConfigurableShader.hpp"
+#include "Shader.hpp"
+
 #include <bit>
 #include <cassert>
 #include <cstdint>
-
-#include "ConfigurableShader.hpp"
-#include "Shader.hpp"
 
 namespace epoch::frontend
 {

@@ -17,10 +17,10 @@
 #ifndef SRC_EPOCH_CORE_PALETTE_HPP_
 #define SRC_EPOCH_CORE_PALETTE_HPP_
 
+#include "Color.hpp"
+
 #include <span>
 #include <vector>
-
-#include "Color.hpp"
 
 namespace epoch
 {

@@ -17,12 +17,12 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_ULA_HPP_
 
+#include "Constants.hpp"
+#include "Z80Interface.hpp"
+
 #include <array>
 #include <cstdint>
 #include <span>
-
-#include "Constants.hpp"
-#include "Z80Interface.hpp"
 
 namespace epoch::zxspectrum
 {

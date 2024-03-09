@@ -16,13 +16,14 @@
 
 #include "Gui.hpp"
 
-#include <cassert>
-#include <stdexcept>
+#include "Shader.hpp"
 
 #include <epoch/core.hpp>
+
 #include <imgui.h>
 
-#include "Shader.hpp"
+#include <cassert>
+#include <stdexcept>
 
 static const char* IMGUI_VERTEX_SHADER = R"GLSL(
 #version 410 core
