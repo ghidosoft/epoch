@@ -18,6 +18,8 @@
 
 namespace epoch::frontend
 {
+    bool SettingsEmulator::operator==(const SettingsEmulator&) const = default;
+
     bool SettingsUI::operator==(const SettingsUI&) const = default;
 
     bool Settings::operator==(const Settings&) const = default;

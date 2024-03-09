@@ -21,6 +21,13 @@
 
 namespace epoch::frontend
 {
+    struct SettingsEmulator final
+    {
+        std::string key;
+
+        bool operator==(const SettingsEmulator&) const;
+    };
+
     struct SettingsUI final
     {
         std::string imgui;
@@ -30,6 +37,7 @@ namespace epoch::frontend
 
     struct Settings final
     {
+        SettingsEmulator emulator;
         SettingsUI ui;
 
         bool operator==(const Settings&) const;

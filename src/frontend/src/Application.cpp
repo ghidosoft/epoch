@@ -35,9 +35,20 @@ namespace epoch::frontend
     {
         assert(!m_configuration.emulators.empty());
         m_settings->load();
-        const auto& entry = m_configuration.emulators[0];
-        m_emulator = entry.factory();
-        m_currentEntry = &entry;
+        for (auto &entry : m_configuration.emulators)
+        {
+            if (entry.key == m_settings->current().emulator.key)
+            {
+                m_currentEntry = &entry;
+                break;
+            }
+        }
+        if (!m_currentEntry)
+        {
+            const auto& entry = m_configuration.emulators[0];
+            m_currentEntry = &entry;
+        }
+        m_emulator = m_currentEntry->factory();
         init();
     }
 
@@ -276,6 +287,7 @@ namespace epoch::frontend
     {
         m_emulator = entry.factory();
         m_currentEntry = &entry;
+        m_settings->current().emulator.key = m_currentEntry->key;
         m_window->setTitle("Epoch emulator: " + m_emulator->info().name);
     }
 

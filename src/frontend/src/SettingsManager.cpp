@@ -21,6 +21,27 @@
 #include <yaml-cpp/yaml.h>
 
 template<>
+struct YAML::convert<epoch::frontend::SettingsEmulator>
+{
+    static Node encode(const epoch::frontend::SettingsEmulator& rhs)
+    {
+        Node node;
+        node["key"] = rhs.key;
+        return node;
+    }
+
+    static bool decode(const Node& node, epoch::frontend::SettingsEmulator& rhs)
+    {
+        if (!node.IsMap())
+        {
+            return false;
+        }
+        rhs.key = node["key"].as<std::string>("");
+        return true;
+    }
+};
+
+template<>
 struct YAML::convert<epoch::frontend::SettingsUI>
 {
     static Node encode(const epoch::frontend::SettingsUI& rhs)
@@ -58,6 +79,7 @@ namespace epoch::frontend
             try
             {
                 const auto node = YAML::Load(fin);
+                m_currentSettings.emulator = node["emulator"].as<SettingsEmulator>();
                 m_currentSettings.ui = node["ui"].as<SettingsUI>();
                 m_storedSettings = m_currentSettings;
             }
@@ -74,6 +96,7 @@ namespace epoch::frontend
         if (fout.good())
         {
             YAML::Node node;
+            node["emulator"] = m_currentSettings.emulator;
             node["ui"] = m_currentSettings.ui;
 
             fout << node;
