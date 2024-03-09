@@ -13,15 +13,20 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: "^<glad.*"
     Priority: 10
+    SortPriority: 10
+    CaseSensitive: true
   - Regex: "^<imgui.*"
     Priority: 10
+    SortPriority: 10
     CaseSensitive: true
   - Regex: "^<epoch.*"
     Priority: 5
   - Regex: '[<"].*(/|\\).*'
-    Priority: 15
+    Priority: 10
+    SortPriority: 11
   - Regex: "^<.*\\.h.*"
-    Priority: 15
+    Priority: 10
+    SortPriority: 11
   - Regex: "^<.*"
     Priority: 20
   - Regex: ".*"

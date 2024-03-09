@@ -26,7 +26,6 @@
 #include <epoch/core.hpp>
 
 #include <imgui.h>
-
 #include <ImGuiFileDialog.h>
 
 #include <sstream>
