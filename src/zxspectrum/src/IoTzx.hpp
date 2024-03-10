@@ -45,6 +45,10 @@ namespace epoch::zxspectrum
         void loadBlock13PulseSequence();
         void loadBlock14PureDataBlock();
 
+        uint8_t getByte();
+        uint16_t getWord();
+        uint32_t getWord3();
+
     private:
         std::istream& m_stream;
         std::vector<std::size_t>& m_pulses;
