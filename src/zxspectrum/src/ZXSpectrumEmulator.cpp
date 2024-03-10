@@ -17,7 +17,7 @@
 #include "ZXSpectrumEmulator.hpp"
 
 #include "Io.hpp"
-#include "Rom.hpp"
+#include "Roms.hpp"
 #include "TapeInterface.hpp"
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
@@ -66,13 +66,14 @@ namespace epoch::zxspectrum
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create48K()
     {
-        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 48K", std::make_unique<Ula>(UlaType::zx48k, ROM_48K));
+        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 48K",
+                                                    std::make_unique<Ula>(UlaType::zx48k, roms::Rom48K));
     }
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128K()
     {
         return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K",
-                                                    std::make_unique<Ula>(UlaType::zx128k, ROM_128K));
+                                                    std::make_unique<Ula>(UlaType::zx128k, roms::Rom128K));
     }
 
     void ZXSpectrumEmulator::reset()
