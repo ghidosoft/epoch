@@ -21,7 +21,7 @@
 #include <span>
 
 #define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
-#define GET_BYTE() static_cast<uint8_t>(is.get())
+#define GET_BYTE() static_cast<uint8_t>(m_stream.get())
 #define GET_WORD_LE()      \
     do                     \
     {                      \
@@ -74,7 +74,110 @@ namespace epoch::zxspectrum
         }
     }
 
-    void loadTzxBlock10StandardSpeed(std::istream& is, std::vector<std::size_t>& pulses)
+    TzxReader::TzxReader(std::istream& stream, std::vector<std::size_t>& pulses) : m_stream{stream}, m_pulses{pulses} {}
+
+    TzxReader::~TzxReader() = default;
+
+    void TzxReader::read()
+    {
+        char header[8];
+        m_stream.read(header, 8);
+        if (std::memcmp("ZXTape!\x1a", header, 8) != 0)
+        {
+            throw std::runtime_error("Invalid TZX header");
+        }
+        const auto versionMajor = GET_BYTE();
+        const auto versionMinor = GET_BYTE();
+        if (versionMajor != 1)
+        {
+            throw std::runtime_error("Unsupported TZX version");
+        }
+
+        do
+        {
+            const auto blockId = GET_BYTE();
+            if (m_stream.eof()) break;
+            loadBlock(blockId);
+        } while (!m_stream.eof());
+    }
+
+    void TzxReader::loadBlock(const uint8_t blockId)
+    {
+        switch (blockId)
+        {
+            case 0x10:
+                loadBlock10StandardSpeed();
+                break;
+            case 0x11:
+                loadBlock11TurboSpeed();
+                break;
+            case 0x12:
+                loadBlock12PureTone();
+                break;
+            case 0x13:
+                loadBlock13PulseSequence();
+                break;
+            case 0x14:
+                loadBlock14PureDataBlock();
+                break;
+            case 0x20:
+                // Pause
+                {
+                    uint8_t high, low;
+                    GET_WORD_LE();
+                    const auto pause = MAKE_WORD(high, low);
+                    if (pause > 0)
+                    {
+                        generatePause(m_pulses, pause);
+                    }
+                    else
+                    {
+                        // TODO: Stop the tape
+                    }
+                }
+                break;
+            case 0x21:
+                // Group start
+                m_stream.seekg(GET_BYTE(), std::ios::cur);
+                break;
+            case 0x22:
+                // Group end
+                break;
+            case 0x24:
+                // Loop start
+                {
+                    uint8_t high, low;
+                    GET_WORD_LE();
+                    m_loopCount = MAKE_WORD(high, low);
+                    m_loopPos = m_stream.tellg();
+                }
+                break;
+            case 0x25:
+                // Loop end
+                if (m_loopCount > 0)
+                {
+                    m_loopCount--;
+                    m_stream.seekg(m_loopPos, std::ios::beg);
+                }
+                break;
+            case 0x30:
+                // Text description
+                m_stream.seekg(GET_BYTE(), std::ios::cur);
+                break;
+            case 0x32:
+                // Archive info
+                {
+                    uint8_t high, low;
+                    GET_WORD_LE();
+                    m_stream.seekg(MAKE_WORD(high, low), std::ios::cur);
+                }
+                break;
+            default:
+                throw std::runtime_error("Unsupported TZX block type");
+        }
+    }
+
+    void TzxReader::loadBlock10StandardSpeed()
     {
         uint8_t high, low;
         GET_WORD_LE();
@@ -84,15 +187,15 @@ namespace epoch::zxspectrum
         if (length < 1) return;
         std::vector<uint8_t> bytes;
         bytes.resize(length);
-        is.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
+        m_stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
 
         const auto isHeaderBlock = bytes[0] < 128;
-        generatePilot(pulses, 2168, isHeaderBlock ? 8063 : 3223, 667, 735);
-        generateDataBlock(pulses, bytes, 855, 1710);
-        generatePause(pulses, pause);
+        generatePilot(m_pulses, 2168, isHeaderBlock ? 8063 : 3223, 667, 735);
+        generateDataBlock(m_pulses, bytes, 855, 1710);
+        generatePause(m_pulses, pause);
     }
 
-    void loadTzxBlock11TurboSpeed(std::istream& is, std::vector<std::size_t>& pulses)
+    void TzxReader::loadBlock11TurboSpeed()
     {
         uint8_t high, low;
         GET_WORD_LE();
@@ -118,58 +221,65 @@ namespace epoch::zxspectrum
         if (length < 1) return;
         std::vector<uint8_t> bytes;
         bytes.resize(length);
-        is.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
+        m_stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
 
-        generatePilot(pulses, pilotPulseLength, pilotPulseCount, sync1, sync2);
-        generateDataBlock(pulses, bytes, zero, one, bitsLastByte);
-        generatePause(pulses, pause);
+        generatePilot(m_pulses, pilotPulseLength, pilotPulseCount, sync1, sync2);
+        generateDataBlock(m_pulses, bytes, zero, one, bitsLastByte);
+        generatePause(m_pulses, pause);
     }
 
-    void loadTzxBlock(const uint8_t blockId, std::istream& is, std::vector<std::size_t>& pulses)
+    void TzxReader::loadBlock12PureTone()
     {
-        switch (blockId)
+        uint8_t high, low;
+        GET_WORD_LE();
+        const auto pulseLength = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        const auto pulseCount = MAKE_WORD(high, low);
+        for (auto i = 0u; i < pulseCount; i++)
         {
-            case 0x10:
-                return loadTzxBlock10StandardSpeed(is, pulses);
-            case 0x11:
-                return loadTzxBlock11TurboSpeed(is, pulses);
-            case 0x30:
-                // Text description
-                is.seekg(GET_BYTE(), std::ios::cur);
-                return;
-            case 0x32:
-                // Archive info
-                {
-                    uint8_t high, low;
-                    GET_WORD_LE();
-                    is.seekg(MAKE_WORD(high, low), std::ios::cur);
-                }
-                return;
-            default:
-                throw std::runtime_error("Unsupported TZX block type");
+            m_pulses.push_back(pulseLength);
         }
+    }
+
+    void TzxReader::loadBlock13PulseSequence()
+    {
+        const auto pulseCount = GET_BYTE();
+        for (auto i = 0u; i < pulseCount; i++)
+        {
+            uint8_t high, low;
+            GET_WORD_LE();
+            const auto pulseLength = MAKE_WORD(high, low);
+            m_pulses.push_back(pulseLength);
+        }
+    }
+
+    void TzxReader::loadBlock14PureDataBlock()
+    {
+        uint8_t high, low;
+        GET_WORD_LE();
+        const auto zero = MAKE_WORD(high, low);
+        GET_WORD_LE();
+        const auto one = MAKE_WORD(high, low);
+        const auto bitsLastByte = GET_BYTE();
+        GET_WORD_LE();
+        const auto pause = MAKE_WORD(high, low);
+
+        GET_WORD_LE();
+        uint32_t length = MAKE_WORD(high, low);
+        length |= GET_BYTE() << 16;
+
+        if (length < 1) return;
+        std::vector<uint8_t> bytes;
+        bytes.resize(length);
+        m_stream.read(reinterpret_cast<char*>(bytes.data()), bytes.size());
+
+        generateDataBlock(m_pulses, bytes, zero, one, bitsLastByte);
+        generatePause(m_pulses, pause);
     }
 
     void loadTzx(std::istream& is, std::vector<std::size_t>& pulses)
     {
-        char header[8];
-        is.read(header, 8);
-        if (std::memcmp("ZXTape!\x1a", header, 8) != 0)
-        {
-            throw std::runtime_error("Invalid TZX header");
-        }
-        const auto versionMajor = GET_BYTE();
-        const auto versionMinor = GET_BYTE();
-        if (versionMajor != 1)
-        {
-            throw std::runtime_error("Unsupported TZX version");
-        }
-
-        do
-        {
-            const auto blockId = GET_BYTE();
-            if (is.eof()) break;
-            loadTzxBlock(blockId, is, pulses);
-        } while (!is.eof());
+        TzxReader reader{is, pulses};
+        reader.read();
     }
 }  // namespace epoch::zxspectrum
