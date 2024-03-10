@@ -146,6 +146,7 @@ namespace epoch::zxspectrum
             case 0x24:
                 // Loop start
                 {
+                    assert(m_loopCount == 0);  // Do not nest loops
                     uint8_t high, low;
                     GET_WORD_LE();
                     m_loopCount = MAKE_WORD(high, low);
