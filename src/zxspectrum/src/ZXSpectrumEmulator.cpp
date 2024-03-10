@@ -76,6 +76,12 @@ namespace epoch::zxspectrum
                                                     std::make_unique<Ula>(UlaType::zx128k, roms::Rom128K));
     }
 
+    std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128KPlus2()
+    {
+        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K+2",
+                                                    std::make_unique<Ula>(UlaType::zx128k, roms::Rom128KPlus2));
+    }
+
     void ZXSpectrumEmulator::reset()
     {
         m_ula->reset();

@@ -15,6 +15,7 @@ add_library(epoch_zxspectrum
 
     "src/roms/Rom48K.cpp"
     "src/roms/Rom128K.cpp"
+    "src/roms/Rom128K+2.cpp"
     "src/roms/RomZXTest.cpp"
 )
 

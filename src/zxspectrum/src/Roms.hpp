@@ -32,6 +32,9 @@ namespace epoch::zxspectrum::roms
     // 128K rom downloaded from https://mdfs.net/Software/Spectrum/ROMImages/128k.rom
     extern const uint8_t Rom128K[32 * 1024];
 
+    // 128K+2 rom downloaded from https://mdfs.net/Software/Spectrum/ROMImages/128k+2.rom
+    extern const uint8_t Rom128KPlus2[32 * 1024];
+
     extern const uint8_t RomZXTest[8 * 1024];
 }  // namespace epoch::zxspectrum::roms
 

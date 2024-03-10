@@ -42,6 +42,7 @@ namespace epoch::zxspectrum
     public:
         static std::unique_ptr<ZXSpectrumEmulator> create48K();
         static std::unique_ptr<ZXSpectrumEmulator> create128K();
+        static std::unique_ptr<ZXSpectrumEmulator> create128KPlus2();
 
     public:
         ZXSpectrumEmulator(const ZXSpectrumEmulator& other) = delete;
