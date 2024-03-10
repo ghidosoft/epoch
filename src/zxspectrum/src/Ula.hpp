@@ -29,7 +29,8 @@ namespace epoch::zxspectrum
     enum class UlaType
     {
         zx48k,
-        zx128k
+        zx128k,
+        zx128kplus3,
     };
 
     class Ula final : public Z80Interface
@@ -75,13 +76,14 @@ namespace epoch::zxspectrum
     private:
         UlaType m_type;
 
-        std::array<MemoryBank, 2> m_rom{};
+        std::array<MemoryBank, 4> m_rom{};
         std::array<MemoryBank, 8> m_ram{};
 
         uint8_t m_ramSelect{0};
         uint8_t m_vramSelect{5};
         uint8_t m_romSelect{0};
         uint8_t m_pagingState{};
+        uint8_t m_pagingPlus3{};
 
         uint8_t m_floatingBusValue{};
         uint8_t m_border{};

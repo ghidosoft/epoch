@@ -11,10 +11,9 @@ This is a cross-platform ZX Spectrum 48K/128K/+2 emulator written, for the fun o
 - Sound
 - Drag&drop file loading
 - Kempston joystick emulation (arrows and right-control for fire)
-- ZX 48K/128K/+2 spectrum
+- ZX 48K/128K/+2/+2A/+3 spectrum
 
 ## Roadmap
-- +2A/+3 spectrum
 - AY sound chip
 - .z80 snapshots
 - Fast loading

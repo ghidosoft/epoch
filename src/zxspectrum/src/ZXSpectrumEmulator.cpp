@@ -46,9 +46,8 @@ namespace epoch::zxspectrum
     };
     const Palette ZXSpectrumEmulator::DefaultPalette{defaultColors};
 
-    ZXSpectrumEmulator::ZXSpectrumEmulator(std::string name, std::unique_ptr<Ula> ula)
-        : Emulator{{std::move(name),
-                    Width,
+    ZXSpectrumEmulator::ZXSpectrumEmulator(std::unique_ptr<Ula> ula)
+        : Emulator{{Width,
                     Height,
                     TStatesPerFrame,
                     FramesPerSecond,
@@ -66,20 +65,22 @@ namespace epoch::zxspectrum
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create48K()
     {
-        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 48K",
-                                                    std::make_unique<Ula>(UlaType::zx48k, roms::Rom48K));
+        return std::make_unique<ZXSpectrumEmulator>(std::make_unique<Ula>(UlaType::zx48k, roms::Rom48K));
     }
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128K()
     {
-        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K",
-                                                    std::make_unique<Ula>(UlaType::zx128k, roms::Rom128K));
+        return std::make_unique<ZXSpectrumEmulator>(std::make_unique<Ula>(UlaType::zx128k, roms::Rom128K));
     }
 
     std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128KPlus2()
     {
-        return std::make_unique<ZXSpectrumEmulator>("ZX Spectrum 128K+2",
-                                                    std::make_unique<Ula>(UlaType::zx128k, roms::Rom128KPlus2));
+        return std::make_unique<ZXSpectrumEmulator>(std::make_unique<Ula>(UlaType::zx128k, roms::Rom128KPlus2));
+    }
+
+    std::unique_ptr<ZXSpectrumEmulator> ZXSpectrumEmulator::create128KPlus3()
+    {
+        return std::make_unique<ZXSpectrumEmulator>(std::make_unique<Ula>(UlaType::zx128kplus3, roms::Rom128KPlus3));
     }
 
     void ZXSpectrumEmulator::reset()

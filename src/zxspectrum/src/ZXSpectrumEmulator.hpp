@@ -36,13 +36,14 @@ namespace epoch::zxspectrum
         static const Palette DefaultPalette;
 
     public:
-        ZXSpectrumEmulator(std::string name, std::unique_ptr<Ula> ula);
+        explicit ZXSpectrumEmulator(std::unique_ptr<Ula> ula);
         ~ZXSpectrumEmulator() override;
 
     public:
         static std::unique_ptr<ZXSpectrumEmulator> create48K();
         static std::unique_ptr<ZXSpectrumEmulator> create128K();
         static std::unique_ptr<ZXSpectrumEmulator> create128KPlus2();
+        static std::unique_ptr<ZXSpectrumEmulator> create128KPlus3();
 
     public:
         ZXSpectrumEmulator(const ZXSpectrumEmulator& other) = delete;

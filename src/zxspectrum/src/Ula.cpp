@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <stdexcept>
 
 namespace epoch::zxspectrum
 {
@@ -65,6 +66,7 @@ namespace epoch::zxspectrum
         m_vramSelect = 5;
         m_romSelect = 0;
         m_pagingState = 0;
+        m_pagingPlus3 = 0;
 
         m_frameCounter = 0;
         m_x = -HorizontalRetrace;
@@ -143,6 +145,8 @@ namespace epoch::zxspectrum
                     return m_pagingState;
                 }
                 break;
+            case UlaType::zx128kplus3:
+                break;
         }
         return 0xff;
     }
@@ -177,6 +181,43 @@ namespace epoch::zxspectrum
                     }
                 }
                 break;
+            case UlaType::zx128kplus3:
+            {
+                bool shouldUpdate = false;
+                if ((port & 0b1100000000000010) == 0b0100000000000000)
+                {
+                    if ((m_pagingState & 0b00100000) == 0)
+                    {
+                        m_pagingState = value;
+                        shouldUpdate = true;
+                    }
+                }
+                else if ((port & 0b1111000000000010) == 0b0001000000000000)
+                {
+                    if ((m_pagingState & 0b00100000) == 0)
+                    {
+                        m_pagingPlus3 = value;
+                        shouldUpdate = true;
+                    }
+                }
+                if (shouldUpdate)
+                {
+                    if (m_pagingPlus3 & 0x01)
+                    {
+                        // Special paging mode
+                        const auto modeSelect = (m_pagingPlus3 >> 1) & 0x03;
+                        throw std::runtime_error("Paging special mode not yet implemented");
+                    }
+                    else
+                    {
+                        // Normal paging mode
+                        m_ramSelect = m_pagingState & 0x07;
+                        m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                        m_romSelect = ((m_pagingPlus3 >> 1) & 0x02) | ((m_pagingState >> 4) & 0x01);
+                    }
+                }
+                break;
+            }
         }
     }
 

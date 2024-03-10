@@ -100,7 +100,7 @@ namespace epoch::frontend
         assert(!m_window);
         const auto& emulatorInfo = m_emulator->info();
         m_window = std::make_unique<Window>(WindowInfo{
-            .title = "Epoch emulator: " + emulatorInfo.name,
+            .title = "Epoch emulator: " + m_currentEntry->name,
             .width = emulatorInfo.width * 2,
             .height = emulatorInfo.height * 2,
         });
@@ -350,7 +350,7 @@ namespace epoch::frontend
         m_emulator = entry.factory();
         m_currentEntry = &entry;
         m_settings->current().emulator.key = m_currentEntry->key;
-        m_window->setTitle("Epoch emulator: " + m_emulator->info().name);
+        m_window->setTitle("Epoch emulator: " + m_currentEntry->name);
     }
 
     void Application::setShader(const std::size_t index)

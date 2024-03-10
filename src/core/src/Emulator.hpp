@@ -35,7 +35,6 @@ namespace epoch
 
     struct EmulatorInfo
     {
-        std::string name;
         unsigned width;
         unsigned height;
         std::size_t frameClocks;

@@ -37,6 +37,11 @@ int main()
                     .name = "ZX Spectrum 128K+2",
                     .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create128KPlus2(); },
                 },
+                {
+                    .key = "ZXSpectrum128K+3",
+                    .name = "ZX Spectrum 128K+2A/+3",
+                    .factory = []() { return epoch::zxspectrum::ZXSpectrumEmulator::create128KPlus3(); },
+                },
             },
     };
     epoch::frontend::Application application{configuration};
