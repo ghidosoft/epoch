@@ -24,6 +24,11 @@
 #include <array>
 #include <memory>
 
+namespace epoch::sound
+{
+    class AY8910Device;
+}
+
 namespace epoch::zxspectrum
 {
     class TapeInterface;
@@ -72,6 +77,7 @@ namespace epoch::zxspectrum
     private:
         const std::unique_ptr<Ula> m_ula;
         const std::unique_ptr<Z80Cpu> m_cpu;
+        std::unique_ptr<sound::AY8910Device> m_ay8910;
         uint64_t m_clockCounter{};
 
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
