@@ -16,6 +16,8 @@
 
 #include "Ula.hpp"
 
+#include <epoch/sound.hpp>
+
 #include <cassert>
 #include <cstring>
 #include <stdexcept>
@@ -23,11 +25,15 @@
 namespace epoch::zxspectrum
 {
     Ula::Ula(const UlaType type, const std::span<const uint8_t> rom)
-        : m_type{type}, m_keyboardState{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+        : m_type{type},
+          m_ay8910{std::make_unique<sound::AY8910Device>()},
+          m_keyboardState{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
     {
         assert(rom.size() <= sizeof(m_rom));
         std::memcpy(m_rom.data(), rom.data(), rom.size());
     }
+
+    Ula::~Ula() = default;
 
     void Ula::clock()
     {
@@ -53,6 +59,13 @@ namespace epoch::zxspectrum
             m_y = -VerticalRetrace;
             m_frameCounter++;
         }
+
+        if ((m_clockCounter & 0x01) == 0 && m_ay8910)
+        {
+            m_ay8910->clock();
+        }
+
+        m_clockCounter++;
     }
 
     void Ula::reset()
@@ -68,6 +81,7 @@ namespace epoch::zxspectrum
         m_pagingState = 0;
         m_pagingPlus3 = 0;
 
+        m_clockCounter = 0;
         m_frameCounter = 0;
         m_x = -HorizontalRetrace;
         m_y = -VerticalRetrace;
@@ -135,6 +149,10 @@ namespace epoch::zxspectrum
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
+        else if (port == 0xfffd)
+        {
+            return m_ay8910->data();
+        }
         switch (m_type)
         {
             case UlaType::zx48k:
@@ -164,6 +182,17 @@ namespace epoch::zxspectrum
             m_ear = newEar;
             m_mic = newMic;
             m_border = value & 0x07;
+        }
+        else if (port == 0xfffd)
+        {
+            if (value < 16)
+            {
+                m_ay8910->address(value);
+            }
+        }
+        else if (port == 0xbffd)
+        {
+            m_ay8910->data(value);
         }
         switch (m_type)
         {

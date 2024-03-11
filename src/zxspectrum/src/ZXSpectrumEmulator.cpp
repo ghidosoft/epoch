@@ -22,8 +22,6 @@
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
 
-#include <epoch/sound.hpp>
-
 namespace epoch::zxspectrum
 {
     static constexpr uint8_t darkColor = 0xd9;
@@ -59,8 +57,7 @@ namespace epoch::zxspectrum
                         {"Z80 Snapshots", ".z80", true, false},
                     }}},
           m_ula{std::move(ula)},
-          m_cpu{std::make_unique<Z80Cpu>(*m_ula)},
-          m_ay8910{std::make_unique<sound::AY8910Device>()}
+          m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
     {
     }
 
@@ -90,7 +87,6 @@ namespace epoch::zxspectrum
     {
         m_ula->reset();
         m_cpu->reset();
-        m_ay8910->reset();
         m_tape = {};
         m_clockCounter = 0;
     }

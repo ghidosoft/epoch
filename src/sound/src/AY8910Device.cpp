@@ -16,9 +16,27 @@
 
 #include "AY8910Device.hpp"
 
+#include <cassert>
+
 namespace epoch::sound
 {
     AY8910Device::AY8910Device() = default;
 
-    void AY8910Device::reset() {}
+    void AY8910Device::reset()
+    {
+        m_address = 0;
+        m_data = 0;
+    }
+
+    void AY8910Device::clock() {}
+
+    void AY8910Device::address(const uint8_t value)
+    {
+        assert(value < m_registers.size());
+        m_address = value;
+    }
+
+    void AY8910Device::data(const uint8_t data) { m_registers[m_address] = data; }
+
+    uint8_t AY8910Device::data() const { return m_registers[m_address]; }
 }  // namespace epoch::sound

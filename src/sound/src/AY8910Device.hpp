@@ -19,15 +19,28 @@
 
 #include "SoundDevice.hpp"
 
+#include <array>
+#include <cstdint>
+
 namespace epoch::sound
 {
-    class AY8910Device final : public SoundDevice
+    class AY8910Device : public SoundDevice
     {
     public:
         AY8910Device();
 
     public:
         void reset() override;
+        virtual void clock();
+
+        void address(uint8_t value);
+        void data(uint8_t data);
+        [[nodiscard]] uint8_t data() const;
+
+    private:
+        std::array<uint8_t, 16> m_registers{};
+        uint8_t m_address{};
+        uint8_t m_data{};
     };
 }  // namespace epoch::sound
 
