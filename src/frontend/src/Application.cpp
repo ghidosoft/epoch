@@ -16,7 +16,7 @@
 
 #include "Application.hpp"
 
-#include "Audio.hpp"
+#include "AudioPlayer.hpp"
 #include "GraphicContext.hpp"
 #include "Gui.hpp"
 #include "SettingsManager.hpp"

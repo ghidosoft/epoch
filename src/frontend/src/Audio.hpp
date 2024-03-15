@@ -19,8 +19,6 @@
 
 #include "CircularBuffer.hpp"
 
-#include <memory>
-
 #ifndef PaStream
 typedef void PaStream;
 #endif
@@ -79,30 +77,6 @@ namespace epoch::frontend
         AudioContext& operator=(const AudioContext& other) = delete;
         AudioContext& operator=(AudioContext&& other) noexcept = delete;
     };
-
-    class AudioPlayer final
-    {
-    public:
-        AudioPlayer(int sampleRate, int channels);
-        ~AudioPlayer();
-
-    public:
-        AudioPlayer(const AudioPlayer& other) = delete;
-        AudioPlayer(AudioPlayer&& other) noexcept = delete;
-        AudioPlayer& operator=(const AudioPlayer& other) = delete;
-        AudioPlayer& operator=(AudioPlayer&& other) noexcept = delete;
-
-    public:
-        void push(const std::span<float> sample) const { m_stream->push(sample); }
-        [[nodiscard]] unsigned long neededSamples() const
-        {
-            return std::max(0L, 4096L - static_cast<long>(m_stream->ahead()));
-        }
-
-    private:
-        AudioContext m_audioContext{};
-        std::unique_ptr<AudioStream> m_stream{};
-    };
-}  // namespace epoch::frontend
+}
 
 #endif
