@@ -10,3 +10,5 @@ target_include_directories(epoch_sound INTERFACE include)
 # target_link_libraries(epoch_sound PRIVATE Epoch::Core)
 
 add_library(Epoch::Sound ALIAS epoch_sound)
+
+add_subdirectory(tools)
