@@ -25,70 +25,72 @@
 
 struct TestConfiguration final
 {
-    uint16_t toneA;
-    uint16_t toneB;
-    uint16_t toneC;
-    uint8_t noise;
+    uint16_t pitchA;
+    uint16_t pitchB;
+    uint16_t pitchC;
+    uint8_t pitchNoise;
     uint8_t mixer;
     uint8_t volA;
     uint8_t volB;
     uint8_t volC;
-    uint8_t envFreq;
-    uint8_t env;
+    uint16_t envDuration;
+    uint8_t envShape;
 };
 
 #define SET_REG(idx, value) \
     device.address(idx);    \
     device.data(static_cast<uint8_t>(value))
 
-void executeTest(const TestConfiguration configuration)
+void executeTest(const TestConfiguration configuration, const unsigned long duration)
 {
-    epoch::sound::AY8910Device device{1750000};
+    epoch::sound::AY8910Device device{};
 
-    SET_REG(0, configuration.toneA & 0xff);
-    SET_REG(1, configuration.toneA >> 8);
-    SET_REG(2, configuration.toneB & 0xff);
-    SET_REG(3, configuration.toneB >> 8);
-    SET_REG(4, configuration.toneC & 0xff);
-    SET_REG(5, configuration.toneC >> 8);
-    SET_REG(6, configuration.noise);
+    SET_REG(0, configuration.pitchA & 0xff);
+    SET_REG(1, configuration.pitchA >> 8);
+    SET_REG(2, configuration.pitchB & 0xff);
+    SET_REG(3, configuration.pitchB >> 8);
+    SET_REG(4, configuration.pitchC & 0xff);
+    SET_REG(5, configuration.pitchC >> 8);
+    SET_REG(6, configuration.pitchNoise);
     SET_REG(7, configuration.mixer);
     SET_REG(8, configuration.volA);
     SET_REG(9, configuration.volB);
     SET_REG(10, configuration.volC);
-    SET_REG(11, configuration.envFreq & 0xff);
-    SET_REG(12, configuration.envFreq >> 8);
-    SET_REG(13, configuration.env);
-
-    const epoch::frontend::AudioPlayer player{48000, 1};
-
-    const auto startTime = std::chrono::system_clock::now();
-    std::vector<float> samples{};
+    SET_REG(11, configuration.envDuration & 0xff);
+    SET_REG(12, configuration.envDuration >> 8);
+    SET_REG(13, configuration.envShape);
 
     unsigned long ticks = 0;
     double sampleCount = 0.;
 
-    do
     {
-        const auto count = player.neededSamples();
-        if (count > 0)
-        {
-            samples.resize(count);
-            for (unsigned long i = 0; i < count; ++i)
-            {
-                while (ticks < (sampleCount * 1750000. / 48000.))
-                {
-                    device.clock();
-                    ticks++;
-                }
-                samples[i] = device.output();
-                sampleCount++;
-            }
-            player.push(samples);
-        }
+        const epoch::frontend::AudioPlayer player{48000, 1};
 
-    } while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - startTime).count() <
-             2);
+        const auto startTime = std::chrono::system_clock::now();
+        std::vector<float> samples{};
+
+        do
+        {
+            const auto count = player.neededSamples();
+            if (count > 0)
+            {
+                samples.resize(count);
+                for (unsigned long i = 0; i < count; ++i)
+                {
+                    while (ticks < (sampleCount * 1764000. / 48000.))
+                    {
+                        device.clock();
+                        ticks++;
+                    }
+                    samples[i] = device.output();
+                    sampleCount++;
+                }
+                player.push(samples);
+            }
+
+        } while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime)
+                     .count() < duration);
+    }
 
     std::cout << "Generated samples: " << sampleCount << "\n";
     std::cout << "Ticks:             " << ticks << "\n";
@@ -97,15 +99,16 @@ void executeTest(const TestConfiguration configuration)
 int main()
 {
     std::cout << "AY8910 CLI utility\n";
-    executeTest({.toneA = 400,
-                 .toneB = 0,
-                 .toneC = 0,
-                 .noise = 0,
-                 .mixer = 0b11111110,
+    executeTest({.pitchA = 2034,
+                 .pitchB = 2715,
+                 .pitchC = 3228,
+                 .pitchNoise = 0,
+                 .mixer = 0b11111000,
                  .volA = 15,
                  .volB = 0,
                  .volC = 0,
-                 .envFreq = 0,
-                 .env = 0});
+                 .envDuration = 0,
+                 .envShape = 0},
+                1000);
     return EXIT_SUCCESS;
 }

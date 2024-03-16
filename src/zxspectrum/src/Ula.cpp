@@ -26,7 +26,7 @@ namespace epoch::zxspectrum
 {
     Ula::Ula(const UlaType type, const std::span<const uint8_t> rom)
         : m_type{type},
-          m_ay8910{std::make_unique<sound::AY8910Device>(CPUClock / 2)},
+          m_ay8910{std::make_unique<sound::AY8910Device>()},
           m_keyboardState{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
     {
         assert(rom.size() <= sizeof(m_rom));

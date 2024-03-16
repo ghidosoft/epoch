@@ -27,7 +27,7 @@ namespace epoch::sound
     class AY8910Device : public SoundDevice
     {
     public:
-        explicit AY8910Device(std::size_t frequency);
+        explicit AY8910Device();
 
     public:
         void reset() override;
@@ -40,11 +40,19 @@ namespace epoch::sound
         [[nodiscard]] float output() const;
 
     private:
-        std::size_t m_frequency;
-
         std::array<uint8_t, 16> m_registers{};
         uint8_t m_address{};
         uint8_t m_data{};
+
+        struct Tone final
+        {
+            uint32_t period;
+            uint8_t volume;
+            uint32_t count;
+            bool output;
+        };
+
+        std::array<Tone, 3> m_tones{};
     };
 }  // namespace epoch::sound
 
