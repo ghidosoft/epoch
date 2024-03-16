@@ -85,6 +85,8 @@ namespace epoch::zxspectrum
         m_frameCounter = 0;
         m_x = -HorizontalRetrace;
         m_y = -VerticalRetrace;
+
+        m_ay8910->reset();
     }
 
     uint8_t Ula::read(const uint16_t address)
