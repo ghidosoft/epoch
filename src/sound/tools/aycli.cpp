@@ -99,14 +99,14 @@ void executeTest(const TestConfiguration configuration, const unsigned long dura
 int main()
 {
     std::cout << "AY8910 CLI utility\n";
-    executeTest({.pitchA = 2034,
-                 .pitchB = 2715,
-                 .pitchC = 3228,
+    executeTest({.pitchA = 251,
+                 .pitchB = 199,
+                 .pitchC = 167,
                  .pitchNoise = 0,
                  .mixer = 0b11111000,
                  .volA = 15,
-                 .volB = 0,
-                 .volC = 0,
+                 .volB = 10,
+                 .volC = 15,
                  .envDuration = 0,
                  .envShape = 0},
                 1000);

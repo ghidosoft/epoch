@@ -149,7 +149,7 @@ namespace epoch::zxspectrum
             if (m_ear || m_audioIn) result |= 0b01000000;
             return result | 0b10100000;
         }
-        else if (port == 0xfffd)
+        else if ((port & 0b1100000000000010) == 0b1100000000000000)
         {
             return m_ay8910->data();
         }
@@ -183,14 +183,14 @@ namespace epoch::zxspectrum
             m_mic = newMic;
             m_border = value & 0x07;
         }
-        else if (port == 0xfffd)
+        else if ((port & 0b1100000000000010) == 0b1100000000000000)
         {
             if (value < 16)
             {
                 m_ay8910->address(value);
             }
         }
-        else if (port == 0xbffd)
+        else if ((port & 0b1100000000000010) == 0b1000000000000000)
         {
             m_ay8910->data(value);
         }
@@ -248,6 +248,11 @@ namespace epoch::zxspectrum
                 break;
             }
         }
+    }
+
+    float Ula::audioOutput() const
+    {
+        return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f) - .8f * m_ay8910->output();
     }
 
     void Ula::setKeyState(const int row, const int col, const bool state)

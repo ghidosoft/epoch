@@ -41,18 +41,30 @@ namespace epoch::sound
 
     private:
         std::array<uint8_t, 16> m_registers{};
+        uint8_t m_counter{};
         uint8_t m_address{};
         uint8_t m_data{};
 
-        struct Tone final
+        struct Channel final
         {
             uint32_t period;
-            uint8_t volume;
+            bool envelope;
+            float volume;
             uint32_t count;
             bool output;
         };
 
-        std::array<Tone, 3> m_tones{};
+        struct Envelope final
+        {
+            uint32_t period;
+            uint32_t count;
+            uint8_t step;
+            uint32_t volume;
+            uint8_t hold, alternate, attack, holding;
+        };
+
+        std::array<Channel, 3> m_channels{};
+        Envelope m_envelope{};
     };
 }  // namespace epoch::sound
 

@@ -74,10 +74,7 @@ namespace epoch::zxspectrum
         }
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const
-        {
-            return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f) /* * 2.f - 1.f*/;
-        }
+        [[nodiscard]] float audioOutput() const;
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
