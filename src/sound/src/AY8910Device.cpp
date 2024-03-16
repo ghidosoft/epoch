@@ -20,7 +20,7 @@
 
 namespace epoch::sound
 {
-    AY8910Device::AY8910Device() = default;
+    AY8910Device::AY8910Device(const std::size_t frequency) : m_frequency{frequency} {}
 
     void AY8910Device::reset()
     {
@@ -39,4 +39,6 @@ namespace epoch::sound
     void AY8910Device::data(const uint8_t data) { m_registers[m_address] = data; }
 
     uint8_t AY8910Device::data() const { return m_registers[m_address]; }
+
+    float AY8910Device::output() const { return 0.f; }
 }  // namespace epoch::sound

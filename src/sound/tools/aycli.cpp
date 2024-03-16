@@ -18,8 +18,10 @@
 
 #include "../../frontend/src/AudioPlayer.hpp"
 
+#include <chrono>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 struct TestConfiguration final
 {
@@ -41,7 +43,7 @@ struct TestConfiguration final
 
 void executeTest(const TestConfiguration configuration)
 {
-    epoch::sound::AY8910Device device{};
+    epoch::sound::AY8910Device device{1750000};
 
     SET_REG(0, configuration.toneA & 0xff);
     SET_REG(1, configuration.toneA >> 8);
@@ -58,25 +60,52 @@ void executeTest(const TestConfiguration configuration)
     SET_REG(12, configuration.envFreq >> 8);
     SET_REG(13, configuration.env);
 
-    epoch::frontend::AudioPlayer player{48000, 1};
+    const epoch::frontend::AudioPlayer player{48000, 1};
 
-    // TODO: call device.clock() and feed the sound player
+    const auto startTime = std::chrono::system_clock::now();
+    std::vector<float> samples{};
+
+    unsigned long ticks = 0;
+    double sampleCount = 0.;
+
+    do
+    {
+        const auto count = player.neededSamples();
+        if (count > 0)
+        {
+            samples.resize(count);
+            for (unsigned long i = 0; i < count; ++i)
+            {
+                while (ticks < (sampleCount * 1750000. / 48000.))
+                {
+                    device.clock();
+                    ticks++;
+                }
+                samples[i] = device.output();
+                sampleCount++;
+            }
+            player.push(samples);
+        }
+
+    } while (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - startTime).count() <
+             2);
+
+    std::cout << "Generated samples: " << sampleCount << "\n";
+    std::cout << "Ticks:             " << ticks << "\n";
 }
 
 int main()
 {
     std::cout << "AY8910 CLI utility\n";
-    {
-        executeTest({.toneA = 400,
-                     .toneB = 0,
-                     .toneC = 0,
-                     .noise = 0,
-                     .mixer = 0b11111110,
-                     .volA = 15,
-                     .volB = 0,
-                     .volC = 0,
-                     .envFreq = 0,
-                     .env = 0});
-    }
+    executeTest({.toneA = 400,
+                 .toneB = 0,
+                 .toneC = 0,
+                 .noise = 0,
+                 .mixer = 0b11111110,
+                 .volA = 15,
+                 .volB = 0,
+                 .volC = 0,
+                 .envFreq = 0,
+                 .env = 0});
     return EXIT_SUCCESS;
 }
