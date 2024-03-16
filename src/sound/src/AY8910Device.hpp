@@ -47,23 +47,30 @@ namespace epoch::sound
 
         struct Channel final
         {
-            uint32_t period;
+            uint16_t period;
             bool envelope;
             float volume;
-            uint32_t count;
+            uint16_t count;
             bool output;
+        };
+
+        struct Noise final
+        {
+            uint8_t period;
+            uint8_t count;
         };
 
         struct Envelope final
         {
-            uint32_t period;
-            uint32_t count;
+            uint16_t period;
+            uint16_t count;
             uint8_t step;
-            uint32_t volume;
-            uint8_t hold, alternate, attack, holding;
+            uint16_t volume;
+            bool hold, alternate, attack, cont;
         };
 
         std::array<Channel, 3> m_channels{};
+        Noise m_noise{};
         Envelope m_envelope{};
     };
 }  // namespace epoch::sound

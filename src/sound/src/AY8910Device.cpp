@@ -36,6 +36,7 @@ namespace epoch::sound
         m_data = 0;
         m_counter = 0;
         m_channels = {};
+        m_noise = {};
         m_envelope = {};
     }
 
@@ -45,7 +46,7 @@ namespace epoch::sound
         {
             for (auto& tone : m_channels)
             {
-                const auto period = std::max(tone.period, 1u);
+                const auto period = tone.period > 0 ? tone.period : 1;
                 tone.count++;
                 while (tone.count > period)
                 {
@@ -71,15 +72,18 @@ namespace epoch::sound
         {
             case 0:
             case 1:
-                m_channels[0].period = (m_registers[0] | (m_registers[1] << 8));
+                m_channels[0].period = m_registers[0] | ((m_registers[1] & 0x0f) << 8);
                 break;
             case 2:
             case 3:
-                m_channels[1].period = (m_registers[2] | (m_registers[3] << 8));
+                m_channels[1].period = m_registers[2] | ((m_registers[3] & 0x0f) << 8);
                 break;
             case 4:
             case 5:
-                m_channels[2].period = (m_registers[4] | (m_registers[5] << 8));
+                m_channels[2].period = m_registers[4] | ((m_registers[5] & 0x0f) << 8);
+                break;
+            case 6:
+                m_noise.period = m_registers[6] & 0x1f;
                 break;
             case 8:
                 m_channels[0].envelope = m_registers[8] & 0x10;
@@ -97,6 +101,12 @@ namespace epoch::sound
             case 12:
                 m_envelope.period = (m_registers[11] | (m_registers[12] << 8));
                 break;
+            case 13:
+                m_envelope.hold = m_registers[13] & 0x01;
+                m_envelope.alternate = m_registers[13] & 0x02;
+                m_envelope.attack = m_registers[13] & 0x04;
+                m_envelope.cont = m_registers[13] & 0x08;
+                break;
         }
     }
 
@@ -104,10 +114,9 @@ namespace epoch::sound
 
     float AY8910Device::output() const
     {
-        const bool noise = m_registers[7] & 0b00001000;
-        const bool channelA = noise & (m_channels[0].output | (m_registers[7] & 0b00000001));
-        const bool channelB = noise & (m_channels[1].output | (m_registers[7] & 0b00000010));
-        const bool channelC = noise & (m_channels[2].output | (m_registers[7] & 0b00000100));
+        const bool channelA = (m_registers[7] & 0b00001000) && (m_channels[0].output | (m_registers[7] & 0b00000001));
+        const bool channelB = (m_registers[7] & 0b00010000) && (m_channels[1].output | (m_registers[7] & 0b00000010));
+        const bool channelC = (m_registers[7] & 0b00100000) && (m_channels[2].output | (m_registers[7] & 0b00000100));
 
         float output = 0.f;
 
