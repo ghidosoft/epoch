@@ -48,10 +48,20 @@ namespace epoch::sound
             {
                 const auto period = tone.period > 0 ? tone.period : 1;
                 tone.count++;
-                while (tone.count > period)
+                while (tone.count >= period)
                 {
                     tone.output = !tone.output;
                     tone.count -= period;
+                }
+            }
+            {
+                m_noise.count++;
+                if (m_noise.count >= m_noise.period)
+                {
+                    m_noise.random =
+                        (m_noise.random >> 1) | (((m_noise.random & 0x01) ^ ((m_noise.random >> 3) & 0x01)) << 16);
+                    m_noise.output = m_noise.random & 0x01;
+                    m_noise.count -= m_noise.period;
                 }
             }
             m_counter = 16;
@@ -83,7 +93,7 @@ namespace epoch::sound
                 m_channels[2].period = m_registers[4] | ((m_registers[5] & 0x0f) << 8);
                 break;
             case 6:
-                m_noise.period = m_registers[6] & 0x1f;
+                m_noise.period = std::max(m_registers[6] & 0x1f, 1);
                 break;
             case 8:
                 m_channels[0].envelope = m_registers[8] & 0x10;
@@ -114,9 +124,12 @@ namespace epoch::sound
 
     float AY8910Device::output() const
     {
-        const bool channelA = (m_registers[7] & 0b00001000) && (m_channels[0].output | (m_registers[7] & 0b00000001));
-        const bool channelB = (m_registers[7] & 0b00010000) && (m_channels[1].output | (m_registers[7] & 0b00000010));
-        const bool channelC = (m_registers[7] & 0b00100000) && (m_channels[2].output | (m_registers[7] & 0b00000100));
+        const bool channelA =
+            (m_noise.output | m_registers[7] & 0b00001000) && (m_channels[0].output | (m_registers[7] & 0b00000001));
+        const bool channelB =
+            (m_noise.output | m_registers[7] & 0b00010000) && (m_channels[1].output | (m_registers[7] & 0b00000010));
+        const bool channelC =
+            (m_noise.output | m_registers[7] & 0b00100000) && (m_channels[2].output | (m_registers[7] & 0b00000100));
 
         float output = 0.f;
 

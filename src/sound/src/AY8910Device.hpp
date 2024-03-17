@@ -58,6 +58,8 @@ namespace epoch::sound
         {
             uint8_t period;
             uint8_t count;
+            uint32_t random{1};
+            bool output;
         };
 
         struct Envelope final
