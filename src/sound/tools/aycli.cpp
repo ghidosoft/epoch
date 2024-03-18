@@ -104,11 +104,11 @@ int main()
                  .pitchC = 167,
                  .pitchNoise = 0,
                  .mixer = 0b11111000,
-                 .volA = 15 | 0x10,
-                 .volB = 10,
-                 .volC = 15,
-                 .envDuration = 200,
+                 .volA = 0x0f,
+                 .volB = 0x10,
+                 .volC = 0x0f,
+                 .envDuration = 1000,
                  .envShape = 0b1110},
-                1000);
+                2000);
     return EXIT_SUCCESS;
 }

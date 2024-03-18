@@ -40,11 +40,6 @@ namespace epoch::sound
         [[nodiscard]] float output() const;
 
     private:
-        std::array<uint8_t, 16> m_registers{};
-        uint8_t m_counter{};
-        uint8_t m_address{};
-        uint8_t m_data{};
-
         struct Channel final
         {
             uint16_t period;
@@ -64,20 +59,28 @@ namespace epoch::sound
 
         struct Envelope final
         {
-            uint16_t period;
-            uint16_t count;
+            uint32_t period;
+            uint32_t count;
             uint8_t step;
             uint8_t shape;
             float volume;
         };
 
-        struct EnvelopeLookupTable final
+        class EnvelopeLookupTable final
         {
+        public:
             EnvelopeLookupTable();
-            std::array<std::array<float, 128>, 16> values;
-            [[nodiscard]] float get(int shape, int position) const { return values[shape][position]; }
+            [[nodiscard]] float get(int shape, int position) const { return m_values[shape][position]; }
+
+        private:
+            std::array<std::array<float, 128>, 16> m_values;
         };
 
+        std::array<uint8_t, 16> m_registers{};
+        uint8_t m_counter{};
+        uint8_t m_envelopeCounter{};
+        uint8_t m_address{};
+        uint8_t m_data{};
         std::array<Channel, 3> m_channels{};
         Noise m_noise{};
         Envelope m_envelope{};

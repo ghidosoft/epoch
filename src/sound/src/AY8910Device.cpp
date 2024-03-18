@@ -69,7 +69,7 @@ namespace epoch::sound
                 if (m_envelope.count >= m_envelope.period)
                 {
                     m_envelope.step++;
-                    if (m_envelope.step >= 128) m_envelope.step = 0;
+                    if (m_envelope.step >= 128) m_envelope.step = 64;
                     m_envelope.count = 0;
                 }
                 m_envelope.volume = m_envelopeLookup.get(m_envelope.shape, m_envelope.step);
@@ -119,13 +119,15 @@ namespace epoch::sound
                 break;
             case 11:
             case 12:
-                m_envelope.period = (m_registers[11] | (m_registers[12] << 8));
+                m_envelope.period = (m_registers[11] | (m_registers[12] << 8)) >> 2;
                 break;
             case 13:
-                // TODO: investigate when (if) to reset envelope position
-                m_envelope.shape = m_registers[13] & 0x0f;
-                m_envelope.count = 0;
-                m_envelope.step = 0;
+                if (m_registers[13] != 0xff)
+                {
+                    m_envelope.shape = m_registers[13] & 0x0f;
+                    m_envelope.count = 0;
+                    m_envelope.step = 0;
+                }
                 break;
         }
     }
@@ -191,7 +193,7 @@ namespace epoch::sound
                         }
                     }
                 }
-                values[shape][i] = static_cast<float>(vol) / 31.f;
+                m_values[shape][i] = static_cast<float>(vol) / 31.f;
             }
         }
     }
