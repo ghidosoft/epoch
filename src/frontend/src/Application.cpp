@@ -315,6 +315,23 @@ namespace epoch::frontend
             ImGui::End();
         }
 
+        if (auto tape = m_emulator->tape())
+        {
+            ImGui::SetNextWindowSize(
+                {
+                    150,
+                    55,
+                },
+                ImGuiCond_Once);
+            if (ImGui::Begin("Tape controls"))
+            {
+                if (ImGui::Button("Play")) tape->play();
+                ImGui::SameLine();
+                if (ImGui::Button("Stop")) tape->stop();
+            }
+            ImGui::End();
+        }
+
         const ImVec2 screenSize{static_cast<float>(m_window->width()), static_cast<float>(m_window->height())};
         ImGui::SetNextWindowPos({0, 0});
 
