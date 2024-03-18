@@ -22,7 +22,13 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <span>
+
+namespace epoch::sound
+{
+    class AY8910Device;
+}
 
 namespace epoch::zxspectrum
 {
@@ -37,6 +43,13 @@ namespace epoch::zxspectrum
     {
     public:
         Ula(UlaType type, std::span<const uint8_t> rom);
+        ~Ula() override;
+
+    public:
+        Ula(const Ula& other) = delete;
+        Ula(Ula&& other) noexcept = delete;
+        Ula& operator=(const Ula& other) = delete;
+        Ula& operator=(Ula&& other) noexcept = delete;
 
     public:
         void clock();
@@ -61,10 +74,7 @@ namespace epoch::zxspectrum
         }
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const
-        {
-            return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f) /* * 2.f - 1.f*/;
-        }
+        [[nodiscard]] float audioOutput() const;
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);
@@ -79,6 +89,8 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 4> m_rom{};
         std::array<MemoryBank, 8> m_ram{};
 
+        std::unique_ptr<sound::AY8910Device> m_ay8910{};
+
         uint8_t m_ramSelect{0};
         uint8_t m_vramSelect{5};
         uint8_t m_romSelect{0};
@@ -92,6 +104,7 @@ namespace epoch::zxspectrum
         uint8_t m_kempstonState{};
         int m_cpuStalled{};
 
+        uint64_t m_clockCounter{};
         uint64_t m_frameCounter{};
         std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_borderBuffer{};
         int m_x{-HorizontalRetrace}, m_y{-VerticalRetrace};

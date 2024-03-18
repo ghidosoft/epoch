@@ -2,7 +2,7 @@
 
 ![BuildBadge](https://github.com/ghidosoft/epoch/actions/workflows/build.yml/badge.svg)
 
-This is a cross-platform ZX Spectrum 48K/128K/+2 emulator written, for the fun of it, from scratch in C++.
+This is a cross-platform ZX Spectrum 48K/128K/+2/+3 emulator written, for the fun of it, from scratch in C++.
 
 ## Features
 - Instruction level Z80 emulation: all instructions passes zexdoc and zexall
@@ -12,14 +12,14 @@ This is a cross-platform ZX Spectrum 48K/128K/+2 emulator written, for the fun o
 - Drag&drop file loading
 - Kempston joystick emulation (arrows and right-control for fire)
 - ZX 48K/128K/+2/+2A/+3 spectrum
+- AY sound chip
 
 ## Roadmap
-- AY sound chip
+- Tape UX
 - .z80 snapshots
 - Fast loading
 - Emulation speed controls
 - Tape saving
-- Tape UX
 - Debugging UX (memory, registers)
 - Disassembler
 

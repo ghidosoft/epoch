@@ -86,12 +86,4 @@ namespace epoch::frontend
     AudioContext::AudioContext() { PA_CHECK(Pa_Initialize()); }
 
     AudioContext::~AudioContext() { Pa_Terminate(); }
-
-    AudioPlayer::AudioPlayer(int sampleRate, int channels)
-    {
-        m_stream = std::make_unique<AudioStream>(sampleRate, channels);
-        m_stream->start();
-    }
-
-    AudioPlayer::~AudioPlayer() = default;
 }  // namespace epoch::frontend

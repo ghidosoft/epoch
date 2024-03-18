@@ -21,7 +21,7 @@ add_library(epoch_zxspectrum
 )
 
 target_include_directories(epoch_zxspectrum INTERFACE include)
-target_link_libraries(epoch_zxspectrum PUBLIC Epoch::Core)
+target_link_libraries(epoch_zxspectrum PUBLIC Epoch::Core Epoch::Sound)
 
 add_library(Epoch::ZXSpectrum ALIAS epoch_zxspectrum)
 
