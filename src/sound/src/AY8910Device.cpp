@@ -64,6 +64,16 @@ namespace epoch::sound
                     m_noise.count -= m_noise.period;
                 }
             }
+            {
+                m_envelope.count++;
+                if (m_envelope.count >= m_envelope.period)
+                {
+                    m_envelope.step++;
+                    if (m_envelope.step >= 128) m_envelope.step = 0;
+                    m_envelope.count = 0;
+                }
+                m_envelope.volume = m_envelopeLookup.get(m_envelope.shape, m_envelope.step);
+            }
             m_counter = 16;
         }
         m_counter--;
@@ -112,10 +122,10 @@ namespace epoch::sound
                 m_envelope.period = (m_registers[11] | (m_registers[12] << 8));
                 break;
             case 13:
-                m_envelope.hold = m_registers[13] & 0x01;
-                m_envelope.alternate = m_registers[13] & 0x02;
-                m_envelope.attack = m_registers[13] & 0x04;
-                m_envelope.cont = m_registers[13] & 0x08;
+                // TODO: investigate when (if) to reset envelope position
+                m_envelope.shape = m_registers[13] & 0x0f;
+                m_envelope.count = 0;
+                m_envelope.step = 0;
                 break;
         }
     }
@@ -135,17 +145,54 @@ namespace epoch::sound
 
         if (channelA)
         {
-            output += m_channels[0].volume;
+            output += m_channels[0].envelope ? m_envelope.volume : m_channels[0].volume;
         }
         if (channelB)
         {
-            output += m_channels[1].volume;
+            output += m_channels[1].envelope ? m_envelope.volume : m_channels[1].volume;
         }
         if (channelC)
         {
-            output += m_channels[2].volume;
+            output += m_channels[2].envelope ? m_envelope.volume : m_channels[2].volume;
         }
 
         return output / 3.f;
+    }
+
+    AY8910Device::EnvelopeLookupTable::EnvelopeLookupTable()
+    {
+        for (auto shape = 0; shape < 16; shape++)
+        {
+            bool attack = shape & 4;
+            bool hold = false;
+            int dir = attack ? 1 : -1;
+            int vol = attack ? -1 : 32;
+            for (auto i = 0; i < 128; i++)
+            {
+                if (!hold)
+                {
+                    vol += dir;
+                    if (vol < 0 || vol >= 32)
+                    {
+                        if (shape & 8)
+                        {
+                            if (shape & 2) dir = -dir;
+                            vol = (dir > 0) ? 0 : 31;
+                            if (shape & 1)
+                            {
+                                hold = true;
+                                vol = (dir > 0) ? 31 : 0;
+                            }
+                        }
+                        else
+                        {
+                            vol = 0;
+                            hold = true;
+                        }
+                    }
+                }
+                values[shape][i] = static_cast<float>(vol) / 31.f;
+            }
+        }
     }
 }  // namespace epoch::sound

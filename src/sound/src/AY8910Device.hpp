@@ -67,13 +67,21 @@ namespace epoch::sound
             uint16_t period;
             uint16_t count;
             uint8_t step;
-            uint16_t volume;
-            bool hold, alternate, attack, cont;
+            uint8_t shape;
+            float volume;
+        };
+
+        struct EnvelopeLookupTable final
+        {
+            EnvelopeLookupTable();
+            std::array<std::array<float, 128>, 16> values;
+            [[nodiscard]] float get(int shape, int position) const { return values[shape][position]; }
         };
 
         std::array<Channel, 3> m_channels{};
         Noise m_noise{};
         Envelope m_envelope{};
+        EnvelopeLookupTable m_envelopeLookup{};
     };
 }  // namespace epoch::sound
 
