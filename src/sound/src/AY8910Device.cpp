@@ -16,8 +16,6 @@
 
 #include "AY8910Device.hpp"
 
-#include <cassert>
-
 namespace
 {
     float VOLUME_VALUES[16] = {0.f / 65535.f,     513.f / 65535.f,   828.f / 65535.f,   1239.f / 65535.f,
@@ -79,11 +77,7 @@ namespace epoch::sound
         m_counter--;
     }
 
-    void AY8910Device::address(const uint8_t value)
-    {
-        assert(value < m_registers.size());
-        m_address = value;
-    }
+    void AY8910Device::address(const uint8_t value) { m_address = value & 0x0f; }
 
     void AY8910Device::data(const uint8_t data)
     {
