@@ -14,13 +14,28 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_EPOCH_CORE_HPP_
-#define INCLUDE_EPOCH_CORE_HPP_
+#ifndef SRC_EPOCH_CORE_TAPE_HPP_
+#define SRC_EPOCH_CORE_TAPE_HPP_
 
-#include "../../src/Color.hpp"
-#include "../../src/Emulator.hpp"
-#include "../../src/Keyboard.hpp"
-#include "../../src/Palette.hpp"
-#include "../../src/Tape.hpp"
+namespace epoch
+{
+    class Tape
+    {
+    public:
+        Tape() = default;
+        virtual ~Tape() = default;
+
+    public:
+        Tape(const Tape& other) = default;
+        Tape(Tape&& other) noexcept = default;
+        Tape& operator=(const Tape& other) = default;
+        Tape& operator=(Tape&& other) noexcept = default;
+
+    public:
+        virtual void play() = 0;
+        virtual void stop() = 0;
+        [[nodiscard]] virtual bool playing() const = 0;
+    };
+}  // namespace epoch
 
 #endif

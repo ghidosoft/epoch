@@ -25,6 +25,8 @@
 
 namespace epoch
 {
+    class Tape;
+
     struct EmulatorFileFormat
     {
         std::string description;
@@ -72,6 +74,8 @@ namespace epoch
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
         virtual void keyEvent(Key key, KeyAction action) {}
+
+        virtual Tape* tape() { return nullptr; }
 
     public:
         [[nodiscard]] const EmulatorInfo& info() const;
