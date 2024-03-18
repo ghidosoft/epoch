@@ -30,7 +30,7 @@ namespace epoch::zxspectrum
     class Ula;
     class Z80Cpu;
 
-    class ZXSpectrumEmulator : public Emulator
+    class ZXSpectrumEmulator final : public Emulator
     {
     public:
         static const Palette DefaultPalette;
@@ -65,6 +65,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] Ula* ula() const { return m_ula.get(); }
         [[nodiscard]] std::array<MemoryBank, 8>& ram();
         [[nodiscard]] const std::array<MemoryBank, 8>& ram() const;
+
+        Tape* tape() override;
 
     protected:
         void doClock() override;

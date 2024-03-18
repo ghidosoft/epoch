@@ -17,11 +17,13 @@
 #ifndef SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
 #define SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
 
+#include <epoch/core.hpp>
+
 #include <vector>
 
 namespace epoch::zxspectrum
 {
-    class PulsesTape
+    class PulsesTape final : public Tape
     {
     public:
         explicit PulsesTape(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
@@ -42,9 +44,15 @@ namespace epoch::zxspectrum
         }
         [[nodiscard]] bool completed() const { return m_position == m_pulses.size(); }
 
+        void play() override { m_playing = true; }
+        void stop() override { m_playing = false; }
+        [[nodiscard]] bool playing() const override { return m_playing; }
+
     private:
         std::size_t m_position{};
         std::vector<std::size_t> m_pulses{};
+
+        bool m_playing{true};
     };
 }  // namespace epoch::zxspectrum
 
