@@ -14,18 +14,18 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
+#ifndef SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
 
 #include <vector>
 
 namespace epoch::zxspectrum
 {
-    class TapeInterface
+    class PulsesTape
     {
     public:
-        explicit TapeInterface(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
-        explicit TapeInterface(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
+        explicit PulsesTape(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
+        explicit PulsesTape(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
 
         [[nodiscard]] bool clock()
         {

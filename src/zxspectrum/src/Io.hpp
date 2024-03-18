@@ -22,10 +22,10 @@
 
 namespace epoch::zxspectrum
 {
-    class TapeInterface;
+    class PulsesTape;
     class ZXSpectrumEmulator;
 
-    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator);
+    std::unique_ptr<PulsesTape> load(const std::string& path, ZXSpectrumEmulator* emulator);
     void save(const std::string& path, const ZXSpectrumEmulator* emulator);
 }  // namespace epoch::zxspectrum
 

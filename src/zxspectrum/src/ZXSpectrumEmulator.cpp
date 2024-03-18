@@ -17,8 +17,8 @@
 #include "ZXSpectrumEmulator.hpp"
 
 #include "Io.hpp"
+#include "PulsesTape.hpp"
 #include "Roms.hpp"
-#include "TapeInterface.hpp"
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
 

@@ -18,7 +18,7 @@
 
 #include "IoSnapshot.hpp"
 #include "IoTzx.hpp"
-#include "TapeInterface.hpp"
+#include "PulsesTape.hpp"
 #include "Ula.hpp"
 #include "ZXSpectrumEmulator.hpp"
 
@@ -113,7 +113,7 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    std::unique_ptr<TapeInterface> load(const std::string& path, ZXSpectrumEmulator* emulator)
+    std::unique_ptr<PulsesTape> load(const std::string& path, ZXSpectrumEmulator* emulator)
     {
         assert(emulator);
         const std::filesystem::path fs{path};
@@ -134,12 +134,12 @@ namespace epoch::zxspectrum
         else if (ext == ".tap")
         {
             const auto pulses = loadTap(fs);
-            return std::make_unique<TapeInterface>(pulses);
+            return std::make_unique<PulsesTape>(pulses);
         }
         else if (ext == ".tzx")
         {
             const auto pulses = loadTzx(fs);
-            return std::make_unique<TapeInterface>(pulses);
+            return std::make_unique<PulsesTape>(pulses);
         }
         return nullptr;
     }

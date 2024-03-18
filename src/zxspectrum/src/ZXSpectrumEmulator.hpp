@@ -26,7 +26,7 @@
 
 namespace epoch::zxspectrum
 {
-    class TapeInterface;
+    class PulsesTape;
     class Ula;
     class Z80Cpu;
 
@@ -76,7 +76,7 @@ namespace epoch::zxspectrum
 
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
 
-        std::unique_ptr<TapeInterface> m_tape{};
+        std::unique_ptr<PulsesTape> m_tape{};
 
         void updateScreenBuffer();
     };
