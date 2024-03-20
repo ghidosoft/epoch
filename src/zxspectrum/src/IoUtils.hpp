@@ -36,6 +36,7 @@ namespace epoch::zxspectrum
     public:
         uint8_t readUInt8() const;
         uint16_t readUInt16LE() const;
+        uint16_t readUInt16BE() const;
 
     private:
         std::istream& m_stream;

@@ -30,4 +30,11 @@ namespace epoch::zxspectrum
         const uint8_t high = readUInt8();
         return static_cast<uint16_t>(high << 8 | low);
     }
+
+    uint16_t StreamReader::readUInt16BE() const
+    {
+        const uint8_t high = readUInt8();
+        const uint8_t low = readUInt8();
+        return static_cast<uint16_t>(high << 8 | low);
+    }
 }  // namespace epoch::zxspectrum
