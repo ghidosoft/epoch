@@ -213,9 +213,7 @@ namespace epoch::frontend
             }
             if (ImGui::BeginMenu("Emulator"))
             {
-                if (ImGui::MenuItem("Run", nullptr, &m_running))
-                {
-                }
+                ImGui::MenuItem("Run", nullptr, &m_running);
                 if (ImGui::MenuItem("Reset"))
                 {
                     m_emulator->reset();
@@ -235,9 +233,7 @@ namespace epoch::frontend
             }
             if (ImGui::BeginMenu("Window"))
             {
-                if (ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio))
-                {
-                }
+                ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio);
                 ImGui::Separator();
                 if (ImGui::MenuItem("1X size"))
                 {
@@ -257,9 +253,7 @@ namespace epoch::frontend
                     m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed);
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings))
-                {
-                }
+                ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings);
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -269,8 +263,8 @@ namespace epoch::frontend
         {
             ImGui::SetNextWindowSize(
                 {
-                    300,
-                    450,
+                    ImGui::GetFontSize() * 25,
+                    ImGui::GetFontSize() * 35,
                 },
                 ImGuiCond_Once);
             if (ImGui::Begin("Shader settings", &m_showShaderSettings))
@@ -319,15 +313,19 @@ namespace epoch::frontend
         {
             ImGui::SetNextWindowSize(
                 {
-                    150,
-                    55,
+                    ImGui::GetFontSize() * 20,
+                    ImGui::GetFontSize() * 4.5f,
                 },
                 ImGuiCond_Once);
             if (ImGui::Begin("Tape controls"))
             {
+                ImGui::BeginDisabled(tape->playing());
                 if (ImGui::Button("Play")) tape->play();
+                ImGui::EndDisabled();
                 ImGui::SameLine();
+                ImGui::BeginDisabled(!tape->playing());
                 if (ImGui::Button("Stop")) tape->stop();
+                ImGui::EndDisabled();
             }
             ImGui::End();
         }

@@ -38,7 +38,7 @@ namespace epoch::zxspectrum
     {
         assert(bitsLastByte > 0 && bitsLastByte <= 8);
         if (data.empty()) return;
-        for (auto i = 0; i < data.size() - 1; i++)
+        for (auto i = 0u; i < data.size() - 1; i++)
         {
             const auto value = data[i];
             for (auto bit = 7; bit >= 0; bit--)
@@ -116,16 +116,13 @@ namespace epoch::zxspectrum
                 break;
             case 0x20:
                 // Pause
+                if (const auto pause = m_reader.readUInt16LE(); pause > 0)
                 {
-                    const auto pause = m_reader.readUInt16LE();
-                    if (pause > 0)
-                    {
-                        generatePause(m_pulses, pause);
-                    }
-                    else
-                    {
-                        // TODO: Stop the tape
-                    }
+                    generatePause(m_pulses, pause);
+                }
+                else
+                {
+                    // TODO: Stop the tape
                 }
                 break;
             case 0x21:

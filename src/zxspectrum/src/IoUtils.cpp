@@ -26,15 +26,15 @@ namespace epoch::zxspectrum
 
     uint16_t StreamReader::readUInt16LE() const
     {
-        const uint8_t low = readUInt8();
-        const uint8_t high = readUInt8();
-        return static_cast<uint16_t>(high << 8 | low);
+        uint8_t data[2];
+        m_stream.read(reinterpret_cast<char*>(data), 2);
+        return static_cast<uint16_t>(data[1] << 8 | data[0]);
     }
 
     uint16_t StreamReader::readUInt16BE() const
     {
-        const uint8_t high = readUInt8();
-        const uint8_t low = readUInt8();
-        return static_cast<uint16_t>(high << 8 | low);
+        uint8_t data[2];
+        m_stream.read(reinterpret_cast<char*>(data), 2);
+        return static_cast<uint16_t>(data[0] << 8 | data[1]);
     }
 }  // namespace epoch::zxspectrum

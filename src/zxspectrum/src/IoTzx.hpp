@@ -14,8 +14,8 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
+#ifndef SRC_EPOCH_ZXSPECTRUM_IOTZX_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_IOTZX_HPP_
 
 #include "IoUtils.hpp"
 
