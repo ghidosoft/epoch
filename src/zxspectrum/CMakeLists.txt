@@ -5,6 +5,7 @@ add_library(epoch_zxspectrum
     "src/Io.cpp" "src/Io.hpp"
     "src/IoSnapshot.cpp" "src/IoSnapshot.hpp"
     "src/IoTzx.cpp" "src/IoTzx.hpp"
+    "src/IoUtils.cpp" "src/IoUtils.hpp"
     "src/PulsesTape.hpp"
     "src/Roms.hpp"
     "src/Ula.cpp" "src/Ula.hpp"

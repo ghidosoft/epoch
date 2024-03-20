@@ -65,7 +65,10 @@ namespace epoch::zxspectrum
         }
     }
 
-    TzxReader::TzxReader(std::istream& stream, std::vector<std::size_t>& pulses) : m_stream{stream}, m_pulses{pulses} {}
+    TzxReader::TzxReader(std::istream& stream, std::vector<std::size_t>& pulses)
+        : m_stream{stream}, m_reader{stream}, m_pulses{pulses}
+    {
+    }
 
     TzxReader::~TzxReader() = default;
 
@@ -77,8 +80,8 @@ namespace epoch::zxspectrum
         {
             throw std::runtime_error("Invalid TZX header");
         }
-        const auto versionMajor = getByte();
-        const auto versionMinor = getByte();
+        const auto versionMajor = m_reader.readUInt8();
+        const auto versionMinor = m_reader.readUInt8();
         if (versionMajor != 1)
         {
             throw std::runtime_error("Unsupported TZX version");
@@ -86,7 +89,7 @@ namespace epoch::zxspectrum
 
         do
         {
-            const auto blockId = getByte();
+            const auto blockId = m_reader.readUInt8();
             if (m_stream.eof()) break;
             loadBlock(blockId);
         } while (!m_stream.eof());
@@ -114,7 +117,7 @@ namespace epoch::zxspectrum
             case 0x20:
                 // Pause
                 {
-                    const auto pause = getWord();
+                    const auto pause = m_reader.readUInt16LE();
                     if (pause > 0)
                     {
                         generatePause(m_pulses, pause);
@@ -127,7 +130,7 @@ namespace epoch::zxspectrum
                 break;
             case 0x21:
                 // Group start
-                m_stream.seekg(getByte(), std::ios::cur);
+                m_stream.seekg(m_reader.readUInt8(), std::ios::cur);
                 break;
             case 0x22:
                 // Group end
@@ -135,7 +138,7 @@ namespace epoch::zxspectrum
             case 0x24:
                 // Loop start
                 assert(m_loopCount == 0);  // Do not nest loops
-                m_loopCount = getWord();
+                m_loopCount = m_reader.readUInt16LE();
                 m_loopPos = m_stream.tellg();
                 break;
             case 0x25:
@@ -148,11 +151,11 @@ namespace epoch::zxspectrum
                 break;
             case 0x30:
                 // Text description
-                m_stream.seekg(getByte(), std::ios::cur);
+                m_stream.seekg(m_reader.readUInt8(), std::ios::cur);
                 break;
             case 0x32:
                 // Archive info
-                m_stream.seekg(getWord(), std::ios::cur);
+                m_stream.seekg(m_reader.readUInt16LE(), std::ios::cur);
                 break;
             default:
                 throw std::runtime_error("Unsupported TZX block type");
@@ -161,8 +164,8 @@ namespace epoch::zxspectrum
 
     void TzxReader::loadBlock10StandardSpeed()
     {
-        const auto pause = getWord();
-        const auto length = getWord();
+        const auto pause = m_reader.readUInt16LE();
+        const auto length = m_reader.readUInt16LE();
         if (length < 1) return;
         std::vector<uint8_t> bytes;
         bytes.resize(length);
@@ -176,14 +179,14 @@ namespace epoch::zxspectrum
 
     void TzxReader::loadBlock11TurboSpeed()
     {
-        const auto pilotPulseLength = getWord();
-        const auto sync1 = getWord();
-        const auto sync2 = getWord();
-        const auto zero = getWord();
-        const auto one = getWord();
-        const auto pilotPulseCount = getWord();
-        const auto bitsLastByte = getByte();
-        const auto pause = getWord();
+        const auto pilotPulseLength = m_reader.readUInt16LE();
+        const auto sync1 = m_reader.readUInt16LE();
+        const auto sync2 = m_reader.readUInt16LE();
+        const auto zero = m_reader.readUInt16LE();
+        const auto one = m_reader.readUInt16LE();
+        const auto pilotPulseCount = m_reader.readUInt16LE();
+        const auto bitsLastByte = m_reader.readUInt8();
+        const auto pause = m_reader.readUInt16LE();
 
         const auto length = getWord3();
 
@@ -199,8 +202,8 @@ namespace epoch::zxspectrum
 
     void TzxReader::loadBlock12PureTone()
     {
-        const auto pulseLength = getWord();
-        const auto pulseCount = getWord();
+        const auto pulseLength = m_reader.readUInt16LE();
+        const auto pulseCount = m_reader.readUInt16LE();
         for (auto i = 0u; i < pulseCount; i++)
         {
             m_pulses.push_back(pulseLength);
@@ -209,20 +212,20 @@ namespace epoch::zxspectrum
 
     void TzxReader::loadBlock13PulseSequence()
     {
-        const auto pulseCount = getByte();
+        const auto pulseCount = m_reader.readUInt8();
         for (auto i = 0u; i < pulseCount; i++)
         {
-            const auto pulseLength = getWord();
+            const auto pulseLength = m_reader.readUInt16LE();
             m_pulses.push_back(pulseLength);
         }
     }
 
     void TzxReader::loadBlock14PureDataBlock()
     {
-        const auto zero = getWord();
-        const auto one = getWord();
-        const auto bitsLastByte = getByte();
-        const auto pause = getWord();
+        const auto zero = m_reader.readUInt16LE();
+        const auto one = m_reader.readUInt16LE();
+        const auto bitsLastByte = m_reader.readUInt8();
+        const auto pause = m_reader.readUInt16LE();
 
         const auto length = getWord3();
 
@@ -235,20 +238,11 @@ namespace epoch::zxspectrum
         generatePause(m_pulses, pause);
     }
 
-    uint8_t TzxReader::getByte() { return static_cast<uint8_t>(m_stream.get()); }
-
-    uint16_t TzxReader::getWord()
+    uint32_t TzxReader::getWord3() const
     {
-        const uint8_t low = getByte();
-        const uint8_t high = getByte();
-        return static_cast<uint16_t>(high << 8 | low);
-    }
-
-    uint32_t TzxReader::getWord3()
-    {
-        const uint8_t b1 = getByte();
-        const uint8_t b2 = getByte();
-        const uint8_t b3 = getByte();
+        const uint8_t b1 = m_reader.readUInt8();
+        const uint8_t b2 = m_reader.readUInt8();
+        const uint8_t b3 = m_reader.readUInt8();
         return static_cast<uint32_t>(b3 << 16 | b2 << 8 | b1);
     }
 
