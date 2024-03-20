@@ -60,6 +60,8 @@ namespace epoch::frontend
         [[nodiscard]] unsigned height() const { return m_height; }
         [[nodiscard]] unsigned framebufferWidth() const { return m_framebufferWidth; }
         [[nodiscard]] unsigned framebufferHeight() const { return m_framebufferHeight; }
+        [[nodiscard]] float scaleX() const { return m_scaleX; }
+        [[nodiscard]] float scaleY() const { return m_scaleY; }
 
         [[nodiscard]] double time() const;
 
@@ -71,6 +73,7 @@ namespace epoch::frontend
         void setTitle(const std::string& title) const;
 
         using CharCallback = std::function<void(unsigned int)>;
+        using ContentScaleCallback = std::function<void(float x, float y)>;
         using CursorEnterCallback = std::function<void(bool)>;
         using CursorPosCallback = std::function<void(float x, float y)>;
         using FileDropCallback = std::function<void(const char*)>;
@@ -79,6 +82,7 @@ namespace epoch::frontend
         using MouseButtonCallback = std::function<void(int button, int action)>;
         using MouseWheelCallback = std::function<void(float x, float y)>;
         void setCharCallback(CharCallback callback);
+        void setContentScaleCallback(ContentScaleCallback callback);
         void setCursorEnterCallback(CursorEnterCallback callback);
         void setCursorPosCallback(CursorPosCallback callback);
         void setFileDropCallback(FileDropCallback callback);
@@ -92,12 +96,14 @@ namespace epoch::frontend
 
         unsigned m_width{}, m_height{};
         unsigned m_framebufferWidth{}, m_framebufferHeight{};
+        float m_scaleX{}, m_scaleY{};
         WindowMode m_mode{WindowMode::windowed};
 
         int m_lastX{}, m_lastY{};
         unsigned m_lastWidth{}, m_lastHeight{};
 
         CharCallback m_charCallback{};
+        ContentScaleCallback m_contentScaleCallback{};
         CursorEnterCallback m_cursorEnterCallback{};
         CursorPosCallback m_cursorPosCallback{};
         FileDropCallback m_fileDropCallback{};
@@ -108,6 +114,7 @@ namespace epoch::frontend
 
     private:
         static void s_charCallback(GLFWwindow* glfwWindow, unsigned int c);
+        static void s_contentScaleCallback(GLFWwindow* glfwWindow, float xscale, float yscale);
         static void s_cursorEnterCallback(GLFWwindow* glfwWindow, int entered);
         static void s_cursorPosCallback(GLFWwindow* glfwWindow, double x, double y);
         static void s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths);

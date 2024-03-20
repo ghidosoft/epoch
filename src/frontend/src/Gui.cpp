@@ -307,12 +307,13 @@ namespace epoch::frontend
         m_context = ImGui::CreateContext();
         auto& io = ImGui::GetIO();
         io.IniFilename = nullptr;
-        ImGui::StyleColorsDark();
 
         if (settings != nullptr)
         {
             ImGui::LoadIniSettingsFromMemory(settings);
         }
+
+        setupStyle(1.f);
 
         unsigned char* pixels;
         int width, height;
@@ -432,6 +433,11 @@ namespace epoch::frontend
         }
     }
 
+    void Gui::contentScaleEvent(const float scale) const
+    {
+        setupStyle(scale);
+    }
+
     void Gui::cursorEnterEvent(const bool entered)
     {
         if (entered)
@@ -475,4 +481,11 @@ namespace epoch::frontend
     bool Gui::wantKeyboardEvents() const { return ImGui::GetIO().WantCaptureKeyboard; }
 
     const char* Gui::generateSettings() const { return ImGui::SaveIniSettingsToMemory(); }
+
+    void Gui::setupStyle(const float scale) const
+    {
+        ImGui::GetStyle() = {};
+        ImGui::StyleColorsDark();
+        ImGui::GetStyle().ScaleAllSizes(scale);
+    }
 }  // namespace epoch::frontend

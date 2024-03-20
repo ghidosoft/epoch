@@ -109,6 +109,7 @@ namespace epoch::frontend
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCharCallback([&](const unsigned int c) { m_gui->charEvent(c); });
+        m_window->setContentScaleCallback([&](const float xscale, const float yscale) { m_gui->contentScaleEvent(std::max(xscale, yscale)); });
         m_window->setCursorEnterCallback([&](const bool entered) { m_gui->cursorEnterEvent(entered); });
         m_window->setCursorPosCallback([&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
         m_window->setFileDropCallback([&](const char* path) { m_emulator->load(path); });
@@ -122,6 +123,8 @@ namespace epoch::frontend
         m_window->setMouseButtonCallback([&](const int button, const int action)
                                          { m_gui->mouseButtonEvent(button, action == 1); });
         m_window->setMouseWheelCallback([&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
+
+        m_gui->contentScaleEvent(std::max(m_window->scaleX(), m_window->scaleY()));
 
         m_context->init(m_emulator->info().width, m_emulator->info().height);
 

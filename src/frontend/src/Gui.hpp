@@ -50,6 +50,7 @@ namespace epoch::frontend
                       double deltaTime) const;
         void render() const;
 
+        void contentScaleEvent(float scale) const;
         void cursorEnterEvent(bool entered);
         void cursorPosEvent(float x, float y);
         void charEvent(unsigned int c) const;
@@ -71,6 +72,8 @@ namespace epoch::frontend
         ImGuiContext* m_context{};
 
         float m_lastMouseX{}, m_lastMouseY{};
+
+        void setupStyle(float scale) const;
     };
 }  // namespace epoch::frontend
 
