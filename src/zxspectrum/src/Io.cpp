@@ -18,6 +18,7 @@
 
 #include "IoSnapshot.hpp"
 #include "IoTzx.hpp"
+#include "IoUtils.hpp"
 #include "PulsesTape.hpp"
 #include "Ula.hpp"
 #include "ZXSpectrumEmulator.hpp"
@@ -29,22 +30,14 @@
 #include <fstream>
 #include <vector>
 
-#define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
-#define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE()      \
-    do                     \
-    {                      \
-        low = GET_BYTE();  \
-        high = GET_BYTE(); \
-    } while (false)
-
 namespace epoch::zxspectrum
 {
     std::vector<std::size_t> loadTap(const std::filesystem::path& path)
     {
         std::vector<std::size_t> result{};
 
-        std::ifstream is(path, std::ios::binary);
+        std::ifstream is{path, std::ios::binary};
+        const StreamReader reader{is};
 
         bool first = true;
 
@@ -56,10 +49,8 @@ namespace epoch::zxspectrum
                 result.push_back(1750000);  // TODO
             }
 
-            uint8_t high, low;
-            GET_WORD_LE();
             if (is.eof()) break;
-            const auto blockSize = MAKE_WORD(high, low);
+            const auto blockSize = reader.readUInt16LE();
             assert(blockSize > 1);
             std::vector<uint8_t> data;
             data.resize(blockSize);
