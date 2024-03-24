@@ -49,8 +49,8 @@ namespace epoch::zxspectrum
                 result.push_back(1750000);  // TODO
             }
 
-            if (is.eof()) break;
             const auto blockSize = reader.readUInt16LE();
+            if (is.eof()) break;
             assert(blockSize > 1);
             std::vector<uint8_t> data;
             data.resize(blockSize);
