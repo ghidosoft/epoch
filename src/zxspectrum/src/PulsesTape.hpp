@@ -14,18 +14,20 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_TAPEINTERFACE_HPP_
+#ifndef SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_PULSESTAPE_HPP_
+
+#include <epoch/core.hpp>
 
 #include <vector>
 
 namespace epoch::zxspectrum
 {
-    class TapeInterface
+    class PulsesTape final : public Tape
     {
     public:
-        explicit TapeInterface(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
-        explicit TapeInterface(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
+        explicit PulsesTape(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
+        explicit PulsesTape(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
 
         [[nodiscard]] bool clock()
         {
@@ -42,9 +44,15 @@ namespace epoch::zxspectrum
         }
         [[nodiscard]] bool completed() const { return m_position == m_pulses.size(); }
 
+        void play() override { m_playing = true; }
+        void stop() override { m_playing = false; }
+        [[nodiscard]] bool playing() const override { return m_playing; }
+
     private:
         std::size_t m_position{};
         std::vector<std::size_t> m_pulses{};
+
+        bool m_playing{true};
     };
 }  // namespace epoch::zxspectrum
 

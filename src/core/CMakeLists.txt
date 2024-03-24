@@ -5,6 +5,7 @@ add_library(epoch_core
     "src/Emulator.cpp" "src/Emulator.hpp"
     "src/Keyboard.hpp"
     "src/Palette.cpp" "src/Palette.hpp"
+    "src/Tape.hpp"
 )
 
 target_include_directories(epoch_core INTERFACE include)

@@ -14,19 +14,27 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_IO_HPP_
-
-#include <memory>
-#include <string>
+#include "IoUtils.hpp"
 
 namespace epoch::zxspectrum
 {
-    class PulsesTape;
-    class ZXSpectrumEmulator;
+    StreamReader::StreamReader(std::istream& stream) : m_stream{stream} {}
 
-    std::unique_ptr<PulsesTape> load(const std::string& path, ZXSpectrumEmulator* emulator);
-    void save(const std::string& path, const ZXSpectrumEmulator* emulator);
+    StreamReader::~StreamReader() = default;
+
+    uint8_t StreamReader::readUInt8() const { return static_cast<uint8_t>(m_stream.get()); }
+
+    uint16_t StreamReader::readUInt16LE() const
+    {
+        uint8_t data[2];
+        m_stream.read(reinterpret_cast<char*>(data), 2);
+        return static_cast<uint16_t>(data[1] << 8 | data[0]);
+    }
+
+    uint16_t StreamReader::readUInt16BE() const
+    {
+        uint8_t data[2];
+        m_stream.read(reinterpret_cast<char*>(data), 2);
+        return static_cast<uint16_t>(data[0] << 8 | data[1]);
+    }
 }  // namespace epoch::zxspectrum
-
-#endif

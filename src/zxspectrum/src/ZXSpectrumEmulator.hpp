@@ -26,11 +26,11 @@
 
 namespace epoch::zxspectrum
 {
-    class TapeInterface;
+    class PulsesTape;
     class Ula;
     class Z80Cpu;
 
-    class ZXSpectrumEmulator : public Emulator
+    class ZXSpectrumEmulator final : public Emulator
     {
     public:
         static const Palette DefaultPalette;
@@ -66,6 +66,8 @@ namespace epoch::zxspectrum
         [[nodiscard]] std::array<MemoryBank, 8>& ram();
         [[nodiscard]] const std::array<MemoryBank, 8>& ram() const;
 
+        Tape* tape() override;
+
     protected:
         void doClock() override;
 
@@ -76,7 +78,7 @@ namespace epoch::zxspectrum
 
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
 
-        std::unique_ptr<TapeInterface> m_tape{};
+        std::unique_ptr<PulsesTape> m_tape{};
 
         void updateScreenBuffer();
     };

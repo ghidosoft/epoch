@@ -15,6 +15,7 @@ This is a cross-platform ZX Spectrum 48K/128K/+2/+3 emulator written, for the fu
 - AY sound chip
 
 ## Roadmap
+- Contended memory
 - Tape UX
 - .z80 snapshots
 - Fast loading

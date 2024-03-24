@@ -307,23 +307,13 @@ namespace epoch::frontend
         m_context = ImGui::CreateContext();
         auto& io = ImGui::GetIO();
         io.IniFilename = nullptr;
-        ImGui::StyleColorsDark();
 
         if (settings != nullptr)
         {
             ImGui::LoadIniSettingsFromMemory(settings);
         }
 
-        unsigned char* pixels;
-        int width, height;
-        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-        glBindTexture(GL_TEXTURE_2D, m_fontTexture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-        io.Fonts->SetTexID(reinterpret_cast<void*>(static_cast<intptr_t>(m_fontTexture)));
+        setupStyle(1.f);
     }
 
     Gui::~Gui()
@@ -432,6 +422,11 @@ namespace epoch::frontend
         }
     }
 
+    void Gui::contentScaleEvent(const float scale) const
+    {
+        setupStyle(scale);
+    }
+
     void Gui::cursorEnterEvent(const bool entered)
     {
         if (entered)
@@ -475,4 +470,28 @@ namespace epoch::frontend
     bool Gui::wantKeyboardEvents() const { return ImGui::GetIO().WantCaptureKeyboard; }
 
     const char* Gui::generateSettings() const { return ImGui::SaveIniSettingsToMemory(); }
+
+    void Gui::setupStyle(const float scale) const
+    {
+        ImGui::GetStyle() = {};
+        ImGui::StyleColorsDark();
+        ImGui::GetStyle().ScaleAllSizes(scale);
+
+        auto& io = ImGui::GetIO();
+        io.Fonts->Clear();
+        // TODO: load a font scaled by scale
+        io.Fonts->AddFontDefault();
+        unsigned char* pixels;
+        int width, height;
+        io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+        glBindTexture(GL_TEXTURE_2D, m_fontTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+        io.Fonts->ClearTexData();
+        io.Fonts->SetTexID(reinterpret_cast<void*>(static_cast<intptr_t>(m_fontTexture)));
+        io.FontGlobalScale = scale;
+    }
 }  // namespace epoch::frontend

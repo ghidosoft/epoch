@@ -14,19 +14,28 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_IO_HPP_
+#ifndef SRC_EPOCH_CORE_TAPE_HPP_
+#define SRC_EPOCH_CORE_TAPE_HPP_
 
-#include <memory>
-#include <string>
-
-namespace epoch::zxspectrum
+namespace epoch
 {
-    class PulsesTape;
-    class ZXSpectrumEmulator;
+    class Tape
+    {
+    public:
+        Tape() = default;
+        virtual ~Tape() = default;
 
-    std::unique_ptr<PulsesTape> load(const std::string& path, ZXSpectrumEmulator* emulator);
-    void save(const std::string& path, const ZXSpectrumEmulator* emulator);
-}  // namespace epoch::zxspectrum
+    public:
+        Tape(const Tape& other) = default;
+        Tape(Tape&& other) noexcept = default;
+        Tape& operator=(const Tape& other) = default;
+        Tape& operator=(Tape&& other) noexcept = default;
+
+    public:
+        virtual void play() = 0;
+        virtual void stop() = 0;
+        [[nodiscard]] virtual bool playing() const = 0;
+    };
+}  // namespace epoch
 
 #endif

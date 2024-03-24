@@ -17,8 +17,8 @@
 #include "ZXSpectrumEmulator.hpp"
 
 #include "Io.hpp"
+#include "PulsesTape.hpp"
 #include "Roms.hpp"
-#include "TapeInterface.hpp"
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
 
@@ -251,6 +251,11 @@ namespace epoch::zxspectrum
 
     const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const { return m_ula->ram(); }
 
+    Tape* ZXSpectrumEmulator::tape()
+    {
+        return m_tape.get();
+    }
+
     void ZXSpectrumEmulator::doClock()
     {
         if (!m_ula->isCpuStalled())
@@ -266,7 +271,7 @@ namespace epoch::zxspectrum
             updateScreenBuffer();
         }
 
-        if (m_tape)
+        if (m_tape && m_tape->playing())
         {
             if (m_tape->completed())
             {

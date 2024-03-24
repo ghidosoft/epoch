@@ -16,6 +16,7 @@
 
 #include "IoSnapshot.hpp"
 
+#include "IoUtils.hpp"
 #include "Ula.hpp"
 #include "Z80Cpu.hpp"
 #include "ZXSpectrumEmulator.hpp"
@@ -26,14 +27,6 @@
 #include <vector>
 
 #define PUT_BYTE(x) os.put(static_cast<uint8_t>(x))
-#define MAKE_WORD(high, low) static_cast<uint16_t>((high) << 8 | (low))
-#define GET_BYTE() static_cast<uint8_t>(is.get())
-#define GET_WORD_LE()      \
-    do                     \
-    {                      \
-        low = GET_BYTE();  \
-        high = GET_BYTE(); \
-    } while (false)
 
 namespace epoch::zxspectrum
 {
@@ -42,41 +35,25 @@ namespace epoch::zxspectrum
         const auto ula = emulator->ula();
         auto& registers = emulator->cpu()->registers();
 
-        std::ifstream is(path, std::ios::binary);
-        uint8_t high, low;
-        low = GET_BYTE();
-        registers.ir = static_cast<uint16_t>(low << 8);
-        GET_WORD_LE();
-        registers.hl2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.de2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.bc2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.af2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.hl = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.de = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.bc = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.iy = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.ix = MAKE_WORD(high, low);
-        low = GET_BYTE();
-        registers.iff1 = registers.iff2 = low & (1 << 2);
-        low = GET_BYTE();
-        registers.ir = (registers.ir | low);
-        GET_WORD_LE();
-        registers.af = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.sp = MAKE_WORD(high, low);
-        low = GET_BYTE();
-        registers.interruptMode = low;
+        std::ifstream is{path, std::ios::binary};
+        const StreamReader reader{is};
+        registers.ir.high = reader.readUInt8();
+        registers.hl2 = reader.readUInt16LE();
+        registers.de2 = reader.readUInt16LE();
+        registers.bc2 = reader.readUInt16LE();
+        registers.af2 = reader.readUInt16LE();
+        registers.hl = reader.readUInt16LE();
+        registers.de = reader.readUInt16LE();
+        registers.bc = reader.readUInt16LE();
+        registers.iy = reader.readUInt16LE();
+        registers.ix = reader.readUInt16LE();
+        registers.iff1 = registers.iff2 = reader.readUInt8() & (1 << 2);
+        registers.ir.low = reader.readUInt8();
+        registers.af = reader.readUInt16LE();
+        registers.sp = reader.readUInt16LE();
+        registers.interruptMode = reader.readUInt8();
         // Border color
-        low = GET_BYTE();
-        ula->ioWrite(0xfe, low);
+        ula->ioWrite(0xfe, reader.readUInt8());
         // Load memory
         is.read(reinterpret_cast<char*>(emulator->ram()[5].data()), MemoryBankSize);
         is.read(reinterpret_cast<char*>(emulator->ram()[2].data()), MemoryBankSize);
@@ -91,23 +68,19 @@ namespace epoch::zxspectrum
         const auto ula = emulator->ula();
         auto& registers = emulator->cpu()->registers();
 
-        std::ifstream is(path, std::ios::binary);
-        uint8_t high, low;
+        std::ifstream is{path, std::ios::binary};
+        const StreamReader reader{is};
 
-        registers.af.high = GET_BYTE();
-        registers.af.low = GET_BYTE();
-        GET_WORD_LE();
-        registers.bc = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.hl = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.pc = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.sp = MAKE_WORD(high, low);
-        registers.ir.high = GET_BYTE();
-        registers.ir.low = GET_BYTE() & 0x7f;
+        registers.af.high = reader.readUInt8();
+        registers.af.low = reader.readUInt8();
+        registers.bc = reader.readUInt16LE();
+        registers.hl = reader.readUInt16LE();
+        registers.pc = reader.readUInt16LE();
+        registers.sp = reader.readUInt16LE();
+        registers.ir.high = reader.readUInt8();
+        registers.ir.low = reader.readUInt8() & 0x7f;
 
-        low = GET_BYTE();
+        auto low = reader.readUInt8();
         if (low == 0xff) low = 0x01;  // Because of compatibility, if byte 12 is 255, it has to be regarded as being 1.
         registers.ir = (registers.ir | ((low & 0x01) << 7));
         const bool basicSamRomv1 = low & (1 << 4);
@@ -115,25 +88,18 @@ namespace epoch::zxspectrum
         const auto border = static_cast<uint8_t>((low >> 1) & 0b111);
         ula->ioWrite(0xfe, border);
 
-        GET_WORD_LE();
-        registers.de = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.bc2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.de2 = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.hl2 = MAKE_WORD(high, low);
-        registers.af2.high = GET_BYTE();
-        registers.af2.low = GET_BYTE();
-        GET_WORD_LE();
-        registers.iy = MAKE_WORD(high, low);
-        GET_WORD_LE();
-        registers.ix = MAKE_WORD(high, low);
+        registers.de = reader.readUInt16LE();
+        registers.bc2 = reader.readUInt16LE();
+        registers.de2 = reader.readUInt16LE();
+        registers.hl2 = reader.readUInt16LE();
+        registers.af2 = reader.readUInt16BE();
+        registers.iy = reader.readUInt16LE();
+        registers.ix = reader.readUInt16LE();
 
-        registers.iff1 = GET_BYTE();
-        registers.iff2 = GET_BYTE();
+        registers.iff1 = reader.readUInt8();
+        registers.iff2 = reader.readUInt8();
 
-        low = GET_BYTE();
+        low = reader.readUInt8();
         registers.interruptMode = low & 0b11;
 
         assert(registers.pc == 0);  // unsupported z80 version 1
@@ -141,11 +107,9 @@ namespace epoch::zxspectrum
         {
             auto pos = is.tellg();
             // version 2/3
-            GET_WORD_LE();
-            const auto additionalHeaderLength = MAKE_WORD(high, low);
-            GET_WORD_LE();
-            registers.pc = MAKE_WORD(high, low);
-            const auto hardwareMode = GET_BYTE();
+            const auto additionalHeaderLength = reader.readUInt16LE();
+            registers.pc = reader.readUInt16LE();
+            const auto hardwareMode = reader.readUInt8();
             assert(hardwareMode == 0 || hardwareMode == 1);  // Only ZX Spectrum 48K supported
 
             pos += additionalHeaderLength + 2;
@@ -153,11 +117,10 @@ namespace epoch::zxspectrum
 
             do
             {
-                GET_WORD_LE();
+                const auto blockLength = reader.readUInt16LE();
                 if (is.eof()) break;
-                const auto blockLength = MAKE_WORD(high, low);
                 assert(blockLength != 0xffff);  // uncompressed not yet supported
-                const auto pageNumber = GET_BYTE();
+                const auto pageNumber = reader.readUInt8();
                 uint8_t* page{};
                 if (pageNumber == 0x04)
                 {

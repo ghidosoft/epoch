@@ -57,10 +57,12 @@ namespace epoch::frontend
         glfwGetFramebufferSize(m_window, &w, &h);
         m_framebufferWidth = static_cast<unsigned>(w);
         m_framebufferHeight = static_cast<unsigned>(h);
+        glfwGetWindowContentScale(m_window, &m_scaleX, &m_scaleY);
 
         glfwSetWindowUserPointer(m_window, this);
 
         glfwSetCharCallback(m_window, s_charCallback);
+        glfwSetWindowContentScaleCallback(m_window, s_contentScaleCallback);
         glfwSetCursorEnterCallback(m_window, s_cursorEnterCallback);
         glfwSetCursorPosCallback(m_window, s_cursorPosCallback);
         glfwSetDropCallback(m_window, s_dropCallback);
@@ -70,7 +72,6 @@ namespace epoch::frontend
         glfwSetMouseButtonCallback(m_window, s_mouseButtonCallback);
         glfwSetScrollCallback(m_window, s_scrollCallback);
         glfwSetWindowFocusCallback(m_window, s_focusCallback);
-        // TODO: setup other callbacks: monitor
 
         glfwMakeContextCurrent(m_window);
 
@@ -156,6 +157,8 @@ namespace epoch::frontend
 
     void Window::setCharCallback(CharCallback callback) { m_charCallback = std::move(callback); }
 
+    void Window::setContentScaleCallback(ContentScaleCallback callback) { m_contentScaleCallback = std::move(callback); }
+
     void Window::setCursorEnterCallback(CursorEnterCallback callback) { m_cursorEnterCallback = std::move(callback); }
 
     void Window::setCursorPosCallback(CursorPosCallback callback) { m_cursorPosCallback = std::move(callback); }
@@ -179,6 +182,17 @@ namespace epoch::frontend
         }
     }
 
+    void Window::s_contentScaleCallback(GLFWwindow* glfwWindow, const float xscale, const float yscale)
+    {
+        const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+        window->m_scaleX = xscale;
+        window->m_scaleY = yscale;
+        if (window->m_contentScaleCallback)
+        {
+            window->m_contentScaleCallback(xscale, yscale);
+        }
+    }
+
     void Window::s_cursorEnterCallback(GLFWwindow* glfwWindow, const int entered)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
@@ -197,7 +211,7 @@ namespace epoch::frontend
         }
     }
 
-    void Window::s_dropCallback(GLFWwindow* glfwWindow, int count, const char** paths)
+    void Window::s_dropCallback(GLFWwindow* glfwWindow, const int count, const char** paths)
     {
         const auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
         if (window->m_fileDropCallback && count >= 1)

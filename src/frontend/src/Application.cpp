@@ -109,6 +109,7 @@ namespace epoch::frontend
         m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
 
         m_window->setCharCallback([&](const unsigned int c) { m_gui->charEvent(c); });
+        m_window->setContentScaleCallback([&](const float xscale, const float yscale) { m_gui->contentScaleEvent(std::max(xscale, yscale)); });
         m_window->setCursorEnterCallback([&](const bool entered) { m_gui->cursorEnterEvent(entered); });
         m_window->setCursorPosCallback([&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
         m_window->setFileDropCallback([&](const char* path) { m_emulator->load(path); });
@@ -122,6 +123,8 @@ namespace epoch::frontend
         m_window->setMouseButtonCallback([&](const int button, const int action)
                                          { m_gui->mouseButtonEvent(button, action == 1); });
         m_window->setMouseWheelCallback([&](const float x, const float y) { m_gui->mouseWheelEvent(x, y); });
+
+        m_gui->contentScaleEvent(std::max(m_window->scaleX(), m_window->scaleY()));
 
         m_context->init(m_emulator->info().width, m_emulator->info().height);
 
@@ -213,9 +216,7 @@ namespace epoch::frontend
             }
             if (ImGui::BeginMenu("Emulator"))
             {
-                if (ImGui::MenuItem("Run", nullptr, &m_running))
-                {
-                }
+                ImGui::MenuItem("Run", nullptr, &m_running);
                 if (ImGui::MenuItem("Reset"))
                 {
                     m_emulator->reset();
@@ -235,9 +236,7 @@ namespace epoch::frontend
             }
             if (ImGui::BeginMenu("Window"))
             {
-                if (ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio))
-                {
-                }
+                ImGui::MenuItem("Keep aspect ratio", nullptr, &m_keepAspectRatio);
                 ImGui::Separator();
                 if (ImGui::MenuItem("1X size"))
                 {
@@ -257,9 +256,7 @@ namespace epoch::frontend
                     m_window->mode(m_fullscreen ? WindowMode::borderless : WindowMode::windowed);
                 }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings))
-                {
-                }
+                ImGui::MenuItem("Shader settings", nullptr, &m_showShaderSettings);
                 ImGui::EndMenu();
             }
             ImGui::EndMainMenuBar();
@@ -269,8 +266,8 @@ namespace epoch::frontend
         {
             ImGui::SetNextWindowSize(
                 {
-                    300,
-                    450,
+                    ImGui::GetFontSize() * 25,
+                    ImGui::GetFontSize() * 35,
                 },
                 ImGuiCond_Once);
             if (ImGui::Begin("Shader settings", &m_showShaderSettings))
@@ -311,6 +308,27 @@ namespace epoch::frontend
                         m_context->updateShaderParameters(m_shaders[m_shader]);
                     }
                 }
+            }
+            ImGui::End();
+        }
+
+        if (auto tape = m_emulator->tape())
+        {
+            ImGui::SetNextWindowSize(
+                {
+                    ImGui::GetFontSize() * 20,
+                    ImGui::GetFontSize() * 4.5f,
+                },
+                ImGuiCond_Once);
+            if (ImGui::Begin("Tape controls"))
+            {
+                ImGui::BeginDisabled(tape->playing());
+                if (ImGui::Button("Play")) tape->play();
+                ImGui::EndDisabled();
+                ImGui::SameLine();
+                ImGui::BeginDisabled(!tape->playing());
+                if (ImGui::Button("Stop")) tape->stop();
+                ImGui::EndDisabled();
             }
             ImGui::End();
         }

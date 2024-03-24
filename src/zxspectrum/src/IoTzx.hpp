@@ -14,8 +14,10 @@
  * along with Epoch.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
-#define SRC_EPOCH_ZXSPECTRUM_IO_TZX_HPP_
+#ifndef SRC_EPOCH_ZXSPECTRUM_IOTZX_HPP_
+#define SRC_EPOCH_ZXSPECTRUM_IOTZX_HPP_
+
+#include "IoUtils.hpp"
 
 #include <istream>
 #include <vector>
@@ -45,12 +47,11 @@ namespace epoch::zxspectrum
         void loadBlock13PulseSequence();
         void loadBlock14PureDataBlock();
 
-        uint8_t getByte();
-        uint16_t getWord();
-        uint32_t getWord3();
+        uint32_t getWord3() const;
 
     private:
         std::istream& m_stream;
+        StreamReader m_reader;
         std::vector<std::size_t>& m_pulses;
 
         uint16_t m_loopCount{};
