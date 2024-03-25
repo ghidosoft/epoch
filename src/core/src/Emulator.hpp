@@ -68,10 +68,10 @@ namespace epoch
         void frame();
         float generateNextAudioSample();
 
-        [[nodiscard]] float audioOut() const { return m_audioOut; }
-        void audioIn(const float sample) { m_audioIn = sample; }
-
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
+
+        [[nodiscard]] virtual float audioOut() const = 0;
+        void audioIn(const float sample) { m_audioIn = sample; }
 
         virtual void keyEvent(Key key, KeyAction action) {}
 
@@ -84,7 +84,6 @@ namespace epoch
         virtual void doClock() = 0;
 
         const EmulatorInfo m_info;
-        float m_audioOut{};
         float m_audioIn{};
 
     private:

@@ -95,6 +95,8 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::save(const std::string& path) { epoch::zxspectrum::save(path, this); }
 
+    float ZXSpectrumEmulator::audioOut() const { return m_ula->audioOutput(); }
+
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
     {
         const auto state = action != KeyAction::release;
@@ -251,10 +253,7 @@ namespace epoch::zxspectrum
 
     const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const { return m_ula->ram(); }
 
-    Tape* ZXSpectrumEmulator::tape()
-    {
-        return m_tape.get();
-    }
+    Tape* ZXSpectrumEmulator::tape() { return m_tape.get(); }
 
     void ZXSpectrumEmulator::doClock()
     {
@@ -265,7 +264,6 @@ namespace epoch::zxspectrum
         }
         m_ula->clock();
         m_ula->setAudioIn(m_audioIn > AudioInThreshold);
-        m_audioOut = m_ula->audioOutput();
         if (m_ula->frameReady())
         {
             updateScreenBuffer();
