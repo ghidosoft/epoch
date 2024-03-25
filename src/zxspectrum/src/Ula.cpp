@@ -46,8 +46,7 @@ namespace epoch::zxspectrum
         }
 
         // 2 pixels per T-state
-        m_x++;
-        m_x++;
+        m_x += 2;
 
         if (m_x >= Width)
         {
@@ -60,7 +59,7 @@ namespace epoch::zxspectrum
             m_frameCounter++;
         }
 
-        if ((m_clockCounter & 0x01) == 0 && m_ay8910)
+        if ((m_clockCounter & 0x01) == 0)
         {
             m_ay8910->clock();
         }
