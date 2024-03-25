@@ -28,7 +28,39 @@
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
 
+#include <chrono>
+#include <numeric>
 #include <sstream>
+
+class BlockProfiler final
+{
+public:
+    using value_t = float;
+
+    explicit BlockProfiler(value_t* target) : m_target{target} { m_start = std::chrono::high_resolution_clock::now(); }
+    ~BlockProfiler()
+    {
+        const auto end = std::chrono::high_resolution_clock::now();
+        const auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - m_start);
+        *m_target = static_cast<value_t>(diff.count()) * 0.001f;
+    }
+
+private:
+    value_t* m_target;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
+};
+
+// TODO: move to CMake
+#define EPOCH_PROFILER
+
+#ifdef EPOCH_PROFILER
+#define PROFILE_BLOCK(x) BlockProfiler __epoch__profiler(x)
+#else
+#define PROFILE_BLOCK(x) \
+    do                   \
+    {                    \
+    } while (false)
+#endif
 
 namespace epoch::frontend
 {
@@ -69,6 +101,7 @@ namespace epoch::frontend
         {
             if (m_running)
             {
+                PROFILE_BLOCK(&m_profiling.emulation[m_profiling.index]);
                 const auto samples = m_audio->neededSamples();
                 if (samples > 0)
                 {
@@ -86,6 +119,10 @@ namespace epoch::frontend
             m_time = currentTime;
             m_context->updateScreen(m_emulator->screenBuffer());
             render();
+#ifdef EPOCH_PROFILER
+            m_profiling.index++;
+            if (m_profiling.index >= profiling_t::COUNT) m_profiling.index = 0;
+#endif
         }
         m_settings->current().ui.imgui = m_gui->generateSettings();
         if (m_settings->dirty())
@@ -144,6 +181,7 @@ namespace epoch::frontend
 
     void Application::render()
     {
+        PROFILE_BLOCK(&m_profiling.render[m_profiling.index]);
         if (m_keepAspectRatio)
         {
             const auto emulatorAspectRatio = m_emulator->info().aspectRatio();
@@ -332,6 +370,23 @@ namespace epoch::frontend
             }
             ImGui::End();
         }
+
+#ifdef EPOCH_PROFILER
+        if (ImGui::Begin("Profiler"))
+        {
+            ImGui::Text("Emulation: %.3f ms",
+                        std::accumulate(std::begin(m_profiling.emulation), std::end(m_profiling.emulation), 0.f) /
+                            static_cast<float>(IM_ARRAYSIZE(m_profiling.emulation)));
+            ImGui::Text("Rendering: %.3f ms",
+                        std::accumulate(std::begin(m_profiling.render), std::end(m_profiling.render), 0.f) /
+                            static_cast<float>(IM_ARRAYSIZE(m_profiling.render)));
+            ImGui::PlotLines("Emulation", m_profiling.emulation, IM_ARRAYSIZE(m_profiling.emulation), m_profiling.index,
+                             nullptr, 0.f, 25.f, {0, 60});
+            ImGui::PlotLines("Rendering", m_profiling.render, IM_ARRAYSIZE(m_profiling.render), m_profiling.index,
+                             nullptr, 0.f, 20.f, {0, 60});
+        }
+        ImGui::End();
+#endif
 
         const ImVec2 screenSize{static_cast<float>(m_window->width()), static_cast<float>(m_window->height())};
         ImGui::SetNextWindowPos({0, 0});
