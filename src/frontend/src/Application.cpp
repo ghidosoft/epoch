@@ -99,31 +99,40 @@ namespace epoch::frontend
         m_time = m_window->time();
         while (m_window->nextFrame())
         {
-            if (m_running)
             {
                 PROFILE_BLOCK(&m_profiling.emulation[m_profiling.index]);
-                const auto samples = m_audio->neededSamples();
-                if (samples > 0)
+                if (m_running)
                 {
-                    m_audioBuffer.resize(samples);
-                    for (unsigned long i = 0; i < samples; i++)
+                    const auto samples = m_audio->neededSamples();
+                    if (samples > 0)
                     {
-                        m_audioBuffer[i] = m_emulator->generateNextAudioSample();
+                        m_audioBuffer.resize(samples);
+                        for (unsigned long i = 0; i < samples; i++)
+                        {
+                            m_audioBuffer[i] = m_emulator->generateNextAudioSample();
+                        }
+                        m_audio->push(m_audioBuffer);
                     }
-                    m_audio->push(m_audioBuffer);
                 }
             }
+            
             auto currentTime = m_window->time();
             if (currentTime <= m_time) currentTime = m_time + 0.00001;
             m_deltaTime = currentTime - m_time;
             m_time = currentTime;
-            m_context->updateScreen(m_emulator->screenBuffer());
-            render();
+
+            {
+                PROFILE_BLOCK(&m_profiling.render[m_profiling.index]);
+                m_context->updateScreen(m_emulator->screenBuffer());
+                render();   
+            }
+
 #ifdef EPOCH_PROFILER
             m_profiling.index++;
             if (m_profiling.index >= profiling_t::COUNT) m_profiling.index = 0;
 #endif
         }
+
         m_settings->current().ui.imgui = m_gui->generateSettings();
         if (m_settings->dirty())
         {
@@ -181,7 +190,6 @@ namespace epoch::frontend
 
     void Application::render()
     {
-        PROFILE_BLOCK(&m_profiling.render[m_profiling.index]);
         if (m_keepAspectRatio)
         {
             const auto emulatorAspectRatio = m_emulator->info().aspectRatio();
