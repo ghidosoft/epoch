@@ -28,39 +28,8 @@
 #include <imgui.h>
 #include <ImGuiFileDialog.h>
 
-#include <chrono>
 #include <numeric>
 #include <sstream>
-
-class BlockProfiler final
-{
-public:
-    using value_t = float;
-
-    explicit BlockProfiler(value_t* target) : m_target{target} { m_start = std::chrono::high_resolution_clock::now(); }
-    ~BlockProfiler()
-    {
-        const auto end = std::chrono::high_resolution_clock::now();
-        const auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - m_start);
-        *m_target = static_cast<value_t>(diff.count()) * 0.001f;
-    }
-
-private:
-    value_t* m_target;
-    std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
-};
-
-// TODO: move to CMake
-#define EPOCH_PROFILER
-
-#ifdef EPOCH_PROFILER
-#define PROFILE_BLOCK(x) BlockProfiler __epoch__profiler(x)
-#else
-#define PROFILE_BLOCK(x) \
-    do                   \
-    {                    \
-    } while (false)
-#endif
 
 namespace epoch::frontend
 {

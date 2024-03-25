@@ -21,6 +21,7 @@
 #include "../../src/Emulator.hpp"
 #include "../../src/Keyboard.hpp"
 #include "../../src/Palette.hpp"
+#include "../../src/Profiler.hpp"
 #include "../../src/Tape.hpp"
 
 #endif
