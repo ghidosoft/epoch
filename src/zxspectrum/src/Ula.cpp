@@ -62,7 +62,7 @@ namespace epoch::zxspectrum
                     paper += 0x08;
                     ink += 0x08;
                 }
-                const bool flash = (attribute & 0x80) && invertPaperInk();
+                const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10); // flash every 16 frames
 
                 bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
                 m_screenBuffer[m_y * Width + m_x++] = (pixel && !flash) || (!pixel && flash) ? ink : paper;

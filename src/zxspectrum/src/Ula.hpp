@@ -66,7 +66,6 @@ namespace epoch::zxspectrum
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 
         [[nodiscard]] std::span<const uint8_t> screenBuffer() const { return m_screenBuffer; }
-        [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; }  // 16 frames
 
         [[nodiscard]] bool interruptRequested() const
         {
