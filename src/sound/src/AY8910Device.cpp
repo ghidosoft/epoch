@@ -113,7 +113,7 @@ namespace epoch::sound
                 break;
             case 11:
             case 12:
-                m_envelope.period = (m_registers[11] | (m_registers[12] << 8)) >> 2;
+                m_envelope.period = (m_registers[11] | (m_registers[12] << 8)) << 6;
                 break;
             case 13:
                 if (m_registers[13] != 0xff)
