@@ -65,7 +65,7 @@ namespace epoch::zxspectrum
 
         [[nodiscard]] bool isCpuStalled() const { return m_cpuStalled > 0; }
 
-        [[nodiscard]] std::span<const uint8_t> borderBuffer() const { return m_borderBuffer; }
+        [[nodiscard]] std::span<const uint8_t> screenBuffer() const { return m_screenBuffer; }
         [[nodiscard]] bool invertPaperInk() const { return m_frameCounter & 0x10; }  // 16 frames
 
         [[nodiscard]] bool interruptRequested() const
@@ -81,8 +81,6 @@ namespace epoch::zxspectrum
         void setKempstonState(int button, bool state);
         void setAudioIn(const bool value) { m_audioIn = value; }
 
-        [[nodiscard]] uint8_t vramRead(uint16_t address) const;
-
     private:
         UlaType m_type;
 
@@ -93,6 +91,7 @@ namespace epoch::zxspectrum
 
         uint8_t m_ramSelect{0};
         uint8_t m_vramSelect{5};
+        std::span<uint8_t> m_vram{m_ram[m_vramSelect]};
         uint8_t m_romSelect{0};
         uint8_t m_pagingState{};
         uint8_t m_pagingPlus3{};
@@ -106,7 +105,7 @@ namespace epoch::zxspectrum
 
         uint64_t m_clockCounter{};
         uint64_t m_frameCounter{};
-        std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_borderBuffer{};
+        std::array<uint8_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
         int m_x{-HorizontalRetrace}, m_y{-VerticalRetrace};
     };
 }  // namespace epoch::zxspectrum

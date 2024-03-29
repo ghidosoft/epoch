@@ -287,49 +287,10 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::updateScreenBuffer()
     {
-        std::size_t source = 0;
-        std::size_t dest = 0;
-        const auto borderBuffer = m_ula->borderBuffer();
-        const auto invertPaperInk = m_ula->invertPaperInk();
-        for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
+        const auto sourceBuffer = m_ula->screenBuffer();
+        for (auto i = 0; i < Width * Height; i++)
         {
-            for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
-            {
-                Color color;
-                if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
-                {
-                    color = DefaultPalette.map(borderBuffer[source]);
-                }
-                else
-                {
-                    const auto xPixel = (x - BorderLeft);
-                    const auto yPixel = (y - BorderTop);
-
-                    uint16_t pixelAddress = 0x4000;
-                    pixelAddress |= (xPixel >> 3) & 0b11111;
-                    pixelAddress |= (yPixel & 0b00000111) << 8;
-                    pixelAddress |= (yPixel & 0b00111000) << 2;
-                    pixelAddress |= (yPixel & 0b11000000) << 5;
-                    const auto pixelData = m_ula->vramRead(pixelAddress);
-                    const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
-
-                    const auto attribute = m_ula->vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
-
-                    auto paper = (attribute >> 3) & 0x07;
-                    auto ink = attribute & 0x07;
-                    const bool bright = attribute & 0x40;
-                    if (bright)
-                    {
-                        paper += 0x08;
-                        ink += 0x08;
-                    }
-                    const bool flash = (attribute & 0x80) && invertPaperInk;
-                    color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
-                }
-
-                source++;
-                m_screenBuffer[dest++] = color.rgba;
-            }
+            m_screenBuffer[i] = DefaultPalette.map(sourceBuffer[i]);
         }
     }
 }  // namespace epoch::zxspectrum
