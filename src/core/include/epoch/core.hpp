@@ -17,10 +17,8 @@
 #ifndef INCLUDE_EPOCH_CORE_HPP_
 #define INCLUDE_EPOCH_CORE_HPP_
 
-#include "../../src/Color.hpp"
 #include "../../src/Emulator.hpp"
 #include "../../src/Keyboard.hpp"
-#include "../../src/Palette.hpp"
 #include "../../src/Profiler.hpp"
 #include "../../src/Tape.hpp"
 

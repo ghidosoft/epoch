@@ -24,28 +24,6 @@
 
 namespace epoch::zxspectrum
 {
-    static constexpr uint8_t darkColor = 0xd9;
-    static constexpr uint8_t brightColor = 0xff;
-    static Color defaultColors[] = {
-        {0x00, 0x00, 0x00},
-        {0x00, 0x00, darkColor},
-        {darkColor, 0x00, 0x00},
-        {darkColor, 0x00, darkColor},
-        {0x00, darkColor, 0x00},
-        {0x00, darkColor, darkColor},
-        {darkColor, darkColor, 0x00},
-        {darkColor, darkColor, darkColor},
-        {0x00, 0x00, 0x00},
-        {0x00, 0x00, brightColor},
-        {brightColor, 0x00, 0x00},
-        {brightColor, 0x00, brightColor},
-        {0x00, brightColor, 0x00},
-        {0x00, brightColor, brightColor},
-        {brightColor, brightColor, 0x00},
-        {brightColor, brightColor, brightColor},
-    };
-    const Palette ZXSpectrumEmulator::DefaultPalette{defaultColors};
-
     ZXSpectrumEmulator::ZXSpectrumEmulator(std::unique_ptr<Ula> ula)
         : Emulator{{Width,
                     Height,
@@ -57,7 +35,11 @@ namespace epoch::zxspectrum
                         {"Z80 Snapshots", ".z80", true, false},
                     }}},
           m_ula{std::move(ula)},
-          m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
+          m_cpu{std::make_unique<Z80Cpu>(*m_ula)},
+          m_palette{
+              0xff000000, 0xffd90000, 0xff0000d9, 0xffd900d9, 0xff00d900, 0xffd9d900, 0xff00d9d9, 0xffd9d9d9,
+              0xff000000, 0xffd90000, 0xff0000d9, 0xffd900d9, 0xff00d900, 0xffd9d900, 0xff00d9d9, 0xffd9d9d9,
+          }
     {
     }
 
@@ -290,7 +272,7 @@ namespace epoch::zxspectrum
         const auto sourceBuffer = m_ula->screenBuffer();
         for (auto i = 0; i < Width * Height; i++)
         {
-            m_screenBuffer[i] = DefaultPalette.map(sourceBuffer[i]);
+            m_screenBuffer[i] = m_palette[sourceBuffer[i]];
         }
     }
 }  // namespace epoch::zxspectrum

@@ -33,9 +33,6 @@ namespace epoch::zxspectrum
     class ZXSpectrumEmulator final : public Emulator
     {
     public:
-        static const Palette DefaultPalette;
-
-    public:
         explicit ZXSpectrumEmulator(std::unique_ptr<Ula> ula);
         ~ZXSpectrumEmulator() override;
 
@@ -77,6 +74,8 @@ namespace epoch::zxspectrum
         const std::unique_ptr<Ula> m_ula;
         const std::unique_ptr<Z80Cpu> m_cpu;
         uint64_t m_clockCounter{};
+
+        std::array<uint32_t, 16> m_palette;
 
         std::array<uint32_t, static_cast<std::size_t>(Width* Height)> m_screenBuffer{};
 
