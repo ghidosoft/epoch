@@ -60,6 +60,7 @@ FetchContent_Declare(
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     URL https://github.com/jbeder/yaml-cpp/archive/0.8.0.zip
 )
+set(YAML_CPP_BUILD_TOOLS OFF CACHE INTERNAL "Enable parse tools")
 FetchContent_MakeAvailable(yaml-cpp)
 
 FetchContent_Declare(

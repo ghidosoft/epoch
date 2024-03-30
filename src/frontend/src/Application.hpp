@@ -98,6 +98,14 @@ namespace epoch::frontend
 
         std::vector<ConfigurableShader> m_shaders{};
         std::size_t m_shader{};
+
+        struct profiling_t
+        {
+            static constexpr int COUNT = 64;
+            int index{};
+            float emulation[COUNT];
+            float render[COUNT];
+        } m_profiling{};
     };
 }  // namespace epoch::frontend
 

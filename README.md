@@ -40,6 +40,9 @@ This project uses CMake 3.22. All dependencies are loaded using CMake `FetchCont
 
 Builds on Windows (Visual Studio 2022), GNU/Linux (Ubuntu 22.04) and MacOS (12.6.7).
 
+CMake options:
+* `EPOCH_ENABLE_PROFILER`: enable/disable profiler
+
 ### Windows
 
 * Install Visual Studio 2022 with CMake and C workload

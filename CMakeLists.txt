@@ -4,6 +4,8 @@ project(epoch)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(EPOCH_ENABLE_PROFILER "Enable profiler" ON)
+
 include(CheckIPOSupported)
 check_ipo_supported(RESULT is_ipo_supported OUTPUT ipo_output)
 if(is_ipo_supported)

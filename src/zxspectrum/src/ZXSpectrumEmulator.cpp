@@ -24,28 +24,6 @@
 
 namespace epoch::zxspectrum
 {
-    static constexpr uint8_t darkColor = 0xd9;
-    static constexpr uint8_t brightColor = 0xff;
-    static Color defaultColors[] = {
-        {0x00, 0x00, 0x00},
-        {0x00, 0x00, darkColor},
-        {darkColor, 0x00, 0x00},
-        {darkColor, 0x00, darkColor},
-        {0x00, darkColor, 0x00},
-        {0x00, darkColor, darkColor},
-        {darkColor, darkColor, 0x00},
-        {darkColor, darkColor, darkColor},
-        {0x00, 0x00, 0x00},
-        {0x00, 0x00, brightColor},
-        {brightColor, 0x00, 0x00},
-        {brightColor, 0x00, brightColor},
-        {0x00, brightColor, 0x00},
-        {0x00, brightColor, brightColor},
-        {brightColor, brightColor, 0x00},
-        {brightColor, brightColor, brightColor},
-    };
-    const Palette ZXSpectrumEmulator::DefaultPalette{defaultColors};
-
     ZXSpectrumEmulator::ZXSpectrumEmulator(std::unique_ptr<Ula> ula)
         : Emulator{{Width,
                     Height,
@@ -57,7 +35,11 @@ namespace epoch::zxspectrum
                         {"Z80 Snapshots", ".z80", true, false},
                     }}},
           m_ula{std::move(ula)},
-          m_cpu{std::make_unique<Z80Cpu>(*m_ula)}
+          m_cpu{std::make_unique<Z80Cpu>(*m_ula)},
+          m_palette{
+              0xff000000, 0xffd90000, 0xff0000d9, 0xffd900d9, 0xff00d900, 0xffd9d900, 0xff00d9d9, 0xffd9d9d9,
+              0xff000000, 0xffd90000, 0xff0000d9, 0xffd900d9, 0xff00d900, 0xffd9d900, 0xff00d9d9, 0xffd9d9d9,
+          }
     {
     }
 
@@ -94,6 +76,8 @@ namespace epoch::zxspectrum
     void ZXSpectrumEmulator::load(const std::string& path) { m_tape = epoch::zxspectrum::load(path, this); }
 
     void ZXSpectrumEmulator::save(const std::string& path) { epoch::zxspectrum::save(path, this); }
+
+    float ZXSpectrumEmulator::audioOut() const { return m_ula->audioOutput(); }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
     {
@@ -251,10 +235,7 @@ namespace epoch::zxspectrum
 
     const std::array<MemoryBank, 8>& ZXSpectrumEmulator::ram() const { return m_ula->ram(); }
 
-    Tape* ZXSpectrumEmulator::tape()
-    {
-        return m_tape.get();
-    }
+    Tape* ZXSpectrumEmulator::tape() { return m_tape.get(); }
 
     void ZXSpectrumEmulator::doClock()
     {
@@ -265,7 +246,6 @@ namespace epoch::zxspectrum
         }
         m_ula->clock();
         m_ula->setAudioIn(m_audioIn > AudioInThreshold);
-        m_audioOut = m_ula->audioOutput();
         if (m_ula->frameReady())
         {
             updateScreenBuffer();
@@ -289,49 +269,10 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::updateScreenBuffer()
     {
-        std::size_t source = 0;
-        std::size_t dest = 0;
-        const auto borderBuffer = m_ula->borderBuffer();
-        const auto invertPaperInk = m_ula->invertPaperInk();
-        for (std::size_t y = 0; y < ScreenHeight + BorderTop + BorderBottom; y++)
+        const auto sourceBuffer = m_ula->screenBuffer();
+        for (auto i = 0; i < Width * Height; i++)
         {
-            for (std::size_t x = 0; x < ScreenWidth + BorderLeft + BorderRight; x++)
-            {
-                Color color;
-                if (y < BorderTop || y >= ScreenHeight + BorderTop || x < BorderLeft || x >= ScreenWidth + BorderLeft)
-                {
-                    color = DefaultPalette.map(borderBuffer[source]);
-                }
-                else
-                {
-                    const auto xPixel = (x - BorderLeft);
-                    const auto yPixel = (y - BorderTop);
-
-                    uint16_t pixelAddress = 0x4000;
-                    pixelAddress |= (xPixel >> 3) & 0b11111;
-                    pixelAddress |= (yPixel & 0b00000111) << 8;
-                    pixelAddress |= (yPixel & 0b00111000) << 2;
-                    pixelAddress |= (yPixel & 0b11000000) << 5;
-                    const auto pixelData = m_ula->vramRead(pixelAddress);
-                    const bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
-
-                    const auto attribute = m_ula->vramRead(0x5800 + ((yPixel >> 3) << 5) + (xPixel >> 3));
-
-                    auto paper = (attribute >> 3) & 0x07;
-                    auto ink = attribute & 0x07;
-                    const bool bright = attribute & 0x40;
-                    if (bright)
-                    {
-                        paper += 0x08;
-                        ink += 0x08;
-                    }
-                    const bool flash = (attribute & 0x80) && invertPaperInk;
-                    color = DefaultPalette.map((pixel && !flash) || (!pixel && flash) ? ink : paper);
-                }
-
-                source++;
-                m_screenBuffer[dest++] = color.rgba;
-            }
+            m_screenBuffer[i] = m_palette[sourceBuffer[i]];
         }
     }
 }  // namespace epoch::zxspectrum

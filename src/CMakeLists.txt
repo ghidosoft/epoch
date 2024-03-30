@@ -10,3 +10,5 @@ if(WIN32)
     set_target_properties(epoch PROPERTIES WIN32_EXECUTABLE TRUE)
     target_link_options(epoch PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/ENTRY:mainCRTStartup>)
 endif()
+
+install(TARGETS epoch)

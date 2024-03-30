@@ -41,13 +41,46 @@ namespace epoch::zxspectrum
 
         if (m_y >= 0 && m_x >= 0)
         {
-            m_borderBuffer[m_y * Width + m_x] = m_border;
-            m_borderBuffer[m_y * Width + m_x + 1] = m_border;
-        }
+            if (m_y >= BorderTop && m_y < BorderTop + ScreenHeight && m_x >= BorderLeft && m_x < BorderLeft + ScreenWidth)
+            {
+                const auto xPixel = (m_x - BorderLeft);
+                const auto yPixel = (m_y - BorderTop);
+                uint16_t pixelAddress = 0;
+                pixelAddress |= (xPixel >> 3) & 0b11111;
+                pixelAddress |= (yPixel & 0b00000111) << 8;
+                pixelAddress |= (yPixel & 0b00111000) << 2;
+                pixelAddress |= (yPixel & 0b11000000) << 5;
+                const auto pixelData = m_vram[pixelAddress];
 
-        // 2 pixels per T-state
-        m_x++;
-        m_x++;
+                const auto attribute = m_vram[0x1800 + ((yPixel >> 3) << 5) + (xPixel >> 3)];
+
+                uint8_t paper = (attribute >> 3) & 0x07;
+                uint8_t ink = attribute & 0x07;
+                if (attribute & 0x40)
+                {
+                    // Bright colors
+                    paper += 0x08;
+                    ink += 0x08;
+                }
+                const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10); // flash every 16 frames
+
+                bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
+                m_screenBuffer[m_y * Width + m_x++] = (pixel && !flash) || (!pixel && flash) ? ink : paper;
+
+                pixel = (pixelData >> (7 - ((xPixel + 1) & 0b111))) & 0x01;
+                m_screenBuffer[m_y * Width + m_x++] = (pixel && !flash) || (!pixel && flash) ? ink : paper;
+            }
+            else
+            {
+                m_screenBuffer[m_y * Width + m_x++] = m_border;
+                m_screenBuffer[m_y * Width + m_x++] = m_border;
+            }
+        }
+        else
+        {
+            // 2 pixels per T-state
+            m_x += 2;
+        }
 
         if (m_x >= Width)
         {
@@ -60,7 +93,7 @@ namespace epoch::zxspectrum
             m_frameCounter++;
         }
 
-        if ((m_clockCounter & 0x01) == 0 && m_ay8910)
+        if ((m_clockCounter & 0x01) == 0)
         {
             m_ay8910->clock();
         }
@@ -77,6 +110,7 @@ namespace epoch::zxspectrum
 
         m_ramSelect = 0;
         m_vramSelect = 5;
+        m_vram = m_ram[m_vramSelect];
         m_romSelect = 0;
         m_pagingState = 0;
         m_pagingPlus3 = 0;
@@ -208,6 +242,7 @@ namespace epoch::zxspectrum
                         m_pagingState = value;
                         m_ramSelect = m_pagingState & 0x07;
                         m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                        m_vram = m_ram[m_vramSelect];
                         m_romSelect = (m_pagingState >> 4) & 0x01;
                     }
                 }
@@ -244,6 +279,7 @@ namespace epoch::zxspectrum
                         // Normal paging mode
                         m_ramSelect = m_pagingState & 0x07;
                         m_vramSelect = (m_pagingState & 0b00001000) ? 7 : 5;
+                        m_vram = m_ram[m_vramSelect];
                         m_romSelect = ((m_pagingPlus3 >> 1) & 0x02) | ((m_pagingState >> 4) & 0x01);
                     }
                 }
@@ -282,10 +318,5 @@ namespace epoch::zxspectrum
         {
             m_kempstonState &= ~(1 << button);
         }
-    }
-
-    uint8_t Ula::vramRead(const uint16_t address) const
-    {
-        return m_ram[m_vramSelect][address & 0x3fff];  // TODO: should update floating bus value?
     }
 }  // namespace epoch::zxspectrum
