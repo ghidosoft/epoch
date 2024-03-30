@@ -44,12 +44,11 @@ namespace epoch::sound
         {
             for (auto& tone : m_channels)
             {
-                const auto period = tone.period > 0 ? tone.period : 1;
                 tone.count++;
-                while (tone.count >= period)
+                while (tone.count >= tone.period)
                 {
                     tone.output = !tone.output;
-                    tone.count -= period;
+                    tone.count -= tone.period;
                 }
             }
             {
@@ -67,12 +66,12 @@ namespace epoch::sound
                 if (m_envelope.count >= m_envelope.period)
                 {
                     m_envelope.step++;
-                    if (m_envelope.step >= 128) m_envelope.step = 64;
+                    if (m_envelope.step >= EnvelopeLookupTable::Size) m_envelope.step = EnvelopeLookupTable::Size / 2;
                     m_envelope.count = 0;
                 }
                 m_envelope.volume = m_envelopeLookup.get(m_envelope.shape, m_envelope.step);
             }
-            m_counter = 16;
+            m_counter = 8;
         }
         m_counter--;
     }
@@ -86,15 +85,15 @@ namespace epoch::sound
         {
             case 0:
             case 1:
-                m_channels[0].period = m_registers[0] | ((m_registers[1] & 0x0f) << 8);
+                m_channels[0].period = std::max(m_registers[0] | ((m_registers[1] & 0x0f) << 8), 1);
                 break;
             case 2:
             case 3:
-                m_channels[1].period = m_registers[2] | ((m_registers[3] & 0x0f) << 8);
+                m_channels[1].period = std::max(m_registers[2] | ((m_registers[3] & 0x0f) << 8), 1);
                 break;
             case 4:
             case 5:
-                m_channels[2].period = m_registers[4] | ((m_registers[5] & 0x0f) << 8);
+                m_channels[2].period = std::max(m_registers[4] | ((m_registers[5] & 0x0f) << 8), 1);
                 break;
             case 6:
                 m_noise.period = std::max(m_registers[6] & 0x1f, 1);
@@ -113,15 +112,12 @@ namespace epoch::sound
                 break;
             case 11:
             case 12:
-                m_envelope.period = (m_registers[11] | (m_registers[12] << 8)) << 6;
+                m_envelope.period = std::max((m_registers[11] | (m_registers[12] << 8)), 1);
                 break;
             case 13:
-                if (m_registers[13] != 0xff)
-                {
-                    m_envelope.shape = m_registers[13] & 0x0f;
-                    m_envelope.count = 0;
-                    m_envelope.step = 0;
-                }
+                m_envelope.shape = m_registers[13] & 0x0f;
+                m_envelope.count = 0;
+                m_envelope.step = 0;
                 break;
         }
     }
@@ -130,12 +126,12 @@ namespace epoch::sound
 
     float AY8910Device::output() const
     {
-        const bool channelA =
-            (m_noise.output | m_registers[7] & 0b00001000) && (m_channels[0].output | (m_registers[7] & 0b00000001));
-        const bool channelB =
-            (m_noise.output | m_registers[7] & 0b00010000) && (m_channels[1].output | (m_registers[7] & 0b00000010));
-        const bool channelC =
-            (m_noise.output | m_registers[7] & 0b00100000) && (m_channels[2].output | (m_registers[7] & 0b00000100));
+        const bool channelA = (m_noise.output || (m_registers[7] & 0b00001000)) &&
+                              (m_channels[0].output || (m_registers[7] & 0b00000001));
+        const bool channelB = (m_noise.output || (m_registers[7] & 0b00010000)) &&
+                              (m_channels[1].output || (m_registers[7] & 0b00000010));
+        const bool channelC = (m_noise.output || (m_registers[7] & 0b00100000)) &&
+                              (m_channels[2].output || (m_registers[7] & 0b00000100));
 
         float output = 0.f;
 
@@ -159,10 +155,10 @@ namespace epoch::sound
     {
         for (auto shape = 0; shape < 16; shape++)
         {
-            bool attack = shape & 4;
-            bool hold = false;
-            int dir = attack ? 1 : -1;
-            int vol = attack ? -1 : 32;
+            const bool attack = shape & 0x04;
+            auto hold = false;
+            auto dir = attack ? 1 : -1;
+            auto vol = attack ? -1 : 32;
             for (auto i = 0; i < 128; i++)
             {
                 if (!hold)
@@ -170,11 +166,14 @@ namespace epoch::sound
                     vol += dir;
                     if (vol < 0 || vol >= 32)
                     {
-                        if (shape & 8)
+                        if (shape & 0x08)
                         {
-                            if (shape & 2) dir = -dir;
+                            if (shape & 0x02)
+                            {
+                                dir = -dir;
+                            }
                             vol = (dir > 0) ? 0 : 31;
-                            if (shape & 1)
+                            if (shape & 0x01)
                             {
                                 hold = true;
                                 vol = (dir > 0) ? 31 : 0;
