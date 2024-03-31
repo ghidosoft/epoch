@@ -70,18 +70,21 @@ namespace epoch::frontend
         {
             {
                 PROFILE_BLOCK(&m_profiling.emulation[m_profiling.index]);
-                if (m_running)
+                if (const auto samples = m_audio->neededSamples(); samples > 0)
                 {
-                    const auto samples = m_audio->neededSamples();
-                    if (samples > 0)
+                    m_audioBuffer.resize(samples);
+                    if (m_running)
                     {
-                        m_audioBuffer.resize(samples);
                         for (unsigned long i = 0; i < samples; i++)
                         {
                             m_audioBuffer[i] = m_emulator->generateNextAudioSample();
                         }
-                        m_audio->push(m_audioBuffer);
                     }
+                    else
+                    {
+                        std::memset(m_audioBuffer.data(), 0, sizeof(m_audioBuffer[0]) * m_audioBuffer.size());
+                    }
+                    m_audio->push(m_audioBuffer);
                 }
             }
             
