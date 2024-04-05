@@ -4,6 +4,7 @@ add_library(epoch_core
     "src/Emulator.cpp" "src/Emulator.hpp"
     "src/Keyboard.hpp"
     "src/Profiler.hpp"
+    "src/SoundSample.hpp"
     "src/Tape.hpp"
 )
 

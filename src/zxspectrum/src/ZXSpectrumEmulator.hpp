@@ -56,7 +56,7 @@ namespace epoch::zxspectrum
 
         [[nodiscard]] std::span<const uint32_t> screenBuffer() override { return m_screenBuffer; }
 
-        [[nodiscard]] float audioOut() const override;
+        [[nodiscard]] SoundSample audioOut() const override;
 
         void keyEvent(Key key, KeyAction action) override;
 

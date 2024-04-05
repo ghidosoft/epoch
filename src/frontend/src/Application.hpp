@@ -63,7 +63,6 @@ namespace epoch::frontend
         int run();
 
         static constexpr auto AudioSampleRate = 48000;
-        static constexpr auto AudioChannels = 1;
 
     private:
         void init();

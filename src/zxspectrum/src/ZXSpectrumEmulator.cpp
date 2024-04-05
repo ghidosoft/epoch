@@ -77,7 +77,7 @@ namespace epoch::zxspectrum
 
     void ZXSpectrumEmulator::save(const std::string& path) { epoch::zxspectrum::save(path, this); }
 
-    float ZXSpectrumEmulator::audioOut() const { return m_ula->audioOutput(); }
+    SoundSample ZXSpectrumEmulator::audioOut() const { return m_ula->audioOutput(); }
 
     void ZXSpectrumEmulator::keyEvent(const Key key, const KeyAction action)
     {

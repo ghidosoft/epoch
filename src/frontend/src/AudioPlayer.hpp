@@ -28,7 +28,7 @@ namespace epoch::frontend
     class AudioPlayer final
     {
     public:
-        AudioPlayer(int sampleRate, int channels);
+        explicit AudioPlayer(int sampleRate);
         ~AudioPlayer();
 
     public:

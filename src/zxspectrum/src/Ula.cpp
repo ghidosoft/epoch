@@ -41,7 +41,8 @@ namespace epoch::zxspectrum
 
         if (m_y >= 0 && m_x >= 0)
         {
-            if (m_y >= BorderTop && m_y < BorderTop + ScreenHeight && m_x >= BorderLeft && m_x < BorderLeft + ScreenWidth)
+            if (m_y >= BorderTop && m_y < BorderTop + ScreenHeight && m_x >= BorderLeft &&
+                m_x < BorderLeft + ScreenWidth)
             {
                 const auto xPixel = (m_x - BorderLeft);
                 const auto yPixel = (m_y - BorderTop);
@@ -62,7 +63,7 @@ namespace epoch::zxspectrum
                     paper += 0x08;
                     ink += 0x08;
                 }
-                const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10); // flash every 16 frames
+                const bool flash = (attribute & 0x80) && (m_frameCounter & 0x10);  // flash every 16 frames
 
                 bool pixel = (pixelData >> (7 - (xPixel & 0b111))) & 0x01;
                 m_screenBuffer[m_y * Width + m_x++] = (pixel && !flash) || (!pixel && flash) ? ink : paper;
@@ -288,9 +289,10 @@ namespace epoch::zxspectrum
         }
     }
 
-    float Ula::audioOutput() const
+    SoundSample Ula::audioOutput() const
     {
-        return (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f) - .8f * m_ay8910->output();
+        return SoundSample{(static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f)} -
+               m_ay8910->output() * .8f;
     }
 
     void Ula::setKeyState(const int row, const int col, const bool state)

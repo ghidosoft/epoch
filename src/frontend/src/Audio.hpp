@@ -32,7 +32,7 @@ namespace epoch::frontend
     class AudioStream final
     {
     public:
-        AudioStream(int sampleRate, int channels);
+        explicit AudioStream(int sampleRate);
         ~AudioStream();
 
     public:
@@ -77,6 +77,6 @@ namespace epoch::frontend
         AudioContext& operator=(const AudioContext& other) = delete;
         AudioContext& operator=(AudioContext&& other) noexcept = delete;
     };
-}
+}  // namespace epoch::frontend
 
 #endif

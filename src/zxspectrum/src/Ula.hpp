@@ -20,6 +20,8 @@
 #include "Constants.hpp"
 #include "Z80Interface.hpp"
 
+#include <epoch/core.hpp>
+
 #include <array>
 #include <cstdint>
 #include <memory>
@@ -73,7 +75,7 @@ namespace epoch::zxspectrum
         }
         [[nodiscard]] bool frameReady() const { return m_y == -VerticalRetrace && m_x == -HorizontalRetrace; }
 
-        [[nodiscard]] float audioOutput() const;
+        [[nodiscard]] SoundSample audioOutput() const;
         [[nodiscard]] uint8_t border() const { return m_border; }
 
         void setKeyState(int row, int col, bool state);

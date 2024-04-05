@@ -64,30 +64,30 @@ void executeTest(const TestConfiguration configuration, const unsigned long dura
     double sampleCount = 0.;
 
     {
-        const epoch::frontend::AudioPlayer player{48000, 1};
+        const epoch::frontend::AudioPlayer player{48000};
 
         const auto startTime = std::chrono::system_clock::now();
         std::vector<float> samples{};
 
         do
         {
-            const auto count = player.neededSamples();
-            if (count > 0)
+            if (const unsigned long count = player.neededSamples(); count > 0)
             {
-                samples.resize(count);
-                for (unsigned long i = 0; i < count; ++i)
+                samples.resize(count * 2);
+                auto i = 0;
+                for (unsigned long x = 0; x < count; ++x)
                 {
                     while (ticks < (sampleCount * 1764000. / 48000.))
                     {
                         device.clock();
                         ticks++;
                     }
-                    samples[i] = device.output();
+                    samples[i++] = device.output().left;
+                    samples[i++] = device.output().right;
                     sampleCount++;
                 }
                 player.push(samples);
             }
-
         } while (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime)
                      .count() < duration);
     }

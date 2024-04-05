@@ -124,7 +124,7 @@ namespace epoch::sound
 
     uint8_t AY8910Device::data() const { return m_registers[m_address]; }
 
-    float AY8910Device::output() const
+    SoundSample AY8910Device::output() const
     {
         const bool channelA = (m_noise.output || (m_registers[7] & 0b00001000)) &&
                               (m_channels[0].output || (m_registers[7] & 0b00000001));
@@ -133,22 +133,22 @@ namespace epoch::sound
         const bool channelC = (m_noise.output || (m_registers[7] & 0b00100000)) &&
                               (m_channels[2].output || (m_registers[7] & 0b00000100));
 
-        float output = 0.f;
+        SoundSample output{};
 
         if (channelA)
         {
-            output += m_channels[0].envelope ? m_envelope.volume : m_channels[0].volume;
+            output += (m_channels[0].envelope ? m_envelope.volume : m_channels[0].volume) * m_channelMix[0];
         }
         if (channelB)
         {
-            output += m_channels[1].envelope ? m_envelope.volume : m_channels[1].volume;
+            output += (m_channels[1].envelope ? m_envelope.volume : m_channels[1].volume) * m_channelMix[1];
         }
         if (channelC)
         {
-            output += m_channels[2].envelope ? m_envelope.volume : m_channels[2].volume;
+            output += (m_channels[2].envelope ? m_envelope.volume : m_channels[2].volume) * m_channelMix[2];
         }
 
-        return output / 3.f;
+        return output * .333333333f;
     }
 
     AY8910Device::EnvelopeLookupTable::EnvelopeLookupTable()

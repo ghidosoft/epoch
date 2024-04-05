@@ -72,12 +72,15 @@ namespace epoch::frontend
                 PROFILE_BLOCK(&m_profiling.emulation[m_profiling.index]);
                 if (const auto samples = m_audio->neededSamples(); samples > 0)
                 {
-                    m_audioBuffer.resize(samples);
+                    m_audioBuffer.resize(samples * 2);
                     if (m_running)
                     {
-                        for (unsigned long i = 0; i < samples; i++)
+                        unsigned long i = 0;
+                        for (unsigned long x = 0; x < samples; ++x)
                         {
-                            m_audioBuffer[i] = m_emulator->generateNextAudioSample();
+                            const auto sample = m_emulator->generateNextAudioSample();
+                            m_audioBuffer[i++] = sample.left;
+                            m_audioBuffer[i++] = sample.right;
                         }
                     }
                     else
@@ -87,7 +90,7 @@ namespace epoch::frontend
                     m_audio->push(m_audioBuffer);
                 }
             }
-            
+
             auto currentTime = m_window->time();
             if (currentTime <= m_time) currentTime = m_time + 0.00001;
             m_deltaTime = currentTime - m_time;
@@ -96,7 +99,7 @@ namespace epoch::frontend
             {
                 PROFILE_BLOCK(&m_profiling.render[m_profiling.index]);
                 m_context->updateScreen(m_emulator->screenBuffer());
-                render();   
+                render();
             }
 
 #ifdef EPOCH_PROFILER
@@ -124,10 +127,11 @@ namespace epoch::frontend
         });
         m_context = std::make_unique<GraphicContext>();
         m_gui = std::make_unique<Gui>(m_settings->current().ui.imgui.c_str());
-        m_audio = std::make_unique<AudioPlayer>(AudioSampleRate, AudioChannels);
+        m_audio = std::make_unique<AudioPlayer>(AudioSampleRate);
 
         m_window->setCharCallback([&](const unsigned int c) { m_gui->charEvent(c); });
-        m_window->setContentScaleCallback([&](const float xscale, const float yscale) { m_gui->contentScaleEvent(std::max(xscale, yscale)); });
+        m_window->setContentScaleCallback([&](const float xscale, const float yscale)
+                                          { m_gui->contentScaleEvent(std::max(xscale, yscale)); });
         m_window->setCursorEnterCallback([&](const bool entered) { m_gui->cursorEnterEvent(entered); });
         m_window->setCursorPosCallback([&](const float x, const float y) { m_gui->cursorPosEvent(x, y); });
         m_window->setFileDropCallback([&](const char* path) { m_emulator->load(path); });

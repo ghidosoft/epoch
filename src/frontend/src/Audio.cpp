@@ -39,14 +39,14 @@
 
 namespace epoch::frontend
 {
-    AudioStream::AudioStream(const int sampleRate, const int channels)
+    AudioStream::AudioStream(const int sampleRate)
     {
         const auto device = Pa_GetDefaultOutputDevice();
         const auto info = Pa_GetDeviceInfo(device);
         assert(info);
         const PaStreamParameters outputParameters{
             .device = device,
-            .channelCount = channels,
+            .channelCount = 2,
             .sampleFormat = paFloat32,
             .suggestedLatency = info->defaultLowOutputLatency,
         };
@@ -71,7 +71,7 @@ namespace epoch::frontend
     int AudioStream::callback(float* outputBuffer, const unsigned long framesPerBuffer,
                               const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags)
     {
-        m_buffer.read(outputBuffer, framesPerBuffer);
+        m_buffer.read(outputBuffer, framesPerBuffer * 2);
         return paContinue;
     }
 

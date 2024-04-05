@@ -19,6 +19,8 @@
 
 #include "SoundDevice.hpp"
 
+#include <epoch/core.hpp>
+
 #include <array>
 #include <cstdint>
 
@@ -37,7 +39,20 @@ namespace epoch::sound
         void data(uint8_t data);
         [[nodiscard]] uint8_t data() const;
 
-        [[nodiscard]] float output() const;
+        [[nodiscard]] SoundSample output() const;
+
+        using Mix = std::array<SoundSample, 3>;
+
+        static constexpr Mix MixABC = {
+            SoundSample{1, 0},
+            SoundSample{1, 1},
+            SoundSample{0, 1},
+        };
+        static constexpr Mix MixACB = {
+            SoundSample{1, 0},
+            SoundSample{0, 1},
+            SoundSample{1, 1},
+        };
 
     private:
         struct Channel final
@@ -84,6 +99,7 @@ namespace epoch::sound
         uint8_t m_address{};
         uint8_t m_data{};
         std::array<Channel, 3> m_channels{};
+        std::array<SoundSample, 3> m_channelMix{MixABC};
         Noise m_noise{};
         Envelope m_envelope{};
         EnvelopeLookupTable m_envelopeLookup{};

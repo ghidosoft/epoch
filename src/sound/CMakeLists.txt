@@ -7,7 +7,7 @@ add_library(epoch_sound
 
 target_include_directories(epoch_sound INTERFACE include)
 
-# target_link_libraries(epoch_sound PRIVATE Epoch::Core)
+target_link_libraries(epoch_sound PUBLIC Epoch::Core)
 
 add_library(Epoch::Sound ALIAS epoch_sound)
 

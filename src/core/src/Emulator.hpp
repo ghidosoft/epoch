@@ -18,6 +18,7 @@
 #define SRC_EPOCH_CORE_EMULATOR_HPP_
 
 #include "Keyboard.hpp"
+#include "SoundSample.hpp"
 
 #include <span>
 #include <string>
@@ -66,11 +67,11 @@ namespace epoch
         virtual void save(const std::string& path) = 0;
 
         void frame();
-        float generateNextAudioSample();
+        SoundSample generateNextAudioSample();
 
         [[nodiscard]] virtual std::span<const uint32_t> screenBuffer() = 0;
 
-        [[nodiscard]] virtual float audioOut() const = 0;
+        [[nodiscard]] virtual SoundSample audioOut() const = 0;
         void audioIn(const float sample) { m_audioIn = sample; }
 
         virtual void keyEvent(Key key, KeyAction action) {}

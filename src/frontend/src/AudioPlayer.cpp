@@ -20,9 +20,9 @@
 
 namespace epoch::frontend
 {
-    AudioPlayer::AudioPlayer(int sampleRate, int channels) : m_audioContext{std::make_unique<AudioContext>()}
+    AudioPlayer::AudioPlayer(int sampleRate) : m_audioContext{std::make_unique<AudioContext>()}
     {
-        m_stream = std::make_unique<AudioStream>(sampleRate, channels);
+        m_stream = std::make_unique<AudioStream>(sampleRate);
         m_stream->start();
     }
 

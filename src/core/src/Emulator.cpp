@@ -45,7 +45,7 @@ namespace epoch
         }
     }
 
-    float Emulator::generateNextAudioSample()
+    SoundSample Emulator::generateNextAudioSample()
     {
         constexpr auto sampleDuration = 1.0 / 48000.0;  // TODO: hardcoded sample rate
         while (m_elapsed < sampleDuration)

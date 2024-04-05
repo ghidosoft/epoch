@@ -20,6 +20,7 @@
 #include "../../src/Emulator.hpp"
 #include "../../src/Keyboard.hpp"
 #include "../../src/Profiler.hpp"
+#include "../../src/SoundSample.hpp"
 #include "../../src/Tape.hpp"
 
 #endif
