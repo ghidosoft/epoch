@@ -95,7 +95,6 @@ namespace epoch::sound
 
         std::array<uint8_t, 16> m_registers{};
         uint8_t m_counter{};
-        uint8_t m_envelopeCounter{};
         uint8_t m_address{};
         uint8_t m_data{};
         std::array<Channel, 3> m_channels{};
