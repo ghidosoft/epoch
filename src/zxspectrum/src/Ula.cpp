@@ -291,8 +291,8 @@ namespace epoch::zxspectrum
 
     SoundSample Ula::audioOutput() const
     {
-        return SoundSample{(static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f)} -
-               m_ay8910->output() * .8f;
+        return m_ay8910->output() * .8f -
+               (static_cast<float>(m_ear) * .8f + static_cast<float>(m_mic || m_audioIn) * .02f);
     }
 
     void Ula::setKeyState(const int row, const int col, const bool state)

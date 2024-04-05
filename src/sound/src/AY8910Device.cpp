@@ -151,6 +151,8 @@ namespace epoch::sound
         return output * .333333333f;
     }
 
+    void AY8910Device::stereoMix(StereoMix mix) { m_channelMix = std::move(mix); }
+
     AY8910Device::EnvelopeLookupTable::EnvelopeLookupTable()
     {
         for (auto shape = 0; shape < 16; shape++)

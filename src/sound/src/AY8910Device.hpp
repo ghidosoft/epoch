@@ -29,6 +29,9 @@ namespace epoch::sound
     class AY8910Device : public SoundDevice
     {
     public:
+        using StereoMix = std::array<SoundSample, 3>;
+
+    public:
         explicit AY8910Device();
 
     public:
@@ -41,14 +44,19 @@ namespace epoch::sound
 
         [[nodiscard]] SoundSample output() const;
 
-        using Mix = std::array<SoundSample, 3>;
+        void stereoMix(StereoMix mix);
 
-        static constexpr Mix MixABC = {
+        static constexpr StereoMix Mono = {
+            SoundSample{1},
+            SoundSample{1},
+            SoundSample{1},
+        };
+        static constexpr StereoMix StereoABC = {
             SoundSample{1, 0},
             SoundSample{1, 1},
             SoundSample{0, 1},
         };
-        static constexpr Mix MixACB = {
+        static constexpr StereoMix StereoACB = {
             SoundSample{1, 0},
             SoundSample{0, 1},
             SoundSample{1, 1},
@@ -98,7 +106,7 @@ namespace epoch::sound
         uint8_t m_address{};
         uint8_t m_data{};
         std::array<Channel, 3> m_channels{};
-        std::array<SoundSample, 3> m_channelMix{MixABC};
+        StereoMix m_channelMix{StereoABC};
         Noise m_noise{};
         Envelope m_envelope{};
         EnvelopeLookupTable m_envelopeLookup{};
