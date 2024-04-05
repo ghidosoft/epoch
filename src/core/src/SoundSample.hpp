@@ -76,6 +76,18 @@ namespace epoch
             return lhs;
         }
 
+        SoundSample& operator-=(const float rhs)
+        {
+            left -= rhs;
+            right -= rhs;
+            return *this;
+        }
+        friend SoundSample operator-(SoundSample lhs, const float rhs)
+        {
+            lhs -= rhs;
+            return lhs;
+        }
+
         SoundSample& operator*=(const float rhs)
         {
             left *= rhs;
