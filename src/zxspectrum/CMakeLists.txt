@@ -2,6 +2,7 @@ add_library(epoch_zxspectrum
     "include/epoch/zxspectrum.hpp"
 
     "src/Constants.hpp"
+    "src/FloppyUpd765.cpp" "src/FloppyUpd765.hpp"
     "src/Io.cpp" "src/Io.hpp"
     "src/IoSnapshot.cpp" "src/IoSnapshot.hpp"
     "src/IoTzx.cpp" "src/IoTzx.hpp"

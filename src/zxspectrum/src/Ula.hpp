@@ -34,6 +34,8 @@ namespace epoch::sound
 
 namespace epoch::zxspectrum
 {
+    class FloppyUpd765;
+
     enum class UlaType
     {
         zx48k,
@@ -89,6 +91,7 @@ namespace epoch::zxspectrum
         std::array<MemoryBank, 8> m_ram{};
 
         std::unique_ptr<sound::AY8910Device> m_ay8910{};
+        std::unique_ptr<FloppyUpd765> m_floppy{};
 
         uint8_t m_ramSelect{0};
         uint8_t m_vramSelect{5};

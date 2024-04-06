@@ -16,6 +16,8 @@
 
 #include "Ula.hpp"
 
+#include "FloppyUpd765.hpp"
+
 #include <epoch/sound.hpp>
 
 #include <cassert>
@@ -27,6 +29,7 @@ namespace epoch::zxspectrum
     Ula::Ula(const UlaType type, const std::span<const uint8_t> rom)
         : m_type{type},
           m_ay8910{std::make_unique<sound::AY8910Device>()},
+          m_floppy{std::make_unique<FloppyUpd765>()},
           m_keyboardState{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
     {
         assert(rom.size() <= sizeof(m_rom));
@@ -121,6 +124,7 @@ namespace epoch::zxspectrum
         m_x = -HorizontalRetrace;
         m_y = -VerticalRetrace;
 
+        m_floppy->reset();
         m_ay8910->reset();
     }
 
@@ -190,6 +194,14 @@ namespace epoch::zxspectrum
         {
             return m_ay8910->data();
         }
+        else if (port == 0x2ffd)
+        {
+            return m_floppy->status();
+        }
+        else if (port == 0x3ffd)
+        {
+            return m_floppy->read();
+        }
         switch (m_type)
         {
             case UlaType::zx48k:
@@ -230,6 +242,10 @@ namespace epoch::zxspectrum
         else if ((port & 0b1100000000000010) == 0b1000000000000000)
         {
             m_ay8910->data(value);
+        }
+        else if (port == 0x3ffd)
+        {
+            m_floppy->write(value);
         }
         switch (m_type)
         {
