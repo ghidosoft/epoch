@@ -34,9 +34,9 @@ namespace epoch::zxspectrum
         StreamReader& operator=(StreamReader&& other) noexcept = delete;
 
     public:
-        uint8_t readUInt8() const;
-        uint16_t readUInt16LE() const;
-        uint16_t readUInt16BE() const;
+        [[nodiscard]] uint8_t readUInt8() const;
+        [[nodiscard]] uint16_t readUInt16LE() const;
+        [[nodiscard]] uint16_t readUInt16BE() const;
 
     private:
         std::istream& m_stream;

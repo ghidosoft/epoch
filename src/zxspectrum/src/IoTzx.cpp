@@ -22,8 +22,10 @@
 
 namespace epoch::zxspectrum
 {
-    void generatePilot(std::vector<std::size_t>& pulses, const std::size_t pulseLength, const std::size_t pulseCount,
-                       const std::size_t sync1, const std::size_t sync2)
+    using pulse_t = PulsesTape::pulse_t;
+
+    void generatePilot(std::vector<pulse_t>& pulses, const pulse_t pulseLength, const pulse_t pulseCount,
+                       const pulse_t sync1, const pulse_t sync2)
     {
         for (auto i = 0u; i < pulseCount; i++)
         {
@@ -33,8 +35,8 @@ namespace epoch::zxspectrum
         pulses.push_back(sync2);
     }
 
-    void generateDataBlock(std::vector<std::size_t>& pulses, const std::span<uint8_t> data, const std::size_t zero,
-                           const std::size_t one, const int bitsLastByte = 8)
+    void generateDataBlock(std::vector<pulse_t>& pulses, const std::span<uint8_t> data, const pulse_t zero,
+                           const pulse_t one, const int bitsLastByte = 8)
     {
         assert(bitsLastByte > 0 && bitsLastByte <= 8);
         if (data.empty()) return;
@@ -55,7 +57,7 @@ namespace epoch::zxspectrum
         }
     }
 
-    void generatePause(std::vector<std::size_t>& pulses, const unsigned long lengthMs)
+    void generatePause(std::vector<pulse_t>& pulses, const pulse_t lengthMs)
     {
         if (lengthMs > 0)
         {
@@ -65,7 +67,7 @@ namespace epoch::zxspectrum
         }
     }
 
-    TzxReader::TzxReader(std::istream& stream, std::vector<std::size_t>& pulses)
+    TzxReader::TzxReader(std::istream& stream, std::vector<pulse_t>& pulses)
         : m_stream{stream}, m_reader{stream}, m_pulses{pulses}
     {
     }
@@ -122,7 +124,7 @@ namespace epoch::zxspectrum
                 }
                 else
                 {
-                    // TODO: Stop the tape
+                    m_pulses.push_back(PulsesTape::StopTape);
                 }
                 break;
             case 0x21:
@@ -134,7 +136,7 @@ namespace epoch::zxspectrum
                 break;
             case 0x24:
                 // Loop start
-                assert(m_loopCount == 0);  // Do not nest loops
+                if (m_loopCount != 0) throw std::runtime_error("Cannot nest loops.");
                 m_loopCount = m_reader.readUInt16LE();
                 m_loopPos = m_stream.tellg();
                 break;
@@ -243,7 +245,7 @@ namespace epoch::zxspectrum
         return static_cast<uint32_t>(b3 << 16 | b2 << 8 | b1);
     }
 
-    void loadTzx(std::istream& is, std::vector<std::size_t>& pulses)
+    void loadTzx(std::istream& is, std::vector<pulse_t>& pulses)
     {
         TzxReader reader{is, pulses};
         reader.read();

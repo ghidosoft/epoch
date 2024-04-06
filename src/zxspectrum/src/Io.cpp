@@ -32,9 +32,9 @@
 
 namespace epoch::zxspectrum
 {
-    std::vector<std::size_t> loadTap(const std::filesystem::path& path)
+    std::vector<PulsesTape::pulse_t> loadTap(const std::filesystem::path& path)
     {
-        std::vector<std::size_t> result{};
+        std::vector<PulsesTape::pulse_t> result{};
 
         std::ifstream is{path, std::ios::binary};
         const StreamReader reader{is};
@@ -93,9 +93,9 @@ namespace epoch::zxspectrum
         return result;
     }
 
-    std::vector<std::size_t> loadTzx(const std::filesystem::path& path)
+    std::vector<PulsesTape::pulse_t> loadTzx(const std::filesystem::path& path)
     {
-        std::vector<std::size_t> result{};
+        std::vector<PulsesTape::pulse_t> result{};
 
         std::ifstream is(path, std::ios::binary);
 

@@ -19,6 +19,7 @@
 
 #include <epoch/core.hpp>
 
+#include <limits>
 #include <vector>
 
 namespace epoch::zxspectrum
@@ -26,19 +27,30 @@ namespace epoch::zxspectrum
     class PulsesTape final : public Tape
     {
     public:
-        explicit PulsesTape(const std::initializer_list<std::size_t> pulses) : m_pulses{pulses} {}
-        explicit PulsesTape(std::vector<std::size_t> other) : m_pulses{std::move(other)} {}
+        using pulse_t = int64_t;
+
+        static constexpr pulse_t StopTape = -1;
+
+    public:
+        explicit PulsesTape(const std::initializer_list<pulse_t> pulses) : m_pulses{pulses} { next(); }
+        explicit PulsesTape(std::vector<pulse_t> other) : m_pulses{std::move(other)} { next(); }
 
         [[nodiscard]] bool clock()
         {
             if (completed()) return false;
-            if (m_pulses[m_position] == 0)
+            if (m_current > 0)
             {
-                m_position++;
+                m_current--;
             }
-            else
+            else if (m_current == 0)
             {
-                m_pulses[m_position]--;
+                next();
+            }
+            else if (m_current == StopTape)
+            {
+                next();
+                stop();
+                return (m_position - 1) & 1;
             }
             return m_position & 1;
         }
@@ -49,10 +61,20 @@ namespace epoch::zxspectrum
         [[nodiscard]] bool playing() const override { return m_playing; }
 
     private:
-        std::size_t m_position{};
-        std::vector<std::size_t> m_pulses{};
+        std::size_t m_position{std::numeric_limits<size_t>::max()};
+        std::vector<pulse_t> m_pulses;
+        pulse_t m_current{};
 
         bool m_playing{true};
+
+        void next()
+        {
+            m_position++;
+            if (completed() == false)
+            {
+                m_current = m_pulses[m_position];
+            }
+        }
     };
 }  // namespace epoch::zxspectrum
 
