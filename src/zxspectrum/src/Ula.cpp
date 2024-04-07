@@ -194,11 +194,11 @@ namespace epoch::zxspectrum
         {
             return m_ay8910->data();
         }
-        else if (port == 0x2ffd)
+        else if ((port & 0b1111000000000010) == 0b0010000000000000)
         {
             return m_floppy->status();
         }
-        else if (port == 0x3ffd)
+        else if ((port & 0b1111000000000010) == 0b0011000000000000)
         {
             return m_floppy->read();
         }
@@ -243,7 +243,7 @@ namespace epoch::zxspectrum
         {
             m_ay8910->data(value);
         }
-        else if (port == 0x3ffd)
+        else if ((port & 0b1111000000000010) == 0b0011000000000000)
         {
             m_floppy->write(value);
         }
