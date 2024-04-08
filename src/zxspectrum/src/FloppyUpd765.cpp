@@ -20,6 +20,8 @@
 
 namespace epoch::zxspectrum
 {
+    void FloppyDrive::seek(const uint8_t cylinder) { m_cylinder = cylinder; }
+
     void FloppyDrive::load(std::shared_ptr<FloppyImage> image) { m_image = std::move(image); }
 
     void FloppyDrive::eject() { load(nullptr); }
@@ -32,6 +34,7 @@ namespace epoch::zxspectrum
         m_input.clear();
         m_drives = {};
         m_lastDrive = 0;
+        m_drives[0].load(std::make_shared<FloppyImage>(std::vector<uint8_t>{0, 0, 0}));
     }
 
     uint8_t FloppyUpd765::read()
@@ -98,6 +101,14 @@ namespace epoch::zxspectrum
                     finishCommand();
                 }
             }
+            else if (m_input[0] == 0x0f)
+            {
+                if (m_input.size() == 3)
+                {
+                    seek();
+                    finishCommand();
+                }
+            }
             else
             {
                 invalid();
@@ -136,13 +147,12 @@ namespace epoch::zxspectrum
         if (m_drives[m_lastDrive].hasImage())
         {
             m_output.push_back(0b00100000 | m_lastDrive);  // ST0
-            m_output.push_back(0x00);                      // Physical track number
         }
         else
         {
             m_output.push_back(0b11100000 | m_lastDrive);  // ST0
-            m_output.push_back(0x00);                      // Physical track number
         }
+        m_output.push_back(m_drives[m_lastDrive].cylinder());  // Physical track number
     }
 
     void FloppyUpd765::readId()
@@ -151,10 +161,13 @@ namespace epoch::zxspectrum
         // TODO
     }
 
-    void FloppyUpd765::invalid()
+    void FloppyUpd765::seek()
     {
-        // TODO
+        const uint8_t drive = m_input[1] & 0x03;
+        m_drives[drive].seek(m_input[2]);
     }
+
+    void FloppyUpd765::invalid() { m_output.push_back(0x80); }
 
     void FloppyUpd765::finishCommand()
     {

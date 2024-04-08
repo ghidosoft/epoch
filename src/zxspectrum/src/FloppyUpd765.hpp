@@ -75,13 +75,18 @@ namespace epoch::zxspectrum
     class FloppyDrive final
     {
     public:
+        void seek(uint8_t cylinder);
         void load(std::shared_ptr<FloppyImage> image);
         void eject();
 
+        [[nodiscard]] uint8_t cylinder() const { return m_cylinder; }
+        [[nodiscard]] uint8_t track() const { return m_track; }
         [[nodiscard]] bool hasImage() const { return m_image != nullptr; }
 
     private:
         std::shared_ptr<FloppyImage> m_image{};
+        uint8_t m_cylinder{};
+        uint8_t m_track{};
     };
 
     class FloppyUpd765 final
@@ -117,6 +122,7 @@ namespace epoch::zxspectrum
         void recalibrate();
         void senseInterruptStatus();
         void readId();
+        void seek();
         void invalid();
 
         void finishCommand();
