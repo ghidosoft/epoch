@@ -16,18 +16,149 @@
 
 #include "FloppyUpd765.hpp"
 
+#include <cassert>
+
 namespace epoch::zxspectrum
 {
-    void FloppyUpd765::reset() { m_statusRegister = {}; }
+    void FloppyDrive::load(std::shared_ptr<FloppyImage> image) { m_image = std::move(image); }
+
+    void FloppyDrive::eject() { load(nullptr); }
+
+    FloppyUpd765::FloppyUpd765() { m_input.reserve(9); }
+
+    void FloppyUpd765::reset()
+    {
+        m_statusRegister = {};
+        m_input.clear();
+        m_drives = {};
+        m_lastDrive = 0;
+    }
 
     uint8_t FloppyUpd765::read()
     {
-        // TODO
-        return 0;
+        uint8_t result = 0;
+        if (m_statusRegister.dio() == true)
+        {
+            result = m_output.back();
+            m_output.pop_back();
+            if (m_output.empty())
+            {
+                // No more data, set write mode
+                m_statusRegister.dio(false);
+                m_statusRegister.rqm(true);
+            }
+        }
+        return result;
     }
 
-    void FloppyUpd765::write(uint8_t data)
+    void FloppyUpd765::write(const uint8_t data)
+    {
+        if (m_statusRegister.dio() == false)
+        {
+            m_input.push_back(data);
+            // TODO: parse (and execute) command
+
+            if (m_input[0] == 0x03)
+            {
+                if (m_input.size() == 3)
+                {
+                    specify();
+                    finishCommand();
+                }
+            }
+            else if (m_input[0] == 0x04)
+            {
+                if (m_input.size() == 2)
+                {
+                    senseDriveStatus();
+                    finishCommand();
+                }
+            }
+            else if (m_input[0] == 0x07)
+            {
+                if (m_input.size() == 2)
+                {
+                    recalibrate();
+                    finishCommand();
+                }
+            }
+            else if (m_input[0] == 0x08)
+            {
+                if (m_input.size() == 1)
+                {
+                    senseInterruptStatus();
+                    finishCommand();
+                }
+            }
+            else if (m_input[0] == 0x0a)
+            {
+                if (m_input.size() == 2)
+                {
+                    readId();
+                    finishCommand();
+                }
+            }
+            else
+            {
+                invalid();
+                finishCommand();
+            }
+        }
+    }
+
+    void FloppyUpd765::load(std::shared_ptr<FloppyImage> image) { m_drives[0].load(std::move(image)); }
+
+    void FloppyUpd765::eject() { m_drives[0].eject(); }
+
+    void FloppyUpd765::specify()
+    {
+        // Only Non-DMA mode supported
+        assert((m_input[2] & 0x01) == 0x01);
+    }
+
+    void FloppyUpd765::senseDriveStatus()
+    {
+        const uint8_t drive = m_input[1] & 0x03;
+        if (m_drives[drive].hasImage())
+        {
+            m_output.push_back(0b00110000 | drive);
+        }
+        else
+        {
+            m_output.push_back(0b00101000 | drive);
+        }
+    }
+
+    void FloppyUpd765::recalibrate() { m_lastDrive = m_input[1] & 0x03; }
+
+    void FloppyUpd765::senseInterruptStatus()
+    {
+        if (m_drives[m_lastDrive].hasImage())
+        {
+            m_output.push_back(0b00100000 | m_lastDrive);  // ST0
+            m_output.push_back(0x00);                      // Physical track number
+        }
+        else
+        {
+            m_output.push_back(0b11100000 | m_lastDrive);  // ST0
+            m_output.push_back(0x00);                      // Physical track number
+        }
+    }
+
+    void FloppyUpd765::readId()
+    {
+        const uint8_t drive = m_input[1] & 0x03;
+        // TODO
+    }
+
+    void FloppyUpd765::invalid()
     {
         // TODO
+    }
+
+    void FloppyUpd765::finishCommand()
+    {
+        m_input.clear();
+        m_statusRegister.dio(m_output.empty() == false);
     }
 }  // namespace epoch::zxspectrum
