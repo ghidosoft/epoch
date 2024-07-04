@@ -25,7 +25,7 @@ FetchContent_MakeAvailable(googletest)
 FetchContent_Declare(
     imgui
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    URL https://github.com/ocornut/imgui/archive/v1.90.4-docking.zip
+    URL https://github.com/ocornut/imgui/archive/v1.90.9-docking.zip
 )
 FetchContent_GetProperties(imgui)
 if(NOT imgui_POPULATED)
@@ -34,9 +34,7 @@ if(NOT imgui_POPULATED)
     file(GLOB IMGUI_SOURCES ${imgui_SOURCE_DIR}/*.cpp)
     file(GLOB IMGUI_HEADERS ${imgui_SOURCE_DIR}/*.h)
     add_library(imgui STATIC ${IMGUI_SOURCES} ${IMGUI_SOURCES})
-    # add_definitions(-DIMGUI_IMPL_OPENGL_LOADER_GLAD)
     target_include_directories(imgui PUBLIC ${IMGUI_INCLUDE_DIR})
-    # target_link_libraries(imgui ${OPENGL_LIBRARIES} glfw glad)
 endif()
 
 FetchContent_Declare(
