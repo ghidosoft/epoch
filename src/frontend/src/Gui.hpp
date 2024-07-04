@@ -21,6 +21,7 @@
 
 #include <memory>
 
+struct ImFont;
 struct ImGuiContext;
 
 namespace epoch
@@ -70,6 +71,7 @@ namespace epoch::frontend
         GLuint m_fontTexture{};
 
         ImGuiContext* m_context{};
+        ImFont* m_font{};
 
         float m_lastMouseX{}, m_lastMouseY{};
 

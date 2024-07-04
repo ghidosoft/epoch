@@ -16,6 +16,7 @@
 
 #include "Gui.hpp"
 
+#include "Fonts.hpp"
 #include "Shader.hpp"
 
 #include <epoch/core.hpp>
@@ -479,8 +480,13 @@ namespace epoch::frontend
 
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        // TODO: load a font scaled by scale
-        io.Fonts->AddFontDefault();
+        //io.Fonts->AddFontDefault();
+        const auto fontSize = std::floor(12.f * scale);
+        ImFontConfig fontConfig{};
+        fontConfig.OversampleH = fontConfig.OversampleV = 2.f;
+        // fontConfig.PixelSnapH = true;
+        io.Fonts->AddFontFromMemoryCompressedTTF(CousineFont_compressed_data, CousineFont_compressed_size, fontSize,
+                                                 &fontConfig, io.Fonts->GetGlyphRangesDefault());
         unsigned char* pixels;
         int width, height;
         io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);

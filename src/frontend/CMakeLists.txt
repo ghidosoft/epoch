@@ -6,6 +6,7 @@ add_library(epoch_frontend
     "src/AudioPlayer.cpp" "src/AudioPlayer.hpp"
     "src/CircularBuffer.hpp"
     "src/ConfigurableShader.cpp" "src/ConfigurableShader.hpp"
+    "src/Fonts.cpp" "src/Fonts.hpp"
     "src/GraphicContext.cpp" "src/GraphicContext.hpp"
     "src/Gui.cpp" "src/Gui.hpp"
     "src/Settings.cpp" "src/Settings.hpp"
