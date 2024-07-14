@@ -17,7 +17,10 @@
 #ifndef SRC_FRONTEND_FONTS_HPP_
 #define SRC_FRONTEND_FONTS_HPP_
 
-extern const unsigned int CousineFont_compressed_size;
-extern const unsigned int CousineFont_compressed_data[];
+namespace epoch::frontend
+{
+    extern const int CousineFont_compressed_size;
+    extern const unsigned int CousineFont_compressed_data[];
+}  // namespace epoch::frontend
 
 #endif

@@ -65,6 +65,9 @@ namespace epoch::frontend
         [[nodiscard]] const char* generateSettings() const;
 
     private:
+        static constexpr float FontSize = 13.f;
+
+    private:
         std::unique_ptr<Shader> m_shader{};
         GLuint m_vao{};
         GLuint m_vertexBuffer{}, m_indexBuffer{};

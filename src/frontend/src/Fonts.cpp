@@ -18,9 +18,8 @@
 
 // File: 'Cousine-Regular.ttf' (43912 bytes)
 // Exported using binary_to_compressed_c.cpp
-const unsigned int CousineFont_compressed_size = 37630;
-const unsigned int CousineFont_compressed_data[37632/4] =
-{
+const int epoch::frontend::CousineFont_compressed_size = 37630;
+const unsigned int epoch::frontend::CousineFont_compressed_data[37632 / 4] = {
     0x0000bc57, 0x00000000, 0x88ab0000, 0x00000400, 0x00010025, 0x82110000, 0x00042604, 0x49534410, 0x820d8247, 0x44ab210c, 0x082c0782, 0x4d544646, 
     0xc867e44e, 0x6cab0000, 0x1c280f82, 0x46454447, 0x04000501, 0x4c200f82, 0x202c0f82, 0x322f534f, 0x4f9e26f9, 0x98010000, 0x603c0f82, 0x70616d63, 
     0x9fad085d, 0xb0030000, 0x7a020000, 0x20747663, 0xb55e164d, 0xa0110000, 0x3c270f82, 0x6d677066, 0x8223d373, 0x2c062d1b, 0x05070000, 0x70736167, 

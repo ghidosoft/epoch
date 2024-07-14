@@ -481,7 +481,7 @@ namespace epoch::frontend
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
         //io.Fonts->AddFontDefault();
-        const auto fontSize = std::floor(12.f * scale);
+        const auto fontSize = std::floor(FontSize * scale);
         ImFontConfig fontConfig{};
         fontConfig.OversampleH = fontConfig.OversampleV = 2.f;
         // fontConfig.PixelSnapH = true;
