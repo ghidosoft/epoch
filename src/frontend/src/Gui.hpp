@@ -21,6 +21,7 @@
 
 #include <memory>
 
+struct ImFont;
 struct ImGuiContext;
 
 namespace epoch
@@ -64,12 +65,16 @@ namespace epoch::frontend
         [[nodiscard]] const char* generateSettings() const;
 
     private:
+        static constexpr float FontSize = 13.f;
+
+    private:
         std::unique_ptr<Shader> m_shader{};
         GLuint m_vao{};
         GLuint m_vertexBuffer{}, m_indexBuffer{};
         GLuint m_fontTexture{};
 
         ImGuiContext* m_context{};
+        ImFont* m_font{};
 
         float m_lastMouseX{}, m_lastMouseY{};
 
