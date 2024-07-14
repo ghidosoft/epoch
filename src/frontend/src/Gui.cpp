@@ -24,6 +24,7 @@
 #include <imgui.h>
 
 #include <cassert>
+#include <cmath>
 #include <stdexcept>
 
 static const char* IMGUI_VERTEX_SHADER = R"GLSL(
@@ -423,10 +424,7 @@ namespace epoch::frontend
         }
     }
 
-    void Gui::contentScaleEvent(const float scale) const
-    {
-        setupStyle(scale);
-    }
+    void Gui::contentScaleEvent(const float scale) const { setupStyle(scale); }
 
     void Gui::cursorEnterEvent(const bool entered)
     {
@@ -480,7 +478,7 @@ namespace epoch::frontend
 
         auto& io = ImGui::GetIO();
         io.Fonts->Clear();
-        //io.Fonts->AddFontDefault();
+        // io.Fonts->AddFontDefault();
         const auto fontSize = std::floor(FontSize * scale);
         ImFontConfig fontConfig{};
         fontConfig.OversampleH = fontConfig.OversampleV = 2.f;
